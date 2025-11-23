@@ -129,3 +129,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'proyecto.Usuario' # Indica que voy a sobreescribir user model al usuario que tengo en mi modelo

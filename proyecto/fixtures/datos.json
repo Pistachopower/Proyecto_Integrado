@@ -1,0 +1,6817 @@
+[
+{
+    "model": "auth.permission",
+    "pk": 1,
+    "fields": {
+        "name": "Can add log entry",
+        "content_type": 1,
+        "codename": "add_logentry"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 2,
+    "fields": {
+        "name": "Can change log entry",
+        "content_type": 1,
+        "codename": "change_logentry"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 3,
+    "fields": {
+        "name": "Can delete log entry",
+        "content_type": 1,
+        "codename": "delete_logentry"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 4,
+    "fields": {
+        "name": "Can view log entry",
+        "content_type": 1,
+        "codename": "view_logentry"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 5,
+    "fields": {
+        "name": "Can add permission",
+        "content_type": 2,
+        "codename": "add_permission"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 6,
+    "fields": {
+        "name": "Can change permission",
+        "content_type": 2,
+        "codename": "change_permission"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 7,
+    "fields": {
+        "name": "Can delete permission",
+        "content_type": 2,
+        "codename": "delete_permission"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 8,
+    "fields": {
+        "name": "Can view permission",
+        "content_type": 2,
+        "codename": "view_permission"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 9,
+    "fields": {
+        "name": "Can add group",
+        "content_type": 3,
+        "codename": "add_group"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 10,
+    "fields": {
+        "name": "Can change group",
+        "content_type": 3,
+        "codename": "change_group"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 11,
+    "fields": {
+        "name": "Can delete group",
+        "content_type": 3,
+        "codename": "delete_group"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 12,
+    "fields": {
+        "name": "Can view group",
+        "content_type": 3,
+        "codename": "view_group"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 13,
+    "fields": {
+        "name": "Can add content type",
+        "content_type": 4,
+        "codename": "add_contenttype"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 14,
+    "fields": {
+        "name": "Can change content type",
+        "content_type": 4,
+        "codename": "change_contenttype"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 15,
+    "fields": {
+        "name": "Can delete content type",
+        "content_type": 4,
+        "codename": "delete_contenttype"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 16,
+    "fields": {
+        "name": "Can view content type",
+        "content_type": 4,
+        "codename": "view_contenttype"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 17,
+    "fields": {
+        "name": "Can add session",
+        "content_type": 5,
+        "codename": "add_session"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 18,
+    "fields": {
+        "name": "Can change session",
+        "content_type": 5,
+        "codename": "change_session"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 19,
+    "fields": {
+        "name": "Can delete session",
+        "content_type": 5,
+        "codename": "delete_session"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 20,
+    "fields": {
+        "name": "Can view session",
+        "content_type": 5,
+        "codename": "view_session"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 21,
+    "fields": {
+        "name": "Can add descuento",
+        "content_type": 6,
+        "codename": "add_descuento"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 22,
+    "fields": {
+        "name": "Can change descuento",
+        "content_type": 6,
+        "codename": "change_descuento"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 23,
+    "fields": {
+        "name": "Can delete descuento",
+        "content_type": 6,
+        "codename": "delete_descuento"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 24,
+    "fields": {
+        "name": "Can view descuento",
+        "content_type": 6,
+        "codename": "view_descuento"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 25,
+    "fields": {
+        "name": "Can add linea pedido",
+        "content_type": 7,
+        "codename": "add_lineapedido"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 26,
+    "fields": {
+        "name": "Can change linea pedido",
+        "content_type": 7,
+        "codename": "change_lineapedido"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 27,
+    "fields": {
+        "name": "Can delete linea pedido",
+        "content_type": 7,
+        "codename": "delete_lineapedido"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 28,
+    "fields": {
+        "name": "Can view linea pedido",
+        "content_type": 7,
+        "codename": "view_lineapedido"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 29,
+    "fields": {
+        "name": "Can add pieza",
+        "content_type": 8,
+        "codename": "add_pieza"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 30,
+    "fields": {
+        "name": "Can change pieza",
+        "content_type": 8,
+        "codename": "change_pieza"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 31,
+    "fields": {
+        "name": "Can delete pieza",
+        "content_type": 8,
+        "codename": "delete_pieza"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 32,
+    "fields": {
+        "name": "Can view pieza",
+        "content_type": 8,
+        "codename": "view_pieza"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 33,
+    "fields": {
+        "name": "Can add tienda",
+        "content_type": 9,
+        "codename": "add_tienda"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 34,
+    "fields": {
+        "name": "Can change tienda",
+        "content_type": 9,
+        "codename": "change_tienda"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 35,
+    "fields": {
+        "name": "Can delete tienda",
+        "content_type": 9,
+        "codename": "delete_tienda"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 36,
+    "fields": {
+        "name": "Can view tienda",
+        "content_type": 9,
+        "codename": "view_tienda"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 37,
+    "fields": {
+        "name": "Can add user",
+        "content_type": 10,
+        "codename": "add_usuario"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 38,
+    "fields": {
+        "name": "Can change user",
+        "content_type": 10,
+        "codename": "change_usuario"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 39,
+    "fields": {
+        "name": "Can delete user",
+        "content_type": 10,
+        "codename": "delete_usuario"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 40,
+    "fields": {
+        "name": "Can view user",
+        "content_type": 10,
+        "codename": "view_usuario"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 41,
+    "fields": {
+        "name": "Can add cliente",
+        "content_type": 11,
+        "codename": "add_cliente"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 42,
+    "fields": {
+        "name": "Can change cliente",
+        "content_type": 11,
+        "codename": "change_cliente"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 43,
+    "fields": {
+        "name": "Can delete cliente",
+        "content_type": 11,
+        "codename": "delete_cliente"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 44,
+    "fields": {
+        "name": "Can view cliente",
+        "content_type": 11,
+        "codename": "view_cliente"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 45,
+    "fields": {
+        "name": "Can add cliente descuento",
+        "content_type": 12,
+        "codename": "add_clientedescuento"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 46,
+    "fields": {
+        "name": "Can change cliente descuento",
+        "content_type": 12,
+        "codename": "change_clientedescuento"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 47,
+    "fields": {
+        "name": "Can delete cliente descuento",
+        "content_type": 12,
+        "codename": "delete_clientedescuento"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 48,
+    "fields": {
+        "name": "Can view cliente descuento",
+        "content_type": 12,
+        "codename": "view_clientedescuento"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 49,
+    "fields": {
+        "name": "Can add devolucion",
+        "content_type": 13,
+        "codename": "add_devolucion"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 50,
+    "fields": {
+        "name": "Can change devolucion",
+        "content_type": 13,
+        "codename": "change_devolucion"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 51,
+    "fields": {
+        "name": "Can delete devolucion",
+        "content_type": 13,
+        "codename": "delete_devolucion"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 52,
+    "fields": {
+        "name": "Can view devolucion",
+        "content_type": 13,
+        "codename": "view_devolucion"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 53,
+    "fields": {
+        "name": "Can add lista deseos",
+        "content_type": 14,
+        "codename": "add_listadeseos"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 54,
+    "fields": {
+        "name": "Can change lista deseos",
+        "content_type": 14,
+        "codename": "change_listadeseos"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 55,
+    "fields": {
+        "name": "Can delete lista deseos",
+        "content_type": 14,
+        "codename": "delete_listadeseos"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 56,
+    "fields": {
+        "name": "Can view lista deseos",
+        "content_type": 14,
+        "codename": "view_listadeseos"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 57,
+    "fields": {
+        "name": "Can add metodo pago",
+        "content_type": 15,
+        "codename": "add_metodopago"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 58,
+    "fields": {
+        "name": "Can change metodo pago",
+        "content_type": 15,
+        "codename": "change_metodopago"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 59,
+    "fields": {
+        "name": "Can delete metodo pago",
+        "content_type": 15,
+        "codename": "delete_metodopago"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 60,
+    "fields": {
+        "name": "Can view metodo pago",
+        "content_type": 15,
+        "codename": "view_metodopago"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 61,
+    "fields": {
+        "name": "Can add cuenta bancaria",
+        "content_type": 16,
+        "codename": "add_cuentabancaria"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 62,
+    "fields": {
+        "name": "Can change cuenta bancaria",
+        "content_type": 16,
+        "codename": "change_cuentabancaria"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 63,
+    "fields": {
+        "name": "Can delete cuenta bancaria",
+        "content_type": 16,
+        "codename": "delete_cuentabancaria"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 64,
+    "fields": {
+        "name": "Can view cuenta bancaria",
+        "content_type": 16,
+        "codename": "view_cuentabancaria"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 65,
+    "fields": {
+        "name": "Can add billetera digital",
+        "content_type": 17,
+        "codename": "add_billeteradigital"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 66,
+    "fields": {
+        "name": "Can change billetera digital",
+        "content_type": 17,
+        "codename": "change_billeteradigital"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 67,
+    "fields": {
+        "name": "Can delete billetera digital",
+        "content_type": 17,
+        "codename": "delete_billeteradigital"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 68,
+    "fields": {
+        "name": "Can view billetera digital",
+        "content_type": 17,
+        "codename": "view_billeteradigital"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 69,
+    "fields": {
+        "name": "Can add pedido",
+        "content_type": 18,
+        "codename": "add_pedido"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 70,
+    "fields": {
+        "name": "Can change pedido",
+        "content_type": 18,
+        "codename": "change_pedido"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 71,
+    "fields": {
+        "name": "Can delete pedido",
+        "content_type": 18,
+        "codename": "delete_pedido"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 72,
+    "fields": {
+        "name": "Can view pedido",
+        "content_type": 18,
+        "codename": "view_pedido"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 73,
+    "fields": {
+        "name": "Can add pago",
+        "content_type": 19,
+        "codename": "add_pago"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 74,
+    "fields": {
+        "name": "Can change pago",
+        "content_type": 19,
+        "codename": "change_pago"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 75,
+    "fields": {
+        "name": "Can delete pago",
+        "content_type": 19,
+        "codename": "delete_pago"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 76,
+    "fields": {
+        "name": "Can view pago",
+        "content_type": 19,
+        "codename": "view_pago"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 77,
+    "fields": {
+        "name": "Can add lista deseos pieza",
+        "content_type": 20,
+        "codename": "add_listadeseospieza"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 78,
+    "fields": {
+        "name": "Can change lista deseos pieza",
+        "content_type": 20,
+        "codename": "change_listadeseospieza"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 79,
+    "fields": {
+        "name": "Can delete lista deseos pieza",
+        "content_type": 20,
+        "codename": "delete_listadeseospieza"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 80,
+    "fields": {
+        "name": "Can view lista deseos pieza",
+        "content_type": 20,
+        "codename": "view_listadeseospieza"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 81,
+    "fields": {
+        "name": "Can add tarjeta",
+        "content_type": 21,
+        "codename": "add_tarjeta"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 82,
+    "fields": {
+        "name": "Can change tarjeta",
+        "content_type": 21,
+        "codename": "change_tarjeta"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 83,
+    "fields": {
+        "name": "Can delete tarjeta",
+        "content_type": 21,
+        "codename": "delete_tarjeta"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 84,
+    "fields": {
+        "name": "Can view tarjeta",
+        "content_type": 21,
+        "codename": "view_tarjeta"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 85,
+    "fields": {
+        "name": "Can add inventario",
+        "content_type": 22,
+        "codename": "add_inventario"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 86,
+    "fields": {
+        "name": "Can change inventario",
+        "content_type": 22,
+        "codename": "change_inventario"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 87,
+    "fields": {
+        "name": "Can delete inventario",
+        "content_type": 22,
+        "codename": "delete_inventario"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 88,
+    "fields": {
+        "name": "Can view inventario",
+        "content_type": 22,
+        "codename": "view_inventario"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 89,
+    "fields": {
+        "name": "Can add valoracion",
+        "content_type": 23,
+        "codename": "add_valoracion"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 90,
+    "fields": {
+        "name": "Can change valoracion",
+        "content_type": 23,
+        "codename": "change_valoracion"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 91,
+    "fields": {
+        "name": "Can delete valoracion",
+        "content_type": 23,
+        "codename": "delete_valoracion"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 92,
+    "fields": {
+        "name": "Can view valoracion",
+        "content_type": 23,
+        "codename": "view_valoracion"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 93,
+    "fields": {
+        "name": "Can add vendedor",
+        "content_type": 24,
+        "codename": "add_vendedor"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 94,
+    "fields": {
+        "name": "Can change vendedor",
+        "content_type": 24,
+        "codename": "change_vendedor"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 95,
+    "fields": {
+        "name": "Can delete vendedor",
+        "content_type": 24,
+        "codename": "delete_vendedor"
+    }
+},
+{
+    "model": "auth.permission",
+    "pk": 96,
+    "fields": {
+        "name": "Can view vendedor",
+        "content_type": 24,
+        "codename": "view_vendedor"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 1,
+    "fields": {
+        "app_label": "admin",
+        "model": "logentry"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 2,
+    "fields": {
+        "app_label": "auth",
+        "model": "permission"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 3,
+    "fields": {
+        "app_label": "auth",
+        "model": "group"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 4,
+    "fields": {
+        "app_label": "contenttypes",
+        "model": "contenttype"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 5,
+    "fields": {
+        "app_label": "sessions",
+        "model": "session"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 6,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "descuento"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 7,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "lineapedido"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 8,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "pieza"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 9,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "tienda"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 10,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "usuario"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 11,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "cliente"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 12,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "clientedescuento"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 13,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "devolucion"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 14,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "listadeseos"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 15,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "metodopago"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 16,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "cuentabancaria"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 17,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "billeteradigital"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 18,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "pedido"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 19,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "pago"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 20,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "listadeseospieza"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 21,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "tarjeta"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 22,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "inventario"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 23,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "valoracion"
+    }
+},
+{
+    "model": "contenttypes.contenttype",
+    "pk": 24,
+    "fields": {
+        "app_label": "proyecto",
+        "model": "vendedor"
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 1,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:16.103Z",
+        "email": "admin@tienda.com",
+        "password_hash": "pbkdf2_sha256$870000$m9bsBRmvjyQC8HaLr7Wlto$i2MhNCn7j92xxGUXhgxt6mLfmnm6zk7+2e9afDO7nKM=",
+        "rol": "1",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 2,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "federicollamas",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:16.330Z",
+        "email": "federicollamas@example.org",
+        "password_hash": "pbkdf2_sha256$870000$ZxnObd7YnIUyOv4klJbaTm$tlmy945E7U54eJvXd2wX5t5jcuJQ6n2DwbouU25Ew6o=",
+        "rol": "2",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 3,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "ponciobayona",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:16.593Z",
+        "email": "ponciobayona@example.org",
+        "password_hash": "pbkdf2_sha256$870000$RmM7tggVTlmKEn5sZmc8Oa$k7NHZly0y+TOdapL9las3/lid16pJjxbmuSIy8//uf8=",
+        "rol": "2",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 4,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "tejadalope",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:16.861Z",
+        "email": "tejadalope@example.org",
+        "password_hash": "pbkdf2_sha256$870000$Hj5apVihmJarZCOPEtpfeR$+NItPyg1zZflbY8Ip8HeLdyxXCCe4NDZKhqz1zW29RQ=",
+        "rol": "2",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 5,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "expositofabio",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:17.133Z",
+        "email": "expositofabio@example.com",
+        "password_hash": "pbkdf2_sha256$870000$4cCrcZoHFrTmjOd9q7qwLs$4tuBrh7oK+XdVM7Ag1v4XeX8nu1K+BQh4AGrRYI+QFc=",
+        "rol": "2",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 6,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "fortunataasenjo",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:17.410Z",
+        "email": "fortunataasenjo@example.org",
+        "password_hash": "pbkdf2_sha256$870000$SLx6zt0diPiIjocTVtFVQF$HvC2NJqN8jM3gxoCi4iLroMTvqQ8JiECcZca/oKEagk=",
+        "rol": "2",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 7,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "pascualalmeida",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:17.672Z",
+        "email": "pascualalmeida@example.org",
+        "password_hash": "pbkdf2_sha256$870000$X4OojHAeC3a2gSrjuxXqcW$wTMRsRal5VC8ioV60WVXGBKMSGv8DAQQPL0qvL4sFgw=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 8,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "fmilla",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:17.932Z",
+        "email": "fmilla@example.net",
+        "password_hash": "pbkdf2_sha256$870000$2LmrbV1iTagpmOko6MWCNo$QUT5M4/CBRXEeC1ZUhPmK+FdheoiEYi6O429rQtyJ64=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 9,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "nacio39",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:18.193Z",
+        "email": "nacio39@example.com",
+        "password_hash": "pbkdf2_sha256$870000$jWcVdbTlOk9HIgyajHQ8YR$uLTQ6irv9ouqyrHN4fiwBEcstwZOjakgk5McUDfBmj8=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 10,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "qrocha",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:18.457Z",
+        "email": "qrocha@example.net",
+        "password_hash": "pbkdf2_sha256$870000$BgJFEcfUDkuKKUWCtwugAm$nrvK10ZdavaEc6jmYRg9pMTz/lqqzx6O5wRbbibnluk=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 11,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "correaxavier",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:18.719Z",
+        "email": "correaxavier@example.net",
+        "password_hash": "pbkdf2_sha256$870000$SDOEv9a5BtZDej4ElfCAcX$X5U7a+QJctXvLbeucBhm74NI9HD7Ctcr+pkBt102l1M=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 12,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "wledesma",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:18.979Z",
+        "email": "wledesma@example.net",
+        "password_hash": "pbkdf2_sha256$870000$vXc8H11KJr2ammqiFQfKRh$i6kBkfnj9ho66PtvSoYrlGYO1b1Kn91LcAO/JI7Y2JA=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 13,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "zborrell",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:19.239Z",
+        "email": "zborrell@example.net",
+        "password_hash": "pbkdf2_sha256$870000$pUC0l1XxyB6o15XXQtsy3e$B3J3endB2Aid/s/g236sVd0oqEHql25ByO8i85CZmq8=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 14,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "estebannilo",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:19.501Z",
+        "email": "estebannilo@example.net",
+        "password_hash": "pbkdf2_sha256$870000$vyEoCmq5FQEpzvKHMCpaQJ$0/Rfk4k00o+bi3ZNihC5NjHu9zhCuCaxJkhxqqlu8VU=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 15,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "rbaro",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:19.761Z",
+        "email": "rbaro@example.org",
+        "password_hash": "pbkdf2_sha256$870000$HdmJW4y7ZzdGe6p3I6pjQU$+CHczi02dkeWCgYKMgkcsue43Ssdwzy6/N0t4BfcJq0=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 16,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "ypuente",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:20.029Z",
+        "email": "ypuente@example.com",
+        "password_hash": "pbkdf2_sha256$870000$fKjG7VYNPJN6LULc0o7MgW$Ca+bb0rr7THVLku1PzMqOdlXQqV36n5HMUysDqRfG6g=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 17,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "nicodemo22",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:20.288Z",
+        "email": "nicodemo22@example.org",
+        "password_hash": "pbkdf2_sha256$870000$hZxu307QhMHISlbDw3fHeE$jhdNcUF8odkJMYx4XrBnX/jBJxAYXvT4qJGZm/7uICw=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 18,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "juanllamas",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:20.548Z",
+        "email": "juanllamas@example.net",
+        "password_hash": "pbkdf2_sha256$870000$dTz8yCfv49KNoeE50fX65k$nX7pp2lpTCDo3S+e6xLBUelE9n7NuC2ovlxfIZXlvks=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 19,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "bernardo03",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:20.809Z",
+        "email": "bernardo03@example.net",
+        "password_hash": "pbkdf2_sha256$870000$pLgNl1HuZs2lCGw4BJup47$X7+1ewvgLzFD1SQlVWAZkQLW5zoophjGj7oSlROsAM8=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 20,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "vito44",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:21.068Z",
+        "email": "vito44@example.net",
+        "password_hash": "pbkdf2_sha256$870000$UChBARHLU9iuC8WMBj9Bla$Ll24saPr8YzPLbgLMPNNEuOwdLqkfC0Y2bTLnTx6JTI=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 21,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "sborras",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:21.335Z",
+        "email": "sborras@example.net",
+        "password_hash": "pbkdf2_sha256$870000$0Xmt90KkA8sblgdAXzBGdh$uWD+CfFK/y3JzXvR7XvgxoGtIv1RVbLgu7faHIxRUHk=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 22,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "judith97",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:21.608Z",
+        "email": "judith97@example.org",
+        "password_hash": "pbkdf2_sha256$870000$64nvGZLQowgzxB1X99RwBR$HZiuOx4idCDFQUbfdtIER2GKaKJY/KEJs4PYloescjk=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 23,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "anabelabellan",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:21.875Z",
+        "email": "anabelabellan@example.com",
+        "password_hash": "pbkdf2_sha256$870000$Lu6RkYw3T9hxzLSHxB7RJv$76CmMDBoIMKixKAEXwhkfW6yIhMJumxHVdr7qcb6k2I=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 24,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "zmuniz",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:22.158Z",
+        "email": "zmuniz@example.net",
+        "password_hash": "pbkdf2_sha256$870000$Lh8JXHv4vxRyIE5LActZtV$8quFs3tAgPGxfVZEa4CjFFo4rUHnVo4fLwGNcJLf9xg=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 25,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "barberojuan-jose",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:22.440Z",
+        "email": "barberojuan-jose@example.net",
+        "password_hash": "pbkdf2_sha256$870000$EulHfgQ8t5FZZbtoKsVppP$pUT3DQxTzx0NcSG5A8HIp/GsggDpamFvQT/4EJAqtG8=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 26,
+    "fields": {
+        "password": "",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "cayetano82",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:27:22.739Z",
+        "email": "cayetano82@example.org",
+        "password_hash": "pbkdf2_sha256$870000$aYfG5nmz3qMDhM7Jz0a7VM$SSaKYhC8rrjBn2sCE8XrLb4RUFobOaEFvPUM9W7DHIw=",
+        "rol": "3",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 27,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$1Q80Q01Ts4fKWGwQsOZFN0$iws8iLnWz8EmCl7d/fOC5S+Q8ZGY0mFyjmW4jgwx7Rs=",
+        "last_login": null,
+        "is_superuser": true,
+        "username": "nelson",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2025-11-23T17:34:55.741Z",
+        "email": "ng@gmail.com",
+        "password_hash": "",
+        "rol": "",
+        "fecha_registro": "2025-11-23",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 1,
+    "fields": {
+        "usuario": 7,
+        "nombre": "Calixto",
+        "apellido": "Gil",
+        "telefono": "+34949 21 48 94",
+        "direccion": "Rambla Apolinar Vizcaíno 77 Piso 4 \nOurense, 48706",
+        "fecha_nacimiento": "1954-11-29"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 2,
+    "fields": {
+        "usuario": 8,
+        "nombre": "Eulalia",
+        "apellido": "Vazquez",
+        "telefono": "+34 980 506 305",
+        "direccion": "Cuesta de Benigno Sáenz 894 Apt. 20 \nSevilla, 28241",
+        "fecha_nacimiento": "1974-07-09"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 3,
+    "fields": {
+        "usuario": 9,
+        "nombre": "Edu",
+        "apellido": "Díez",
+        "telefono": "+34880309725",
+        "direccion": "Acceso Chucho Díez 98\nCiudad, 32729",
+        "fecha_nacimiento": "1988-02-13"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 4,
+    "fields": {
+        "usuario": 10,
+        "nombre": "Pastor",
+        "apellido": "Sala",
+        "telefono": "+34 741 39 80 34",
+        "direccion": "Alameda de Ildefonso Crespi 11 Puerta 6 \nGranada, 42801",
+        "fecha_nacimiento": "1982-07-20"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 5,
+    "fields": {
+        "usuario": 11,
+        "nombre": "Evita",
+        "apellido": "Nogueira",
+        "telefono": "+34 876677606",
+        "direccion": "Glorieta Fortunato Gimenez 95 Piso 8 \nCádiz, 30056",
+        "fecha_nacimiento": "1999-07-07"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 6,
+    "fields": {
+        "usuario": 12,
+        "nombre": "Carlota",
+        "apellido": "Arjona",
+        "telefono": "+34 948 265 594",
+        "direccion": "Acceso Gerónimo Vigil 532 Piso 4 \nCeuta, 01678",
+        "fecha_nacimiento": "1951-08-08"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 7,
+    "fields": {
+        "usuario": 13,
+        "nombre": "Belen",
+        "apellido": "Gonzalo",
+        "telefono": "+34 843086481",
+        "direccion": "Cañada María Dolores Lamas 233\nLa Rioja, 14862",
+        "fecha_nacimiento": "2007-10-30"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 8,
+    "fields": {
+        "usuario": 14,
+        "nombre": "Sigfrido",
+        "apellido": "Álvarez",
+        "telefono": "+34 941969971",
+        "direccion": "C. de Baudelio Giner 17 Puerta 3 \nAlmería, 36013",
+        "fecha_nacimiento": "1990-04-29"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 9,
+    "fields": {
+        "usuario": 15,
+        "nombre": "Borja",
+        "apellido": "Barral",
+        "telefono": "+34 985 809 006",
+        "direccion": "Alameda Paca Español 142\nMadrid, 36441",
+        "fecha_nacimiento": "1957-07-27"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 10,
+    "fields": {
+        "usuario": 16,
+        "nombre": "Judith",
+        "apellido": "Calderon",
+        "telefono": "+34 974 54 36 80",
+        "direccion": "Pasadizo de Ainara Ángel 65\nCiudad, 50874",
+        "fecha_nacimiento": "1949-11-28"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 11,
+    "fields": {
+        "usuario": 17,
+        "nombre": "Amalia",
+        "apellido": "Chacón",
+        "telefono": "+34 947628442",
+        "direccion": "Callejón Natalia Sáez 49\nOurense, 50216",
+        "fecha_nacimiento": "1954-04-02"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 12,
+    "fields": {
+        "usuario": 18,
+        "nombre": "Sabina",
+        "apellido": "Tomé",
+        "telefono": "+34 824 11 42 20",
+        "direccion": "Urbanización Maximiano Calderon 62 Piso 0 \nCantabria, 16111",
+        "fecha_nacimiento": "1991-05-31"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 13,
+    "fields": {
+        "usuario": 19,
+        "nombre": "Ana",
+        "apellido": "Castillo",
+        "telefono": "+34 943 384 409",
+        "direccion": "Acceso de Berta Múgica 23 Apt. 54 \nCeuta, 46507",
+        "fecha_nacimiento": "2003-07-19"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 14,
+    "fields": {
+        "usuario": 20,
+        "nombre": "Eligia",
+        "apellido": "Godoy",
+        "telefono": "+34987 086 540",
+        "direccion": "Calle Marcelo Jordá 878 Apt. 89 \nMelilla, 27081",
+        "fecha_nacimiento": "1991-12-02"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 15,
+    "fields": {
+        "usuario": 21,
+        "nombre": "Martina",
+        "apellido": "Aragonés",
+        "telefono": "+34803643634",
+        "direccion": "Calle de Moisés Briones 716\nTarragona, 27349",
+        "fecha_nacimiento": "1961-06-03"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 16,
+    "fields": {
+        "usuario": 22,
+        "nombre": "Victoriano",
+        "apellido": "Casals",
+        "telefono": "+34901 394 279",
+        "direccion": "Plaza Camilo Terrón 375\nVizcaya, 09301",
+        "fecha_nacimiento": "1945-01-30"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 17,
+    "fields": {
+        "usuario": 23,
+        "nombre": "Nazario",
+        "apellido": "Salmerón",
+        "telefono": "+34828 726 553",
+        "direccion": "Callejón de Jesusa Bonet 8 Piso 5 \nCórdoba, 27761",
+        "fecha_nacimiento": "1996-06-07"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 18,
+    "fields": {
+        "usuario": 24,
+        "nombre": "Rosenda",
+        "apellido": "Medina",
+        "telefono": "+34859 21 06 68",
+        "direccion": "Cuesta Eutropio Vives 525\nLas Palmas, 50491",
+        "fecha_nacimiento": "1978-11-11"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 19,
+    "fields": {
+        "usuario": 25,
+        "nombre": "Zaira",
+        "apellido": "Varela",
+        "telefono": "+34732 55 76 51",
+        "direccion": "Via de Carlota Izaguirre 308 Piso 8 \nTarragona, 44381",
+        "fecha_nacimiento": "1982-11-10"
+    }
+},
+{
+    "model": "proyecto.cliente",
+    "pk": 20,
+    "fields": {
+        "usuario": 26,
+        "nombre": "Quique",
+        "apellido": "Alemán",
+        "telefono": "+34 922 35 86 03",
+        "direccion": "Calle Amancio Sarmiento 32\nZamora, 22992",
+        "fecha_nacimiento": "2006-03-02"
+    }
+},
+{
+    "model": "proyecto.tienda",
+    "pk": 1,
+    "fields": {
+        "nombre": "Tienda Murcia",
+        "direccion": "Avenida de Carina Villalobos 7\nLa Rioja, 13931",
+        "telefono": "+34 950 62 10 51",
+        "email": "jose-ignacio99@hotel.es",
+        "horario": "09:00 - 18:00"
+    }
+},
+{
+    "model": "proyecto.tienda",
+    "pk": 2,
+    "fields": {
+        "nombre": "Tienda Córdoba",
+        "direccion": "Rambla de Anselma Cantero 166\nHuesca, 11318",
+        "telefono": "+34728891047",
+        "email": "ayllonpriscila@esteban.com",
+        "horario": "09:00 - 18:00"
+    }
+},
+{
+    "model": "proyecto.tienda",
+    "pk": 3,
+    "fields": {
+        "nombre": "Tienda Ceuta",
+        "direccion": "Via María Manuela Rojas 71 Piso 5 \nVizcaya, 10130",
+        "telefono": "+34 922 910 409",
+        "email": "paulino97@banco.es",
+        "horario": "09:00 - 18:00"
+    }
+},
+{
+    "model": "proyecto.vendedor",
+    "pk": 1,
+    "fields": {
+        "usuario": 2,
+        "tienda": 3,
+        "nombre": "Lilia",
+        "apellido": "Alegria",
+        "telefono": "+34 978 942 883",
+        "direccion": "Vial Asunción Rosa 7 Apt. 87 \nCiudad, 14100",
+        "fecha_nacimiento": "1980-12-12",
+        "fecha_contratacion": "2025-03-03",
+        "comision_porcentaje": "2.00"
+    }
+},
+{
+    "model": "proyecto.vendedor",
+    "pk": 2,
+    "fields": {
+        "usuario": 3,
+        "tienda": 1,
+        "nombre": "Custodia",
+        "apellido": "Valero",
+        "telefono": "+34 821 86 96 38",
+        "direccion": "Rambla Germán Figueras 87\nOurense, 28518",
+        "fecha_nacimiento": "1996-08-15",
+        "fecha_contratacion": "2024-03-19",
+        "comision_porcentaje": "6.00"
+    }
+},
+{
+    "model": "proyecto.vendedor",
+    "pk": 3,
+    "fields": {
+        "usuario": 4,
+        "tienda": 2,
+        "nombre": "Martin",
+        "apellido": "Barreda",
+        "telefono": "+34 947 594 226",
+        "direccion": "Vial de Guiomar Gual 22 Piso 2 \nCantabria, 40886",
+        "fecha_nacimiento": "1973-02-04",
+        "fecha_contratacion": "2023-01-14",
+        "comision_porcentaje": "3.00"
+    }
+},
+{
+    "model": "proyecto.vendedor",
+    "pk": 4,
+    "fields": {
+        "usuario": 5,
+        "tienda": 1,
+        "nombre": "Clemente",
+        "apellido": "Santiago",
+        "telefono": "+34921 801 711",
+        "direccion": "Pasadizo Víctor Matas 2\nJaén, 10504",
+        "fecha_nacimiento": "2000-06-21",
+        "fecha_contratacion": "2024-12-09",
+        "comision_porcentaje": "5.00"
+    }
+},
+{
+    "model": "proyecto.vendedor",
+    "pk": 5,
+    "fields": {
+        "usuario": 6,
+        "tienda": 1,
+        "nombre": "Virginia",
+        "apellido": "Madrigal",
+        "telefono": "+34835 72 50 22",
+        "direccion": "Pasaje Octavia Benítez 68\nAlbacete, 21085",
+        "fecha_nacimiento": "1966-04-12",
+        "fecha_contratacion": "2025-10-27",
+        "comision_porcentaje": "7.00"
+    }
+},
+{
+    "model": "proyecto.pieza",
+    "pk": 1,
+    "fields": {
+        "nombre": "Radiador",
+        "referencia": "REF-6948",
+        "version": "v3",
+        "marca": "Volkswagen",
+        "anio": 2006,
+        "estado": "2",
+        "precio_base": "443.00",
+        "descripcion": "Señaló momentos pequeño pero habla antes. Hablar construcción cómo esa efectos imposible quizá. Carrera creación manera gran.\nReunión vivir hacen medio suelo otro duda."
+    }
+},
+{
+    "model": "proyecto.pieza",
+    "pk": 2,
+    "fields": {
+        "nombre": "Caja de cambios",
+        "referencia": "REF-7944",
+        "version": "v4",
+        "marca": "Volkswagen",
+        "anio": 2009,
+        "estado": "2",
+        "precio_base": "573.00",
+        "descripcion": "Idea unas asunto sistemas un político meses.\nEstar según ejército quién cara. Si objetivo luis algún año debido. Pedro comercio acto sí."
+    }
+},
+{
+    "model": "proyecto.pieza",
+    "pk": 3,
+    "fields": {
+        "nombre": "Bomba de agua",
+        "referencia": "REF-4860",
+        "version": "v2",
+        "marca": "BMW",
+        "anio": 2002,
+        "estado": "3",
+        "precio_base": "773.00",
+        "descripcion": "Estuvo barcelona superior quedó armas. Meses fiscal dolor cuya quien. Cuenta camino plazo suelo proyectos superior al. Humano nuevas cuba alguien."
+    }
+},
+{
+    "model": "proyecto.pieza",
+    "pk": 4,
+    "fields": {
+        "nombre": "Motor",
+        "referencia": "REF-8912",
+        "version": "v1",
+        "marca": "Volkswagen",
+        "anio": 2002,
+        "estado": "2",
+        "precio_base": "808.00",
+        "descripcion": "Iba cómo trabajar. Recuerdo un resto aquellos mediante fuego esas.\nRespecto estudio ahí necesario política diversos sociedad grupo. Largo me información desarrollo. Costa pronto llamado usted hizo."
+    }
+},
+{
+    "model": "proyecto.pieza",
+    "pk": 5,
+    "fields": {
+        "nombre": "Amortiguador",
+        "referencia": "REF-1372",
+        "version": "v2",
+        "marca": "Ford",
+        "anio": 2024,
+        "estado": "3",
+        "precio_base": "1168.00",
+        "descripcion": "Incluso llevar ahí sólo diario centros. Palabras esfuerzo posición llegó práctica cultural estos.\nÉl hasta tiempo nada. Año común dólares resto podemos pablo. Incluso final nuevo quiere sabía cosa."
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 1,
+    "fields": {
+        "pieza": 1,
+        "tienda": 1,
+        "stock": 16,
+        "precio_venta": "611.72",
+        "ubicacion_almacen": "Estante L"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 2,
+    "fields": {
+        "pieza": 2,
+        "tienda": 1,
+        "stock": 10,
+        "precio_venta": "803.23",
+        "ubicacion_almacen": "Estante O"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 3,
+    "fields": {
+        "pieza": 3,
+        "tienda": 1,
+        "stock": 5,
+        "precio_venta": "965.98",
+        "ubicacion_almacen": "Estante O"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 4,
+    "fields": {
+        "pieza": 4,
+        "tienda": 1,
+        "stock": 8,
+        "precio_venta": "991.79",
+        "ubicacion_almacen": "Estante Z"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 5,
+    "fields": {
+        "pieza": 5,
+        "tienda": 1,
+        "stock": 2,
+        "precio_venta": "1708.45",
+        "ubicacion_almacen": "Estante N"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 6,
+    "fields": {
+        "pieza": 1,
+        "tienda": 2,
+        "stock": 9,
+        "precio_venta": "619.19",
+        "ubicacion_almacen": "Estante L"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 7,
+    "fields": {
+        "pieza": 2,
+        "tienda": 2,
+        "stock": 3,
+        "precio_venta": "658.41",
+        "ubicacion_almacen": "Estante L"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 8,
+    "fields": {
+        "pieza": 3,
+        "tienda": 2,
+        "stock": 14,
+        "precio_venta": "979.97",
+        "ubicacion_almacen": "Estante T"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 9,
+    "fields": {
+        "pieza": 4,
+        "tienda": 2,
+        "stock": 20,
+        "precio_venta": "930.10",
+        "ubicacion_almacen": "Estante Q"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 10,
+    "fields": {
+        "pieza": 5,
+        "tienda": 2,
+        "stock": 17,
+        "precio_venta": "1703.01",
+        "ubicacion_almacen": "Estante I"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 11,
+    "fields": {
+        "pieza": 1,
+        "tienda": 3,
+        "stock": 13,
+        "precio_venta": "584.82",
+        "ubicacion_almacen": "Estante H"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 12,
+    "fields": {
+        "pieza": 2,
+        "tienda": 3,
+        "stock": 5,
+        "precio_venta": "639.69",
+        "ubicacion_almacen": "Estante Y"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 13,
+    "fields": {
+        "pieza": 3,
+        "tienda": 3,
+        "stock": 12,
+        "precio_venta": "1041.84",
+        "ubicacion_almacen": "Estante J"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 14,
+    "fields": {
+        "pieza": 4,
+        "tienda": 3,
+        "stock": 0,
+        "precio_venta": "1049.58",
+        "ubicacion_almacen": "Estante Y"
+    }
+},
+{
+    "model": "proyecto.inventario",
+    "pk": 15,
+    "fields": {
+        "pieza": 5,
+        "tienda": 3,
+        "stock": 18,
+        "precio_venta": "1376.01",
+        "ubicacion_almacen": "Estante D"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 1,
+    "fields": {
+        "cliente": 17,
+        "tienda": 3,
+        "vendedor": 1,
+        "fecha_pedido": "2025-04-14",
+        "direccion_envio": "Callejón de Jesusa Bonet 8 Piso 5 \nCórdoba, 27761",
+        "estado": "5",
+        "total": "5962.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 2,
+    "fields": {
+        "cliente": 18,
+        "tienda": 1,
+        "vendedor": 5,
+        "fecha_pedido": "2025-02-27",
+        "direccion_envio": "Cuesta Eutropio Vives 525\nLas Palmas, 50491",
+        "estado": "1",
+        "total": "1681.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 3,
+    "fields": {
+        "cliente": 13,
+        "tienda": 3,
+        "vendedor": 3,
+        "fecha_pedido": "2025-07-24",
+        "direccion_envio": "Acceso de Berta Múgica 23 Apt. 54 \nCeuta, 46507",
+        "estado": "1",
+        "total": "11234.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 4,
+    "fields": {
+        "cliente": 16,
+        "tienda": 2,
+        "vendedor": 5,
+        "fecha_pedido": "2025-01-05",
+        "direccion_envio": "Plaza Camilo Terrón 375\nVizcaya, 09301",
+        "estado": "1",
+        "total": "3444.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 5,
+    "fields": {
+        "cliente": 6,
+        "tienda": 1,
+        "vendedor": 1,
+        "fecha_pedido": "2025-02-28",
+        "direccion_envio": "Acceso Gerónimo Vigil 532 Piso 4 \nCeuta, 01678",
+        "estado": "4",
+        "total": "2262.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 6,
+    "fields": {
+        "cliente": 4,
+        "tienda": 1,
+        "vendedor": 3,
+        "fecha_pedido": "2025-03-27",
+        "direccion_envio": "Alameda de Ildefonso Crespi 11 Puerta 6 \nGranada, 42801",
+        "estado": "2",
+        "total": "9747.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 7,
+    "fields": {
+        "cliente": 15,
+        "tienda": 3,
+        "vendedor": 5,
+        "fecha_pedido": "2025-04-05",
+        "direccion_envio": "Calle de Moisés Briones 716\nTarragona, 27349",
+        "estado": "4",
+        "total": "5424.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 8,
+    "fields": {
+        "cliente": 4,
+        "tienda": 1,
+        "vendedor": 4,
+        "fecha_pedido": "2025-08-17",
+        "direccion_envio": "Alameda de Ildefonso Crespi 11 Puerta 6 \nGranada, 42801",
+        "estado": "4",
+        "total": "4068.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 9,
+    "fields": {
+        "cliente": 14,
+        "tienda": 2,
+        "vendedor": 5,
+        "fecha_pedido": "2025-02-04",
+        "direccion_envio": "Calle Marcelo Jordá 878 Apt. 89 \nMelilla, 27081",
+        "estado": "2",
+        "total": "7345.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 10,
+    "fields": {
+        "cliente": 16,
+        "tienda": 3,
+        "vendedor": 4,
+        "fecha_pedido": "2025-04-16",
+        "direccion_envio": "Plaza Camilo Terrón 375\nVizcaya, 09301",
+        "estado": "4",
+        "total": "2331.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 11,
+    "fields": {
+        "cliente": 19,
+        "tienda": 1,
+        "vendedor": 2,
+        "fecha_pedido": "2025-09-01",
+        "direccion_envio": "Via de Carlota Izaguirre 308 Piso 8 \nTarragona, 44381",
+        "estado": "3",
+        "total": "7593.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 12,
+    "fields": {
+        "cliente": 6,
+        "tienda": 2,
+        "vendedor": 4,
+        "fecha_pedido": "2025-11-21",
+        "direccion_envio": "Acceso Gerónimo Vigil 532 Piso 4 \nCeuta, 01678",
+        "estado": "1",
+        "total": "7482.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 13,
+    "fields": {
+        "cliente": 14,
+        "tienda": 2,
+        "vendedor": 3,
+        "fecha_pedido": "2025-08-17",
+        "direccion_envio": "Calle Marcelo Jordá 878 Apt. 89 \nMelilla, 27081",
+        "estado": "3",
+        "total": "4295.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 14,
+    "fields": {
+        "cliente": 4,
+        "tienda": 1,
+        "vendedor": 3,
+        "fecha_pedido": "2025-11-04",
+        "direccion_envio": "Alameda de Ildefonso Crespi 11 Puerta 6 \nGranada, 42801",
+        "estado": "3",
+        "total": "6185.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 15,
+    "fields": {
+        "cliente": 2,
+        "tienda": 2,
+        "vendedor": 3,
+        "fecha_pedido": "2025-02-25",
+        "direccion_envio": "Cuesta de Benigno Sáenz 894 Apt. 20 \nSevilla, 28241",
+        "estado": "5",
+        "total": "11840.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 16,
+    "fields": {
+        "cliente": 13,
+        "tienda": 2,
+        "vendedor": 4,
+        "fecha_pedido": "2025-11-03",
+        "direccion_envio": "Acceso de Berta Múgica 23 Apt. 54 \nCeuta, 46507",
+        "estado": "1",
+        "total": "2075.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 17,
+    "fields": {
+        "cliente": 20,
+        "tienda": 3,
+        "vendedor": 4,
+        "fecha_pedido": "2025-02-25",
+        "direccion_envio": "Calle Amancio Sarmiento 32\nZamora, 22992",
+        "estado": "4",
+        "total": "5927.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 18,
+    "fields": {
+        "cliente": 3,
+        "tienda": 2,
+        "vendedor": 3,
+        "fecha_pedido": "2025-04-20",
+        "direccion_envio": "Acceso Chucho Díez 98\nCiudad, 32729",
+        "estado": "4",
+        "total": "6177.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 19,
+    "fields": {
+        "cliente": 4,
+        "tienda": 1,
+        "vendedor": 2,
+        "fecha_pedido": "2025-03-12",
+        "direccion_envio": "Alameda de Ildefonso Crespi 11 Puerta 6 \nGranada, 42801",
+        "estado": "2",
+        "total": "1641.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 20,
+    "fields": {
+        "cliente": 6,
+        "tienda": 1,
+        "vendedor": 2,
+        "fecha_pedido": "2025-07-14",
+        "direccion_envio": "Acceso Gerónimo Vigil 532 Piso 4 \nCeuta, 01678",
+        "estado": "3",
+        "total": "10244.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 21,
+    "fields": {
+        "cliente": 12,
+        "tienda": 1,
+        "vendedor": 3,
+        "fecha_pedido": "2025-09-17",
+        "direccion_envio": "Urbanización Maximiano Calderon 62 Piso 0 \nCantabria, 16111",
+        "estado": "5",
+        "total": "2141.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 22,
+    "fields": {
+        "cliente": 1,
+        "tienda": 2,
+        "vendedor": 4,
+        "fecha_pedido": "2025-04-20",
+        "direccion_envio": "Rambla Apolinar Vizcaíno 77 Piso 4 \nOurense, 48706",
+        "estado": "4",
+        "total": "2962.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 23,
+    "fields": {
+        "cliente": 6,
+        "tienda": 2,
+        "vendedor": 3,
+        "fecha_pedido": "2025-05-14",
+        "direccion_envio": "Acceso Gerónimo Vigil 532 Piso 4 \nCeuta, 01678",
+        "estado": "1",
+        "total": "5476.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 24,
+    "fields": {
+        "cliente": 2,
+        "tienda": 2,
+        "vendedor": 2,
+        "fecha_pedido": "2025-07-12",
+        "direccion_envio": "Cuesta de Benigno Sáenz 894 Apt. 20 \nSevilla, 28241",
+        "estado": "4",
+        "total": "1798.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 25,
+    "fields": {
+        "cliente": 7,
+        "tienda": 2,
+        "vendedor": 5,
+        "fecha_pedido": "2025-01-13",
+        "direccion_envio": "Cañada María Dolores Lamas 233\nLa Rioja, 14862",
+        "estado": "4",
+        "total": "5811.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 26,
+    "fields": {
+        "cliente": 19,
+        "tienda": 2,
+        "vendedor": 3,
+        "fecha_pedido": "2025-08-07",
+        "direccion_envio": "Via de Carlota Izaguirre 308 Piso 8 \nTarragona, 44381",
+        "estado": "4",
+        "total": "3495.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 27,
+    "fields": {
+        "cliente": 2,
+        "tienda": 2,
+        "vendedor": 1,
+        "fecha_pedido": "2025-08-12",
+        "direccion_envio": "Cuesta de Benigno Sáenz 894 Apt. 20 \nSevilla, 28241",
+        "estado": "3",
+        "total": "2808.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 28,
+    "fields": {
+        "cliente": 12,
+        "tienda": 2,
+        "vendedor": 1,
+        "fecha_pedido": "2025-09-20",
+        "direccion_envio": "Urbanización Maximiano Calderon 62 Piso 0 \nCantabria, 16111",
+        "estado": "3",
+        "total": "6550.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 29,
+    "fields": {
+        "cliente": 8,
+        "tienda": 1,
+        "vendedor": 2,
+        "fecha_pedido": "2025-10-14",
+        "direccion_envio": "C. de Baudelio Giner 17 Puerta 3 \nAlmería, 36013",
+        "estado": "3",
+        "total": "4243.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 30,
+    "fields": {
+        "cliente": 3,
+        "tienda": 2,
+        "vendedor": 3,
+        "fecha_pedido": "2025-10-28",
+        "direccion_envio": "Acceso Chucho Díez 98\nCiudad, 32729",
+        "estado": "2",
+        "total": "3672.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 31,
+    "fields": {
+        "cliente": 19,
+        "tienda": 2,
+        "vendedor": 3,
+        "fecha_pedido": "2025-10-25",
+        "direccion_envio": "Via de Carlota Izaguirre 308 Piso 8 \nTarragona, 44381",
+        "estado": "4",
+        "total": "5256.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 32,
+    "fields": {
+        "cliente": 11,
+        "tienda": 1,
+        "vendedor": 5,
+        "fecha_pedido": "2025-06-25",
+        "direccion_envio": "Callejón Natalia Sáez 49\nOurense, 50216",
+        "estado": "5",
+        "total": "7099.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 33,
+    "fields": {
+        "cliente": 16,
+        "tienda": 1,
+        "vendedor": 1,
+        "fecha_pedido": "2025-04-08",
+        "direccion_envio": "Plaza Camilo Terrón 375\nVizcaya, 09301",
+        "estado": "1",
+        "total": "7097.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 34,
+    "fields": {
+        "cliente": 14,
+        "tienda": 3,
+        "vendedor": 3,
+        "fecha_pedido": "2025-02-09",
+        "direccion_envio": "Calle Marcelo Jordá 878 Apt. 89 \nMelilla, 27081",
+        "estado": "5",
+        "total": "3320.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 35,
+    "fields": {
+        "cliente": 15,
+        "tienda": 2,
+        "vendedor": 1,
+        "fecha_pedido": "2025-08-09",
+        "direccion_envio": "Calle de Moisés Briones 716\nTarragona, 27349",
+        "estado": "4",
+        "total": "1159.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 36,
+    "fields": {
+        "cliente": 18,
+        "tienda": 2,
+        "vendedor": 5,
+        "fecha_pedido": "2025-09-07",
+        "direccion_envio": "Cuesta Eutropio Vives 525\nLas Palmas, 50491",
+        "estado": "2",
+        "total": "2310.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 37,
+    "fields": {
+        "cliente": 16,
+        "tienda": 2,
+        "vendedor": 1,
+        "fecha_pedido": "2025-08-24",
+        "direccion_envio": "Plaza Camilo Terrón 375\nVizcaya, 09301",
+        "estado": "2",
+        "total": "6538.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 38,
+    "fields": {
+        "cliente": 10,
+        "tienda": 2,
+        "vendedor": 2,
+        "fecha_pedido": "2025-06-04",
+        "direccion_envio": "Pasadizo de Ainara Ángel 65\nCiudad, 50874",
+        "estado": "3",
+        "total": "5042.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 39,
+    "fields": {
+        "cliente": 4,
+        "tienda": 1,
+        "vendedor": 3,
+        "fecha_pedido": "2025-07-09",
+        "direccion_envio": "Alameda de Ildefonso Crespi 11 Puerta 6 \nGranada, 42801",
+        "estado": "5",
+        "total": "7304.00"
+    }
+},
+{
+    "model": "proyecto.pedido",
+    "pk": 40,
+    "fields": {
+        "cliente": 12,
+        "tienda": 2,
+        "vendedor": 1,
+        "fecha_pedido": "2025-10-08",
+        "direccion_envio": "Urbanización Maximiano Calderon 62 Piso 0 \nCantabria, 16111",
+        "estado": "4",
+        "total": "2482.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 1,
+    "fields": {
+        "pedido": 1,
+        "pieza": 5,
+        "cantidad": 1,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "17.00",
+        "subtotal": "1151.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 2,
+    "fields": {
+        "pedido": 1,
+        "pieza": 3,
+        "cantidad": 2,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "2.00",
+        "subtotal": "1542.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 3,
+    "fields": {
+        "pedido": 1,
+        "pieza": 1,
+        "cantidad": 2,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "13.00",
+        "subtotal": "860.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 4,
+    "fields": {
+        "pedido": 1,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "5.00",
+        "subtotal": "2409.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 5,
+    "fields": {
+        "pedido": 2,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "13.00",
+        "subtotal": "795.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 6,
+    "fields": {
+        "pedido": 2,
+        "pieza": 1,
+        "cantidad": 2,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "0.00",
+        "subtotal": "886.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 7,
+    "fields": {
+        "pedido": 3,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "2.00",
+        "subtotal": "806.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 8,
+    "fields": {
+        "pedido": 3,
+        "pieza": 5,
+        "cantidad": 3,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "13.00",
+        "subtotal": "3465.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 9,
+    "fields": {
+        "pedido": 3,
+        "pieza": 5,
+        "cantidad": 3,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "12.00",
+        "subtotal": "3468.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 10,
+    "fields": {
+        "pedido": 3,
+        "pieza": 5,
+        "cantidad": 3,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "3.00",
+        "subtotal": "3495.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 11,
+    "fields": {
+        "pedido": 4,
+        "pieza": 5,
+        "cantidad": 3,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "3444.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 12,
+    "fields": {
+        "pedido": 5,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "19.00",
+        "subtotal": "2262.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 13,
+    "fields": {
+        "pedido": 6,
+        "pieza": 1,
+        "cantidad": 3,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "8.00",
+        "subtotal": "1305.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 14,
+    "fields": {
+        "pedido": 6,
+        "pieza": 5,
+        "cantidad": 3,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "17.00",
+        "subtotal": "3453.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 15,
+    "fields": {
+        "pedido": 6,
+        "pieza": 5,
+        "cantidad": 1,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "1148.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 16,
+    "fields": {
+        "pedido": 6,
+        "pieza": 4,
+        "cantidad": 2,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "17.00",
+        "subtotal": "1582.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 17,
+    "fields": {
+        "pedido": 6,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "2259.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 18,
+    "fields": {
+        "pedido": 7,
+        "pieza": 5,
+        "cantidad": 1,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "17.00",
+        "subtotal": "1151.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 19,
+    "fields": {
+        "pedido": 7,
+        "pieza": 4,
+        "cantidad": 2,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "6.00",
+        "subtotal": "1604.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 20,
+    "fields": {
+        "pedido": 7,
+        "pieza": 5,
+        "cantidad": 1,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "15.00",
+        "subtotal": "1153.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 21,
+    "fields": {
+        "pedido": 7,
+        "pieza": 3,
+        "cantidad": 2,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "15.00",
+        "subtotal": "1516.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 22,
+    "fields": {
+        "pedido": 8,
+        "pieza": 2,
+        "cantidad": 3,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "17.00",
+        "subtotal": "1668.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 23,
+    "fields": {
+        "pedido": 8,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "8.00",
+        "subtotal": "2400.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 24,
+    "fields": {
+        "pedido": 9,
+        "pieza": 5,
+        "cantidad": 3,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "5.00",
+        "subtotal": "3489.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 25,
+    "fields": {
+        "pedido": 9,
+        "pieza": 2,
+        "cantidad": 1,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "8.00",
+        "subtotal": "565.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 26,
+    "fields": {
+        "pedido": 9,
+        "pieza": 1,
+        "cantidad": 2,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "5.00",
+        "subtotal": "876.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 27,
+    "fields": {
+        "pedido": 9,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "3.00",
+        "subtotal": "2415.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 28,
+    "fields": {
+        "pedido": 10,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "1.00",
+        "subtotal": "807.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 29,
+    "fields": {
+        "pedido": 10,
+        "pieza": 3,
+        "cantidad": 2,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "11.00",
+        "subtotal": "1524.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 30,
+    "fields": {
+        "pedido": 11,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "11.00",
+        "subtotal": "797.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 31,
+    "fields": {
+        "pedido": 11,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "6.00",
+        "subtotal": "2406.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 32,
+    "fields": {
+        "pedido": 11,
+        "pieza": 1,
+        "cantidad": 3,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "12.00",
+        "subtotal": "1293.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 33,
+    "fields": {
+        "pedido": 11,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "9.00",
+        "subtotal": "799.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 34,
+    "fields": {
+        "pedido": 11,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "7.00",
+        "subtotal": "2298.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 35,
+    "fields": {
+        "pedido": 12,
+        "pieza": 5,
+        "cantidad": 2,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "15.00",
+        "subtotal": "2306.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 36,
+    "fields": {
+        "pedido": 12,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "5.00",
+        "subtotal": "2304.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 37,
+    "fields": {
+        "pedido": 12,
+        "pieza": 5,
+        "cantidad": 2,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "10.00",
+        "subtotal": "2316.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 38,
+    "fields": {
+        "pedido": 12,
+        "pieza": 2,
+        "cantidad": 1,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "17.00",
+        "subtotal": "556.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 39,
+    "fields": {
+        "pedido": 13,
+        "pieza": 3,
+        "cantidad": 1,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "7.00",
+        "subtotal": "766.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 40,
+    "fields": {
+        "pedido": 13,
+        "pieza": 1,
+        "cantidad": 1,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "6.00",
+        "subtotal": "437.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 41,
+    "fields": {
+        "pedido": 13,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "5.00",
+        "subtotal": "803.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 42,
+    "fields": {
+        "pedido": 13,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "10.00",
+        "subtotal": "2289.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 43,
+    "fields": {
+        "pedido": 14,
+        "pieza": 5,
+        "cantidad": 1,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "14.00",
+        "subtotal": "1154.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 44,
+    "fields": {
+        "pedido": 14,
+        "pieza": 1,
+        "cantidad": 2,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "9.00",
+        "subtotal": "868.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 45,
+    "fields": {
+        "pedido": 14,
+        "pieza": 2,
+        "cantidad": 3,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "14.00",
+        "subtotal": "1677.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 46,
+    "fields": {
+        "pedido": 14,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "2.00",
+        "subtotal": "806.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 47,
+    "fields": {
+        "pedido": 14,
+        "pieza": 2,
+        "cantidad": 3,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "13.00",
+        "subtotal": "1680.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 48,
+    "fields": {
+        "pedido": 15,
+        "pieza": 5,
+        "cantidad": 2,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "0.00",
+        "subtotal": "2336.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 49,
+    "fields": {
+        "pedido": 15,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "4.00",
+        "subtotal": "2412.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 50,
+    "fields": {
+        "pedido": 15,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "4.00",
+        "subtotal": "2412.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 51,
+    "fields": {
+        "pedido": 15,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "8.00",
+        "subtotal": "2295.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 52,
+    "fields": {
+        "pedido": 15,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "13.00",
+        "subtotal": "2385.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 53,
+    "fields": {
+        "pedido": 16,
+        "pieza": 3,
+        "cantidad": 1,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "14.00",
+        "subtotal": "759.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 54,
+    "fields": {
+        "pedido": 16,
+        "pieza": 2,
+        "cantidad": 1,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "12.00",
+        "subtotal": "561.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 55,
+    "fields": {
+        "pedido": 16,
+        "pieza": 3,
+        "cantidad": 1,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "18.00",
+        "subtotal": "755.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 56,
+    "fields": {
+        "pedido": 17,
+        "pieza": 1,
+        "cantidad": 1,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "5.00",
+        "subtotal": "438.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 57,
+    "fields": {
+        "pedido": 17,
+        "pieza": 3,
+        "cantidad": 1,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "1.00",
+        "subtotal": "772.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 58,
+    "fields": {
+        "pedido": 17,
+        "pieza": 5,
+        "cantidad": 2,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "8.00",
+        "subtotal": "2320.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 59,
+    "fields": {
+        "pedido": 17,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "9.00",
+        "subtotal": "2397.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 60,
+    "fields": {
+        "pedido": 18,
+        "pieza": 2,
+        "cantidad": 2,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "10.00",
+        "subtotal": "1126.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 61,
+    "fields": {
+        "pedido": 18,
+        "pieza": 1,
+        "cantidad": 1,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "9.00",
+        "subtotal": "434.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 62,
+    "fields": {
+        "pedido": 18,
+        "pieza": 1,
+        "cantidad": 2,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "18.00",
+        "subtotal": "850.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 63,
+    "fields": {
+        "pedido": 18,
+        "pieza": 3,
+        "cantidad": 2,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "19.00",
+        "subtotal": "1508.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 64,
+    "fields": {
+        "pedido": 18,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "2259.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 65,
+    "fields": {
+        "pedido": 19,
+        "pieza": 1,
+        "cantidad": 2,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "1.00",
+        "subtotal": "884.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 66,
+    "fields": {
+        "pedido": 19,
+        "pieza": 3,
+        "cantidad": 1,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "16.00",
+        "subtotal": "757.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 67,
+    "fields": {
+        "pedido": 20,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "13.00",
+        "subtotal": "2385.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 68,
+    "fields": {
+        "pedido": 20,
+        "pieza": 1,
+        "cantidad": 3,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "2.00",
+        "subtotal": "1323.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 69,
+    "fields": {
+        "pedido": 20,
+        "pieza": 5,
+        "cantidad": 2,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "2296.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 70,
+    "fields": {
+        "pedido": 20,
+        "pieza": 5,
+        "cantidad": 3,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "3444.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 71,
+    "fields": {
+        "pedido": 20,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "12.00",
+        "subtotal": "796.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 72,
+    "fields": {
+        "pedido": 21,
+        "pieza": 1,
+        "cantidad": 1,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "6.00",
+        "subtotal": "437.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 73,
+    "fields": {
+        "pedido": 21,
+        "pieza": 1,
+        "cantidad": 1,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "423.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 74,
+    "fields": {
+        "pedido": 21,
+        "pieza": 1,
+        "cantidad": 3,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "16.00",
+        "subtotal": "1281.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 75,
+    "fields": {
+        "pedido": 22,
+        "pieza": 1,
+        "cantidad": 2,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "1.00",
+        "subtotal": "884.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 76,
+    "fields": {
+        "pedido": 22,
+        "pieza": 3,
+        "cantidad": 1,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "0.00",
+        "subtotal": "773.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 77,
+    "fields": {
+        "pedido": 22,
+        "pieza": 1,
+        "cantidad": 3,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "8.00",
+        "subtotal": "1305.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 78,
+    "fields": {
+        "pedido": 23,
+        "pieza": 1,
+        "cantidad": 3,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "0.00",
+        "subtotal": "1329.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 79,
+    "fields": {
+        "pedido": 23,
+        "pieza": 2,
+        "cantidad": 2,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "12.00",
+        "subtotal": "1122.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 80,
+    "fields": {
+        "pedido": 23,
+        "pieza": 2,
+        "cantidad": 1,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "8.00",
+        "subtotal": "565.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 81,
+    "fields": {
+        "pedido": 23,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "7.00",
+        "subtotal": "801.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 82,
+    "fields": {
+        "pedido": 23,
+        "pieza": 2,
+        "cantidad": 3,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "1659.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 83,
+    "fields": {
+        "pedido": 24,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "12.00",
+        "subtotal": "796.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 84,
+    "fields": {
+        "pedido": 24,
+        "pieza": 1,
+        "cantidad": 1,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "8.00",
+        "subtotal": "435.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 85,
+    "fields": {
+        "pedido": 24,
+        "pieza": 2,
+        "cantidad": 1,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "6.00",
+        "subtotal": "567.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 86,
+    "fields": {
+        "pedido": 25,
+        "pieza": 2,
+        "cantidad": 3,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "3.00",
+        "subtotal": "1710.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 87,
+    "fields": {
+        "pedido": 25,
+        "pieza": 1,
+        "cantidad": 3,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "15.00",
+        "subtotal": "1284.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 88,
+    "fields": {
+        "pedido": 25,
+        "pieza": 2,
+        "cantidad": 3,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "10.00",
+        "subtotal": "1689.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 89,
+    "fields": {
+        "pedido": 25,
+        "pieza": 2,
+        "cantidad": 2,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "9.00",
+        "subtotal": "1128.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 90,
+    "fields": {
+        "pedido": 26,
+        "pieza": 5,
+        "cantidad": 3,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "3.00",
+        "subtotal": "3495.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 91,
+    "fields": {
+        "pedido": 27,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "19.00",
+        "subtotal": "2367.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 92,
+    "fields": {
+        "pedido": 27,
+        "pieza": 1,
+        "cantidad": 1,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "2.00",
+        "subtotal": "441.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 93,
+    "fields": {
+        "pedido": 28,
+        "pieza": 5,
+        "cantidad": 1,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "10.00",
+        "subtotal": "1158.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 94,
+    "fields": {
+        "pedido": 28,
+        "pieza": 5,
+        "cantidad": 2,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "1.00",
+        "subtotal": "2334.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 95,
+    "fields": {
+        "pedido": 28,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "7.00",
+        "subtotal": "2298.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 96,
+    "fields": {
+        "pedido": 28,
+        "pieza": 3,
+        "cantidad": 1,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "13.00",
+        "subtotal": "760.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 97,
+    "fields": {
+        "pedido": 29,
+        "pieza": 1,
+        "cantidad": 2,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "8.00",
+        "subtotal": "870.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 98,
+    "fields": {
+        "pedido": 29,
+        "pieza": 2,
+        "cantidad": 3,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "10.00",
+        "subtotal": "1689.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 99,
+    "fields": {
+        "pedido": 29,
+        "pieza": 1,
+        "cantidad": 2,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "5.00",
+        "subtotal": "876.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 100,
+    "fields": {
+        "pedido": 29,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "0.00",
+        "subtotal": "808.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 101,
+    "fields": {
+        "pedido": 30,
+        "pieza": 5,
+        "cantidad": 2,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "15.00",
+        "subtotal": "2306.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 102,
+    "fields": {
+        "pedido": 30,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "8.00",
+        "subtotal": "800.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 103,
+    "fields": {
+        "pedido": 30,
+        "pieza": 2,
+        "cantidad": 1,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "7.00",
+        "subtotal": "566.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 104,
+    "fields": {
+        "pedido": 31,
+        "pieza": 1,
+        "cantidad": 3,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "19.00",
+        "subtotal": "1272.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 105,
+    "fields": {
+        "pedido": 31,
+        "pieza": 4,
+        "cantidad": 2,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "19.00",
+        "subtotal": "1578.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 106,
+    "fields": {
+        "pedido": 31,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "6.00",
+        "subtotal": "2406.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 107,
+    "fields": {
+        "pedido": 32,
+        "pieza": 1,
+        "cantidad": 1,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "14.00",
+        "subtotal": "429.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 108,
+    "fields": {
+        "pedido": 32,
+        "pieza": 5,
+        "cantidad": 3,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "18.00",
+        "subtotal": "3450.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 109,
+    "fields": {
+        "pedido": 32,
+        "pieza": 2,
+        "cantidad": 1,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "553.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 110,
+    "fields": {
+        "pedido": 32,
+        "pieza": 3,
+        "cantidad": 2,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "14.00",
+        "subtotal": "1518.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 111,
+    "fields": {
+        "pedido": 32,
+        "pieza": 5,
+        "cantidad": 1,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "19.00",
+        "subtotal": "1149.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 112,
+    "fields": {
+        "pedido": 33,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "6.00",
+        "subtotal": "2301.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 113,
+    "fields": {
+        "pedido": 33,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "7.00",
+        "subtotal": "2403.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 114,
+    "fields": {
+        "pedido": 33,
+        "pieza": 4,
+        "cantidad": 2,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "9.00",
+        "subtotal": "1598.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 115,
+    "fields": {
+        "pedido": 33,
+        "pieza": 4,
+        "cantidad": 1,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "13.00",
+        "subtotal": "795.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 116,
+    "fields": {
+        "pedido": 34,
+        "pieza": 4,
+        "cantidad": 2,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "3.00",
+        "subtotal": "1610.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 117,
+    "fields": {
+        "pedido": 34,
+        "pieza": 2,
+        "cantidad": 3,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "3.00",
+        "subtotal": "1710.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 118,
+    "fields": {
+        "pedido": 35,
+        "pieza": 5,
+        "cantidad": 1,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "9.00",
+        "subtotal": "1159.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 119,
+    "fields": {
+        "pedido": 36,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "3.00",
+        "subtotal": "2310.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 120,
+    "fields": {
+        "pedido": 37,
+        "pieza": 2,
+        "cantidad": 3,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "9.00",
+        "subtotal": "1692.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 121,
+    "fields": {
+        "pedido": 37,
+        "pieza": 5,
+        "cantidad": 1,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "18.00",
+        "subtotal": "1150.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 122,
+    "fields": {
+        "pedido": 37,
+        "pieza": 1,
+        "cantidad": 3,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "3.00",
+        "subtotal": "1320.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 123,
+    "fields": {
+        "pedido": 37,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "16.00",
+        "subtotal": "2376.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 124,
+    "fields": {
+        "pedido": 38,
+        "pieza": 5,
+        "cantidad": 2,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "15.00",
+        "subtotal": "2306.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 125,
+    "fields": {
+        "pedido": 38,
+        "pieza": 4,
+        "cantidad": 2,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "14.00",
+        "subtotal": "1588.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 126,
+    "fields": {
+        "pedido": 38,
+        "pieza": 5,
+        "cantidad": 1,
+        "precio_unitario": "1168.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "1148.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 127,
+    "fields": {
+        "pedido": 39,
+        "pieza": 4,
+        "cantidad": 3,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "14.00",
+        "subtotal": "2382.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 128,
+    "fields": {
+        "pedido": 39,
+        "pieza": 3,
+        "cantidad": 2,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "20.00",
+        "subtotal": "1506.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 129,
+    "fields": {
+        "pedido": 39,
+        "pieza": 2,
+        "cantidad": 2,
+        "precio_unitario": "573.00",
+        "descuento_aplicado": "5.00",
+        "subtotal": "1136.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 130,
+    "fields": {
+        "pedido": 39,
+        "pieza": 3,
+        "cantidad": 3,
+        "precio_unitario": "773.00",
+        "descuento_aplicado": "13.00",
+        "subtotal": "2280.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 131,
+    "fields": {
+        "pedido": 40,
+        "pieza": 1,
+        "cantidad": 2,
+        "precio_unitario": "443.00",
+        "descuento_aplicado": "4.00",
+        "subtotal": "878.00"
+    }
+},
+{
+    "model": "proyecto.lineapedido",
+    "pk": 132,
+    "fields": {
+        "pedido": 40,
+        "pieza": 4,
+        "cantidad": 2,
+        "precio_unitario": "808.00",
+        "descuento_aplicado": "6.00",
+        "subtotal": "1604.00"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 1,
+    "fields": {
+        "cliente": 1,
+        "tipo_metodo": "2",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-11-22"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 2,
+    "fields": {
+        "cliente": 2,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-11-17"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 3,
+    "fields": {
+        "cliente": 2,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-03-18"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 4,
+    "fields": {
+        "cliente": 3,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-08-17"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 5,
+    "fields": {
+        "cliente": 3,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-08-23"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 6,
+    "fields": {
+        "cliente": 3,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-06-14"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 7,
+    "fields": {
+        "cliente": 4,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-10-22"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 8,
+    "fields": {
+        "cliente": 4,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-02-02"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 9,
+    "fields": {
+        "cliente": 5,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-04-23"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 10,
+    "fields": {
+        "cliente": 5,
+        "tipo_metodo": "2",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-03-12"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 11,
+    "fields": {
+        "cliente": 6,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-04-07"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 12,
+    "fields": {
+        "cliente": 6,
+        "tipo_metodo": "2",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-09-23"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 13,
+    "fields": {
+        "cliente": 6,
+        "tipo_metodo": "2",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-06-08"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 14,
+    "fields": {
+        "cliente": 7,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-09-09"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 15,
+    "fields": {
+        "cliente": 8,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-03-28"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 16,
+    "fields": {
+        "cliente": 9,
+        "tipo_metodo": "2",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-08-13"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 17,
+    "fields": {
+        "cliente": 10,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-01-23"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 18,
+    "fields": {
+        "cliente": 11,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-11-16"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 19,
+    "fields": {
+        "cliente": 12,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-04-26"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 20,
+    "fields": {
+        "cliente": 13,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-02-17"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 21,
+    "fields": {
+        "cliente": 14,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-02-05"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 22,
+    "fields": {
+        "cliente": 14,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-08-25"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 23,
+    "fields": {
+        "cliente": 14,
+        "tipo_metodo": "2",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-08-15"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 24,
+    "fields": {
+        "cliente": 15,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-03-07"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 25,
+    "fields": {
+        "cliente": 15,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-11-20"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 26,
+    "fields": {
+        "cliente": 16,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-09-16"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 27,
+    "fields": {
+        "cliente": 17,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-05-01"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 28,
+    "fields": {
+        "cliente": 17,
+        "tipo_metodo": "1",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-08-25"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 29,
+    "fields": {
+        "cliente": 18,
+        "tipo_metodo": "2",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-01-09"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 30,
+    "fields": {
+        "cliente": 19,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-09-04"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 31,
+    "fields": {
+        "cliente": 19,
+        "tipo_metodo": "2",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-09-27"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 32,
+    "fields": {
+        "cliente": 19,
+        "tipo_metodo": "3",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-05-31"
+    }
+},
+{
+    "model": "proyecto.metodopago",
+    "pk": 33,
+    "fields": {
+        "cliente": 20,
+        "tipo_metodo": "2",
+        "es_predeterminado": false,
+        "fecha_agregado": "2025-04-28"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 1,
+    "fields": {
+        "metodo_pago": 3,
+        "num_tarjeta_encriptado": "4563264843392286552",
+        "propietario": "Eulalia Vazquez",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "2",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 2,
+    "fields": {
+        "metodo_pago": 8,
+        "num_tarjeta_encriptado": "379224406669761",
+        "propietario": "Pastor Sala",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "2",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 3,
+    "fields": {
+        "metodo_pago": 9,
+        "num_tarjeta_encriptado": "2716529860842292",
+        "propietario": "Evita Nogueira",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "3",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 4,
+    "fields": {
+        "metodo_pago": 14,
+        "num_tarjeta_encriptado": "4292935015725977",
+        "propietario": "Belen Gonzalo",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "2",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 5,
+    "fields": {
+        "metodo_pago": 18,
+        "num_tarjeta_encriptado": "2260420920924041",
+        "propietario": "Amalia Chacón",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "2",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 6,
+    "fields": {
+        "metodo_pago": 19,
+        "num_tarjeta_encriptado": "2225611395945149",
+        "propietario": "Sabina Tomé",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "2",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 7,
+    "fields": {
+        "metodo_pago": 20,
+        "num_tarjeta_encriptado": "3521667374855567",
+        "propietario": "Ana Castillo",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "2",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 8,
+    "fields": {
+        "metodo_pago": 21,
+        "num_tarjeta_encriptado": "379160351086066",
+        "propietario": "Eligia Godoy",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "3",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 9,
+    "fields": {
+        "metodo_pago": 22,
+        "num_tarjeta_encriptado": "4381771814868501884",
+        "propietario": "Eligia Godoy",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "3",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 10,
+    "fields": {
+        "metodo_pago": 25,
+        "num_tarjeta_encriptado": "676233199014",
+        "propietario": "Martina Aragonés",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "3",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 11,
+    "fields": {
+        "metodo_pago": 27,
+        "num_tarjeta_encriptado": "349886551623889",
+        "propietario": "Nazario Salmerón",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "2",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.tarjeta",
+    "pk": 12,
+    "fields": {
+        "metodo_pago": 28,
+        "num_tarjeta_encriptado": "4624115960259102283",
+        "propietario": "Nazario Salmerón",
+        "fecha_caducidad": null,
+        "tipo_tarjeta": "1",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.cuentabancaria",
+    "pk": 1,
+    "fields": {
+        "metodo_pago": 1,
+        "iban": "ES9822843993992149516789",
+        "banco": "Grupo Crespi S.Com.",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.cuentabancaria",
+    "pk": 2,
+    "fields": {
+        "metodo_pago": 10,
+        "iban": "ES4379489509546480928924",
+        "banco": "Transportes Arcos y asociados S.A.U",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.cuentabancaria",
+    "pk": 3,
+    "fields": {
+        "metodo_pago": 12,
+        "iban": "ES8065694526726415413477",
+        "banco": "Natalia Nicolau Nebot S.Coop.",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.cuentabancaria",
+    "pk": 4,
+    "fields": {
+        "metodo_pago": 13,
+        "iban": "ES1665853008999624200393",
+        "banco": "Fabregat y Huerta S.Com.",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.cuentabancaria",
+    "pk": 5,
+    "fields": {
+        "metodo_pago": 16,
+        "iban": "ES8803987993972928708622",
+        "banco": "Hermanos Falcó S.L.",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.cuentabancaria",
+    "pk": 6,
+    "fields": {
+        "metodo_pago": 23,
+        "iban": "ES3912149664344846930377",
+        "banco": "Inmobiliaria Carpio S.L.L.",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.cuentabancaria",
+    "pk": 7,
+    "fields": {
+        "metodo_pago": 29,
+        "iban": "ES0858063934655166714216",
+        "banco": "Linares y Oliveras S.L.",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.cuentabancaria",
+    "pk": 8,
+    "fields": {
+        "metodo_pago": 31,
+        "iban": "ES7814912518737970977999",
+        "banco": "Quintero & Asociados S.A.",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.cuentabancaria",
+    "pk": 9,
+    "fields": {
+        "metodo_pago": 33,
+        "iban": "ES7964323933551486148958",
+        "banco": "Fábrica Morillo S.Coop.",
+        "moneda": "EUR"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 1,
+    "fields": {
+        "metodo_pago": 2,
+        "email": "fmilla@example.net",
+        "proveedor": "2"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 2,
+    "fields": {
+        "metodo_pago": 4,
+        "email": "nacio39@example.com",
+        "proveedor": "1"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 3,
+    "fields": {
+        "metodo_pago": 5,
+        "email": "nacio39@example.com",
+        "proveedor": "1"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 4,
+    "fields": {
+        "metodo_pago": 6,
+        "email": "nacio39@example.com",
+        "proveedor": "1"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 5,
+    "fields": {
+        "metodo_pago": 7,
+        "email": "qrocha@example.net",
+        "proveedor": "1"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 6,
+    "fields": {
+        "metodo_pago": 11,
+        "email": "wledesma@example.net",
+        "proveedor": "2"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 7,
+    "fields": {
+        "metodo_pago": 15,
+        "email": "estebannilo@example.net",
+        "proveedor": "3"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 8,
+    "fields": {
+        "metodo_pago": 17,
+        "email": "ypuente@example.com",
+        "proveedor": "1"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 9,
+    "fields": {
+        "metodo_pago": 24,
+        "email": "sborras@example.net",
+        "proveedor": "1"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 10,
+    "fields": {
+        "metodo_pago": 26,
+        "email": "judith97@example.org",
+        "proveedor": "1"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 11,
+    "fields": {
+        "metodo_pago": 30,
+        "email": "barberojuan-jose@example.net",
+        "proveedor": "2"
+    }
+},
+{
+    "model": "proyecto.billeteradigital",
+    "pk": 12,
+    "fields": {
+        "metodo_pago": 32,
+        "email": "barberojuan-jose@example.net",
+        "proveedor": "1"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 1,
+    "fields": {
+        "pedido": 1,
+        "metodo_pago": 20,
+        "fecha_pago": "2025-04-14",
+        "monto": "5962.00",
+        "estado": "1",
+        "numero_transaccion": "e98618b5-eacd-49a3-906e-c474dad0947c"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 2,
+    "fields": {
+        "pedido": 2,
+        "metodo_pago": 8,
+        "fecha_pago": "2025-02-27",
+        "monto": "1681.00",
+        "estado": "2",
+        "numero_transaccion": "a3bfb9db-c4b7-4ec1-8313-15f3397de644"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 3,
+    "fields": {
+        "pedido": 3,
+        "metodo_pago": 30,
+        "fecha_pago": "2025-07-24",
+        "monto": "11234.00",
+        "estado": "2",
+        "numero_transaccion": "43b0b464-65c9-4f0a-aebf-99b0dc255023"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 4,
+    "fields": {
+        "pedido": 4,
+        "metodo_pago": 31,
+        "fecha_pago": "2025-01-05",
+        "monto": "3444.00",
+        "estado": "3",
+        "numero_transaccion": "0825300c-5410-4e22-be40-9451df12d624"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 5,
+    "fields": {
+        "pedido": 5,
+        "metodo_pago": 22,
+        "fecha_pago": "2025-02-28",
+        "monto": "2262.00",
+        "estado": "3",
+        "numero_transaccion": "548d1422-25f7-42d7-afd7-c1cc1b9ad705"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 6,
+    "fields": {
+        "pedido": 6,
+        "metodo_pago": 17,
+        "fecha_pago": "2025-03-27",
+        "monto": "9747.00",
+        "estado": "3",
+        "numero_transaccion": "1f056371-70e4-4ad4-a8e2-ac261d3c7f2b"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 7,
+    "fields": {
+        "pedido": 7,
+        "metodo_pago": 29,
+        "fecha_pago": "2025-04-05",
+        "monto": "5424.00",
+        "estado": "2",
+        "numero_transaccion": "431e2816-f002-4a8f-9f47-24e59dfb2960"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 8,
+    "fields": {
+        "pedido": 8,
+        "metodo_pago": 29,
+        "fecha_pago": "2025-08-17",
+        "monto": "4068.00",
+        "estado": "1",
+        "numero_transaccion": "d28022a2-ab96-4983-8d5e-91784a42f9c6"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 9,
+    "fields": {
+        "pedido": 9,
+        "metodo_pago": 31,
+        "fecha_pago": "2025-02-04",
+        "monto": "7345.00",
+        "estado": "3",
+        "numero_transaccion": "7b8b5382-c80f-4bcb-914f-2be313065547"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 10,
+    "fields": {
+        "pedido": 10,
+        "metodo_pago": 18,
+        "fecha_pago": "2025-04-16",
+        "monto": "2331.00",
+        "estado": "1",
+        "numero_transaccion": "942d4ada-9a5a-41eb-a49f-add59c2ae625"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 11,
+    "fields": {
+        "pedido": 11,
+        "metodo_pago": 26,
+        "fecha_pago": "2025-09-01",
+        "monto": "7593.00",
+        "estado": "3",
+        "numero_transaccion": "82d0c8a0-02db-40dc-b70f-fb2cb7dc661b"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 12,
+    "fields": {
+        "pedido": 12,
+        "metodo_pago": 33,
+        "fecha_pago": "2025-11-21",
+        "monto": "7482.00",
+        "estado": "1",
+        "numero_transaccion": "13f0dedb-30f4-41d0-a2f2-014cbd81bc38"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 13,
+    "fields": {
+        "pedido": 13,
+        "metodo_pago": 24,
+        "fecha_pago": "2025-08-17",
+        "monto": "4295.00",
+        "estado": "3",
+        "numero_transaccion": "670c7388-8d63-4da2-9719-42070b08fbde"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 14,
+    "fields": {
+        "pedido": 14,
+        "metodo_pago": 19,
+        "fecha_pago": "2025-11-04",
+        "monto": "6185.00",
+        "estado": "3",
+        "numero_transaccion": "20a1fdd7-c354-41bb-86bc-0488449e1f07"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 15,
+    "fields": {
+        "pedido": 15,
+        "metodo_pago": 2,
+        "fecha_pago": "2025-02-25",
+        "monto": "11840.00",
+        "estado": "2",
+        "numero_transaccion": "9d02b7de-420a-4768-996a-5886eb9ad81b"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 16,
+    "fields": {
+        "pedido": 16,
+        "metodo_pago": 24,
+        "fecha_pago": "2025-11-03",
+        "monto": "2075.00",
+        "estado": "1",
+        "numero_transaccion": "0f8cdbc2-9a50-412c-8910-a00a390cabc8"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 17,
+    "fields": {
+        "pedido": 17,
+        "metodo_pago": 14,
+        "fecha_pago": "2025-02-25",
+        "monto": "5927.00",
+        "estado": "3",
+        "numero_transaccion": "14904113-e360-4995-b178-ca5497ae8465"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 18,
+    "fields": {
+        "pedido": 18,
+        "metodo_pago": 9,
+        "fecha_pago": "2025-04-20",
+        "monto": "6177.00",
+        "estado": "3",
+        "numero_transaccion": "b2f307be-48f5-4742-b135-dd21ce30906c"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 19,
+    "fields": {
+        "pedido": 19,
+        "metodo_pago": 11,
+        "fecha_pago": "2025-03-12",
+        "monto": "1641.00",
+        "estado": "2",
+        "numero_transaccion": "33ef42b6-3692-458b-be51-32eece56162d"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 20,
+    "fields": {
+        "pedido": 20,
+        "metodo_pago": 19,
+        "fecha_pago": "2025-07-14",
+        "monto": "10244.00",
+        "estado": "2",
+        "numero_transaccion": "01bfbfea-cbbc-4224-a0ed-3c7e7f7b4ad0"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 21,
+    "fields": {
+        "pedido": 21,
+        "metodo_pago": 11,
+        "fecha_pago": "2025-09-17",
+        "monto": "2141.00",
+        "estado": "3",
+        "numero_transaccion": "ac6891ca-b263-4de9-a11b-223cc2ebcfb0"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 22,
+    "fields": {
+        "pedido": 22,
+        "metodo_pago": 15,
+        "fecha_pago": "2025-04-20",
+        "monto": "2962.00",
+        "estado": "2",
+        "numero_transaccion": "3023c925-0de7-46c4-96b9-88d0f691e467"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 23,
+    "fields": {
+        "pedido": 23,
+        "metodo_pago": 14,
+        "fecha_pago": "2025-05-14",
+        "monto": "5476.00",
+        "estado": "1",
+        "numero_transaccion": "6f648d00-aab2-4bde-b66f-7fd589018d78"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 24,
+    "fields": {
+        "pedido": 24,
+        "metodo_pago": 9,
+        "fecha_pago": "2025-07-12",
+        "monto": "1798.00",
+        "estado": "1",
+        "numero_transaccion": "1bcf2842-ed91-44db-8054-ebd34f109664"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 25,
+    "fields": {
+        "pedido": 25,
+        "metodo_pago": 6,
+        "fecha_pago": "2025-01-13",
+        "monto": "5811.00",
+        "estado": "2",
+        "numero_transaccion": "565d2092-6427-4eda-909c-7954dbb40aa3"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 26,
+    "fields": {
+        "pedido": 26,
+        "metodo_pago": 11,
+        "fecha_pago": "2025-08-07",
+        "monto": "3495.00",
+        "estado": "3",
+        "numero_transaccion": "a84a3f1e-20c8-4c59-9fcb-3dd1e44e9452"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 27,
+    "fields": {
+        "pedido": 27,
+        "metodo_pago": 8,
+        "fecha_pago": "2025-08-12",
+        "monto": "2808.00",
+        "estado": "2",
+        "numero_transaccion": "3755ce80-24bd-456b-87f9-9d6501187934"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 28,
+    "fields": {
+        "pedido": 28,
+        "metodo_pago": 23,
+        "fecha_pago": "2025-09-20",
+        "monto": "6550.00",
+        "estado": "1",
+        "numero_transaccion": "a7243054-16e2-41bd-b067-1fb080a9f550"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 29,
+    "fields": {
+        "pedido": 29,
+        "metodo_pago": 32,
+        "fecha_pago": "2025-10-14",
+        "monto": "4243.00",
+        "estado": "3",
+        "numero_transaccion": "5ad8f3e5-49a0-4cdf-af06-7e62eae26696"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 30,
+    "fields": {
+        "pedido": 30,
+        "metodo_pago": 17,
+        "fecha_pago": "2025-10-28",
+        "monto": "3672.00",
+        "estado": "3",
+        "numero_transaccion": "cfa00e78-0c37-48f3-9432-56584d8f7c29"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 31,
+    "fields": {
+        "pedido": 31,
+        "metodo_pago": 22,
+        "fecha_pago": "2025-10-25",
+        "monto": "5256.00",
+        "estado": "3",
+        "numero_transaccion": "0ae7b721-77d3-48f3-a3f7-1f7f75c57928"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 32,
+    "fields": {
+        "pedido": 32,
+        "metodo_pago": 9,
+        "fecha_pago": "2025-06-25",
+        "monto": "7099.00",
+        "estado": "3",
+        "numero_transaccion": "ebae2dbb-fc39-4d2d-bc57-a99be3176c03"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 33,
+    "fields": {
+        "pedido": 33,
+        "metodo_pago": 9,
+        "fecha_pago": "2025-04-08",
+        "monto": "7097.00",
+        "estado": "2",
+        "numero_transaccion": "bba04cbf-7095-4085-a510-a1b2ef454d62"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 34,
+    "fields": {
+        "pedido": 34,
+        "metodo_pago": 21,
+        "fecha_pago": "2025-02-09",
+        "monto": "3320.00",
+        "estado": "2",
+        "numero_transaccion": "70b3332e-bf50-442f-80ca-4e5e7b0b9d9e"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 35,
+    "fields": {
+        "pedido": 35,
+        "metodo_pago": 21,
+        "fecha_pago": "2025-08-09",
+        "monto": "1159.00",
+        "estado": "3",
+        "numero_transaccion": "9fcaeab0-42df-45fa-8dc6-e9fd23d6e8d8"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 36,
+    "fields": {
+        "pedido": 36,
+        "metodo_pago": 25,
+        "fecha_pago": "2025-09-07",
+        "monto": "2310.00",
+        "estado": "1",
+        "numero_transaccion": "7188a10f-5a6a-49f4-9f1a-5615b995d6e9"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 37,
+    "fields": {
+        "pedido": 37,
+        "metodo_pago": 14,
+        "fecha_pago": "2025-08-24",
+        "monto": "6538.00",
+        "estado": "3",
+        "numero_transaccion": "2178a757-3dba-4bd7-be4a-4c03010819ca"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 38,
+    "fields": {
+        "pedido": 38,
+        "metodo_pago": 4,
+        "fecha_pago": "2025-06-04",
+        "monto": "5042.00",
+        "estado": "1",
+        "numero_transaccion": "c36e9b67-93ff-47f2-a793-0d3eb81b4024"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 39,
+    "fields": {
+        "pedido": 39,
+        "metodo_pago": 22,
+        "fecha_pago": "2025-07-09",
+        "monto": "7304.00",
+        "estado": "1",
+        "numero_transaccion": "6ae50a43-ed94-4ac5-8e4d-232029198f41"
+    }
+},
+{
+    "model": "proyecto.pago",
+    "pk": 40,
+    "fields": {
+        "pedido": 40,
+        "metodo_pago": 11,
+        "fecha_pago": "2025-10-08",
+        "monto": "2482.00",
+        "estado": "3",
+        "numero_transaccion": "252a5068-f78d-4663-bca9-089386c39568"
+    }
+},
+{
+    "model": "proyecto.devolucion",
+    "pk": 1,
+    "fields": {
+        "linea_pedido": 14,
+        "cliente": 4,
+        "fecha_solicitud": "2025-05-28",
+        "fecha_aprobacion": null,
+        "motivo": "Función imagen largo local particular producto vista. Suelo tratamiento aquellos empresa. Puedo estar conjunto pedro nuevos.",
+        "estado": "1",
+        "cantidad_devuelta": 1,
+        "monto_reembolso": "3453.00"
+    }
+},
+{
+    "model": "proyecto.devolucion",
+    "pk": 2,
+    "fields": {
+        "linea_pedido": 93,
+        "cliente": 12,
+        "fecha_solicitud": "2025-09-17",
+        "fecha_aprobacion": null,
+        "motivo": "Salud hacer suerte sociedad. Hijo asimismo también produce médico fue.\nNuevos aspecto caso condiciones un programas carlos. Fin campaña don historia asimismo duda la aquellos.",
+        "estado": "2",
+        "cantidad_devuelta": 1,
+        "monto_reembolso": "1158.00"
+    }
+},
+{
+    "model": "proyecto.devolucion",
+    "pk": 3,
+    "fields": {
+        "linea_pedido": 85,
+        "cliente": 2,
+        "fecha_solicitud": "2025-11-13",
+        "fecha_aprobacion": null,
+        "motivo": "Generales aquella recursos carlos ellas aún ministerio.\nNuevo centro fuera salida iglesia propuesta ambiente. Esta española momentos costa trabajar. Últimos orden película decía oficial.",
+        "estado": "2",
+        "cantidad_devuelta": 1,
+        "monto_reembolso": "567.00"
+    }
+},
+{
+    "model": "proyecto.devolucion",
+    "pk": 4,
+    "fields": {
+        "linea_pedido": 61,
+        "cliente": 3,
+        "fecha_solicitud": "2025-07-07",
+        "fecha_aprobacion": null,
+        "motivo": "Éste han vez tomar cultura revolución. Cómo millones características deseo ministerio mano cuales. Veces pues alto aún.",
+        "estado": "1",
+        "cantidad_devuelta": 1,
+        "monto_reembolso": "434.00"
+    }
+},
+{
+    "model": "proyecto.devolucion",
+    "pk": 5,
+    "fields": {
+        "linea_pedido": 89,
+        "cliente": 7,
+        "fecha_solicitud": "2025-07-04",
+        "fecha_aprobacion": null,
+        "motivo": "Hacia cabo qué vivir todas psoe.\nActitud concepto viene. Datos están mejor está domingo. Aquellos sectores sector hijo hubo.\nLibro popular trata siete. Precisamente hacer tras aquellas hasta.",
+        "estado": "1",
+        "cantidad_devuelta": 2,
+        "monto_reembolso": "1128.00"
+    }
+},
+{
+    "model": "proyecto.devolucion",
+    "pk": 6,
+    "fields": {
+        "linea_pedido": 72,
+        "cliente": 12,
+        "fecha_solicitud": "2025-09-13",
+        "fecha_aprobacion": null,
+        "motivo": "Necesario imágenes sistemas está contenido años. Lejos realizar ciudad natural dónde lucha los futuro.",
+        "estado": "2",
+        "cantidad_devuelta": 1,
+        "monto_reembolso": "437.00"
+    }
+},
+{
+    "model": "proyecto.devolucion",
+    "pk": 7,
+    "fields": {
+        "linea_pedido": 41,
+        "cliente": 14,
+        "fecha_solicitud": "2025-04-01",
+        "fecha_aprobacion": null,
+        "motivo": "Otros minutos vio último mismos d. Militares condiciones tenemos. Demasiado recursos vivir gracias. Existencia resultados campo.",
+        "estado": "1",
+        "cantidad_devuelta": 1,
+        "monto_reembolso": "803.00"
+    }
+},
+{
+    "model": "proyecto.devolucion",
+    "pk": 8,
+    "fields": {
+        "linea_pedido": 130,
+        "cliente": 4,
+        "fecha_solicitud": "2025-11-15",
+        "fecha_aprobacion": null,
+        "motivo": "Luis libros él alrededor proceso. Diversos economía habría noche opinión aspecto. Hora crecimiento cabeza encuentran obra.",
+        "estado": "3",
+        "cantidad_devuelta": 2,
+        "monto_reembolso": "2280.00"
+    }
+},
+{
+    "model": "proyecto.devolucion",
+    "pk": 9,
+    "fields": {
+        "linea_pedido": 32,
+        "cliente": 19,
+        "fecha_solicitud": "2025-09-16",
+        "fecha_aprobacion": null,
+        "motivo": "Peor te deja.\nÚnica habían armas metros muerto metros. Cómo suelo línea. Hacía podría diferentes libre.",
+        "estado": "3",
+        "cantidad_devuelta": 2,
+        "monto_reembolso": "1293.00"
+    }
+},
+{
+    "model": "proyecto.devolucion",
+    "pk": 10,
+    "fields": {
+        "linea_pedido": 12,
+        "cliente": 6,
+        "fecha_solicitud": "2025-10-16",
+        "fecha_aprobacion": null,
+        "motivo": "Productos izquierda fernando nos oposición gobierno mujeres. Carácter civil español antes partes reunión. Contenido precio artículo proyecto ocho.",
+        "estado": "3",
+        "cantidad_devuelta": 1,
+        "monto_reembolso": "2262.00"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 1,
+    "fields": {
+        "pieza": 3,
+        "cliente": 20,
+        "puntuacion": 4,
+        "titulo": "Efectos pablo mar tienen fuerza han.",
+        "comentario": "Nuestros familia toma mayo ojos de tenía. Riesgo por alto presidente casa posibilidades llega tribunal. Mundo aquellas esto fuerzas se dar cultural.",
+        "fecha_valoracion": "2025-05-07"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 2,
+    "fields": {
+        "pieza": 5,
+        "cliente": 19,
+        "puntuacion": 3,
+        "titulo": "Seis aparece están demás rosa este adelante francisco.",
+        "comentario": "Habría yo sociedad países país de. Obstante ninguna él aspecto.\nCaracterísticas medida importancia dios palabra. Prensa resulta campo momentos ocasiones poner.",
+        "fecha_valoracion": "2025-11-08"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 3,
+    "fields": {
+        "pieza": 1,
+        "cliente": 15,
+        "puntuacion": 1,
+        "titulo": "Constitución resultado han económico creo.",
+        "comentario": "Adelante pacientes animales sido muchos. Española mantener nuestra partir tomar martín.\nNo jamás espacio miedo. Sectores éxito algo don. Mayo debido septiembre rey.",
+        "fecha_valoracion": "2025-09-04"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 4,
+    "fields": {
+        "pieza": 2,
+        "cliente": 10,
+        "puntuacion": 1,
+        "titulo": "Posible contenido saber según tengo.",
+        "comentario": "Más ésta militar sino hijos boca. Mundial si concepto realizar programa jefe tanto.\nActividades deben actividad mientras. Septiembre mejor allí. Casos mujer conseguir participación corazón quién.",
+        "fecha_valoracion": "2025-02-16"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 5,
+    "fields": {
+        "pieza": 2,
+        "cliente": 5,
+        "puntuacion": 5,
+        "titulo": "Defensa plan rafael seis historia.",
+        "comentario": "Hasta dinero julio cuba minutos oposición esta.\nAlrededor cultura tan. Sigue ejemplo problemas nombre casa. Haber edad hace siguientes.",
+        "fecha_valoracion": "2025-06-04"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 6,
+    "fields": {
+        "pieza": 4,
+        "cliente": 10,
+        "puntuacion": 1,
+        "titulo": "Cultural llegar revolución aquellos millones llegado naturaleza.",
+        "comentario": "Haya mayor aquí nos. Piel es segundo dólares ejército qué informe. Quería corte dice texto cuarto hechos cuenta.\nCuyo público unas juego. Animales ninguna políticas hijo.",
+        "fecha_valoracion": "2025-10-15"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 7,
+    "fields": {
+        "pieza": 1,
+        "cliente": 15,
+        "puntuacion": 2,
+        "titulo": "Nivel capaz tuvo ese humana movimiento hace.",
+        "comentario": "Crisis toma calle según congreso compañía hubo pasar. Centro objeto línea sistema. Izquierda permite primeras carrera.\nHas corazón aquellos. Bastante deben quedó algunas ambos señora.",
+        "fecha_valoracion": "2025-10-18"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 8,
+    "fields": {
+        "pieza": 4,
+        "cliente": 17,
+        "puntuacion": 1,
+        "titulo": "Viaje carrera dejó g año habrá.",
+        "comentario": "Ahí allá diferencia muchas medidas. Suelo comunicación razón puede cualquier días buen.\nBlanco rodríguez análisis qué. Aunque sistemas datos mucho área toma exterior.",
+        "fecha_valoracion": "2025-08-02"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 9,
+    "fields": {
+        "pieza": 1,
+        "cliente": 9,
+        "puntuacion": 4,
+        "titulo": "Sol difícil tal ideas toma.",
+        "comentario": "Posición quién economía fuerzas productos económica programas. Antonio sido existe práctica.\nMúsica cuestión políticas producto b fernando. Estaba industria ya esos ideas corazón.",
+        "fecha_valoracion": "2025-01-31"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 10,
+    "fields": {
+        "pieza": 1,
+        "cliente": 18,
+        "puntuacion": 5,
+        "titulo": "Estados mayor zonas usted hora instituto.",
+        "comentario": "Puesto programa visita revolución máximo sociedad pronto fin. Aún parece nivel sabía asociación.\nEntonces encima aquellos natural.\nConciencia ante algún tenían vida. Destino dos reforma texto cuyo.",
+        "fecha_valoracion": "2025-01-04"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 11,
+    "fields": {
+        "pieza": 3,
+        "cliente": 6,
+        "puntuacion": 2,
+        "titulo": "Quien pero u cabeza.",
+        "comentario": "Realidad peso otro. Nivel teoría tiempo carácter resulta. Principio ello investigación solo. Volver supuesto económica tipos razón.",
+        "fecha_valoracion": "2025-09-03"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 12,
+    "fields": {
+        "pieza": 1,
+        "cliente": 18,
+        "puntuacion": 5,
+        "titulo": "Razones menos hubo cuatro político mejor.",
+        "comentario": "Fútbol ve último. Principal autoridades nuestras esa volver capaz.",
+        "fecha_valoracion": "2025-03-01"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 13,
+    "fields": {
+        "pieza": 1,
+        "cliente": 20,
+        "puntuacion": 1,
+        "titulo": "Producción hoy había te participación centros demás.",
+        "comentario": "Internacional sabe visto quiero. Especialmente primeros memoria lucha señora hijos.\nCuya cuarto mayo buen cuenta humanos acerca cabo. Voluntad contenido contrario hombres.",
+        "fecha_valoracion": "2025-02-23"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 14,
+    "fields": {
+        "pieza": 3,
+        "cliente": 17,
+        "puntuacion": 4,
+        "titulo": "Base s junto ambiente volver.",
+        "comentario": "Tengo valor internacional policía ojos militares. Niño grado banco amigos ocho campo victoria poner.\nSangre líder fecha mis los acciones. Aumento paz crisis poco comercio señaló económico.",
+        "fecha_valoracion": "2025-08-13"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 15,
+    "fields": {
+        "pieza": 5,
+        "cliente": 6,
+        "puntuacion": 3,
+        "titulo": "Tú va van.",
+        "comentario": "Buena cuatro hecho g volvió carlos. Espera oficial precisamente padres. Hombres idea bueno llegar estar. S línea cabeza objeto parecía pública cuerpo mundial.",
+        "fecha_valoracion": "2025-07-10"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 16,
+    "fields": {
+        "pieza": 1,
+        "cliente": 2,
+        "puntuacion": 3,
+        "titulo": "Tierra alrededor saber noche servicio favor éxito.",
+        "comentario": "Niños manos campaña sectores. Vía mal jorge semanas tratamiento.\nCuba tal lenguaje ley pasado ha alguna. Ve favor sentido hijo. Llevar aire conciencia nuevas.",
+        "fecha_valoracion": "2025-07-26"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 17,
+    "fields": {
+        "pieza": 3,
+        "cliente": 12,
+        "puntuacion": 3,
+        "titulo": "Futuro pablo segundo tema e favor.",
+        "comentario": "Antonio sea especial dirección vista he plan. Última junto gobierno pablo.\nDeben elecciones solamente nacional parís hubiera fuera. Sabe cuatro otra hecho reunión ese medidas.",
+        "fecha_valoracion": "2025-04-24"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 18,
+    "fields": {
+        "pieza": 2,
+        "cliente": 17,
+        "puntuacion": 1,
+        "titulo": "Podría práctica dónde existe paciente serie estoy.",
+        "comentario": "Dirección nuevo segundo afirmó hombre salud iba. Diez fiscal g felipe durante encuentran. Aquel ante anterior rosa será solución.",
+        "fecha_valoracion": "2025-05-08"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 19,
+    "fields": {
+        "pieza": 4,
+        "cliente": 15,
+        "puntuacion": 4,
+        "titulo": "Solo rodríguez cierta deseo otros.",
+        "comentario": "Será sueño expresión ante sería hacer marzo. Nosotros juan dan familia de desarrollo proyectos. Productos especial muchas sigue.",
+        "fecha_valoracion": "2025-01-10"
+    }
+},
+{
+    "model": "proyecto.valoracion",
+    "pk": 20,
+    "fields": {
+        "pieza": 1,
+        "cliente": 15,
+        "puntuacion": 1,
+        "titulo": "Futuro derecha s.",
+        "comentario": "Tal negro ha. Dijo sí opinión.\nPudo vamos poner vivir ninguna sobre. Posibilidad crecimiento único si proyectos cuba. Anterior llevar visto desarrollo felipe conocimiento cuerpo.",
+        "fecha_valoracion": "2025-06-07"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 1,
+    "fields": {
+        "cliente": 1,
+        "nombre": "Lista de Calixto",
+        "fecha_creacion": "2025-08-19"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 2,
+    "fields": {
+        "cliente": 2,
+        "nombre": "Lista de Eulalia",
+        "fecha_creacion": "2025-01-27"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 3,
+    "fields": {
+        "cliente": 3,
+        "nombre": "Lista de Edu",
+        "fecha_creacion": "2025-08-20"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 4,
+    "fields": {
+        "cliente": 4,
+        "nombre": "Lista de Pastor",
+        "fecha_creacion": "2025-02-05"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 5,
+    "fields": {
+        "cliente": 5,
+        "nombre": "Lista de Evita",
+        "fecha_creacion": "2025-11-01"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 6,
+    "fields": {
+        "cliente": 6,
+        "nombre": "Lista de Carlota",
+        "fecha_creacion": "2025-02-10"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 7,
+    "fields": {
+        "cliente": 7,
+        "nombre": "Lista de Belen",
+        "fecha_creacion": "2025-05-24"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 8,
+    "fields": {
+        "cliente": 8,
+        "nombre": "Lista de Sigfrido",
+        "fecha_creacion": "2025-02-07"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 9,
+    "fields": {
+        "cliente": 9,
+        "nombre": "Lista de Borja",
+        "fecha_creacion": "2025-10-25"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 10,
+    "fields": {
+        "cliente": 10,
+        "nombre": "Lista de Judith",
+        "fecha_creacion": "2025-10-15"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 11,
+    "fields": {
+        "cliente": 11,
+        "nombre": "Lista de Amalia",
+        "fecha_creacion": "2025-06-16"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 12,
+    "fields": {
+        "cliente": 12,
+        "nombre": "Lista de Sabina",
+        "fecha_creacion": "2025-02-04"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 13,
+    "fields": {
+        "cliente": 13,
+        "nombre": "Lista de Ana",
+        "fecha_creacion": "2025-10-16"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 14,
+    "fields": {
+        "cliente": 14,
+        "nombre": "Lista de Eligia",
+        "fecha_creacion": "2025-04-19"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 15,
+    "fields": {
+        "cliente": 15,
+        "nombre": "Lista de Martina",
+        "fecha_creacion": "2025-06-24"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 16,
+    "fields": {
+        "cliente": 16,
+        "nombre": "Lista de Victoriano",
+        "fecha_creacion": "2025-09-06"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 17,
+    "fields": {
+        "cliente": 17,
+        "nombre": "Lista de Nazario",
+        "fecha_creacion": "2025-09-24"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 18,
+    "fields": {
+        "cliente": 18,
+        "nombre": "Lista de Rosenda",
+        "fecha_creacion": "2025-10-24"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 19,
+    "fields": {
+        "cliente": 19,
+        "nombre": "Lista de Zaira",
+        "fecha_creacion": "2025-04-19"
+    }
+},
+{
+    "model": "proyecto.listadeseos",
+    "pk": 20,
+    "fields": {
+        "cliente": 20,
+        "nombre": "Lista de Quique",
+        "fecha_creacion": "2025-05-05"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 1,
+    "fields": {
+        "lista_deseos": 1,
+        "pieza": 4,
+        "fecha_agregado": "2025-05-02"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 2,
+    "fields": {
+        "lista_deseos": 1,
+        "pieza": 1,
+        "fecha_agregado": "2025-07-21"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 3,
+    "fields": {
+        "lista_deseos": 1,
+        "pieza": 5,
+        "fecha_agregado": "2025-08-05"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 4,
+    "fields": {
+        "lista_deseos": 2,
+        "pieza": 5,
+        "fecha_agregado": "2025-01-11"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 5,
+    "fields": {
+        "lista_deseos": 2,
+        "pieza": 4,
+        "fecha_agregado": "2025-01-08"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 6,
+    "fields": {
+        "lista_deseos": 3,
+        "pieza": 1,
+        "fecha_agregado": "2025-09-15"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 7,
+    "fields": {
+        "lista_deseos": 3,
+        "pieza": 1,
+        "fecha_agregado": "2025-06-02"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 8,
+    "fields": {
+        "lista_deseos": 3,
+        "pieza": 1,
+        "fecha_agregado": "2025-03-12"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 9,
+    "fields": {
+        "lista_deseos": 3,
+        "pieza": 2,
+        "fecha_agregado": "2025-01-11"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 10,
+    "fields": {
+        "lista_deseos": 3,
+        "pieza": 4,
+        "fecha_agregado": "2025-08-06"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 11,
+    "fields": {
+        "lista_deseos": 4,
+        "pieza": 5,
+        "fecha_agregado": "2025-04-30"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 12,
+    "fields": {
+        "lista_deseos": 5,
+        "pieza": 2,
+        "fecha_agregado": "2025-08-29"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 13,
+    "fields": {
+        "lista_deseos": 5,
+        "pieza": 5,
+        "fecha_agregado": "2025-04-15"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 14,
+    "fields": {
+        "lista_deseos": 6,
+        "pieza": 2,
+        "fecha_agregado": "2025-08-17"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 15,
+    "fields": {
+        "lista_deseos": 6,
+        "pieza": 3,
+        "fecha_agregado": "2025-09-01"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 16,
+    "fields": {
+        "lista_deseos": 6,
+        "pieza": 2,
+        "fecha_agregado": "2025-06-07"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 17,
+    "fields": {
+        "lista_deseos": 6,
+        "pieza": 4,
+        "fecha_agregado": "2025-07-04"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 18,
+    "fields": {
+        "lista_deseos": 7,
+        "pieza": 3,
+        "fecha_agregado": "2025-09-02"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 19,
+    "fields": {
+        "lista_deseos": 8,
+        "pieza": 5,
+        "fecha_agregado": "2025-08-16"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 20,
+    "fields": {
+        "lista_deseos": 8,
+        "pieza": 1,
+        "fecha_agregado": "2025-06-28"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 21,
+    "fields": {
+        "lista_deseos": 8,
+        "pieza": 5,
+        "fecha_agregado": "2025-09-13"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 22,
+    "fields": {
+        "lista_deseos": 8,
+        "pieza": 4,
+        "fecha_agregado": "2025-10-10"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 23,
+    "fields": {
+        "lista_deseos": 8,
+        "pieza": 5,
+        "fecha_agregado": "2025-07-30"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 24,
+    "fields": {
+        "lista_deseos": 9,
+        "pieza": 5,
+        "fecha_agregado": "2025-05-30"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 25,
+    "fields": {
+        "lista_deseos": 9,
+        "pieza": 2,
+        "fecha_agregado": "2025-06-16"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 26,
+    "fields": {
+        "lista_deseos": 9,
+        "pieza": 1,
+        "fecha_agregado": "2025-05-01"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 27,
+    "fields": {
+        "lista_deseos": 10,
+        "pieza": 1,
+        "fecha_agregado": "2025-02-13"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 28,
+    "fields": {
+        "lista_deseos": 10,
+        "pieza": 2,
+        "fecha_agregado": "2025-11-20"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 29,
+    "fields": {
+        "lista_deseos": 10,
+        "pieza": 2,
+        "fecha_agregado": "2025-01-05"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 30,
+    "fields": {
+        "lista_deseos": 11,
+        "pieza": 4,
+        "fecha_agregado": "2025-06-07"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 31,
+    "fields": {
+        "lista_deseos": 11,
+        "pieza": 3,
+        "fecha_agregado": "2025-02-24"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 32,
+    "fields": {
+        "lista_deseos": 11,
+        "pieza": 4,
+        "fecha_agregado": "2025-03-26"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 33,
+    "fields": {
+        "lista_deseos": 12,
+        "pieza": 3,
+        "fecha_agregado": "2025-10-20"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 34,
+    "fields": {
+        "lista_deseos": 12,
+        "pieza": 1,
+        "fecha_agregado": "2025-01-12"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 35,
+    "fields": {
+        "lista_deseos": 13,
+        "pieza": 2,
+        "fecha_agregado": "2025-11-05"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 36,
+    "fields": {
+        "lista_deseos": 13,
+        "pieza": 4,
+        "fecha_agregado": "2025-06-25"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 37,
+    "fields": {
+        "lista_deseos": 13,
+        "pieza": 5,
+        "fecha_agregado": "2025-01-06"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 38,
+    "fields": {
+        "lista_deseos": 13,
+        "pieza": 1,
+        "fecha_agregado": "2025-01-09"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 39,
+    "fields": {
+        "lista_deseos": 14,
+        "pieza": 2,
+        "fecha_agregado": "2025-07-23"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 40,
+    "fields": {
+        "lista_deseos": 15,
+        "pieza": 5,
+        "fecha_agregado": "2025-04-28"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 41,
+    "fields": {
+        "lista_deseos": 15,
+        "pieza": 2,
+        "fecha_agregado": "2025-08-26"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 42,
+    "fields": {
+        "lista_deseos": 15,
+        "pieza": 2,
+        "fecha_agregado": "2025-11-16"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 43,
+    "fields": {
+        "lista_deseos": 16,
+        "pieza": 1,
+        "fecha_agregado": "2025-01-21"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 44,
+    "fields": {
+        "lista_deseos": 16,
+        "pieza": 2,
+        "fecha_agregado": "2025-04-21"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 45,
+    "fields": {
+        "lista_deseos": 16,
+        "pieza": 3,
+        "fecha_agregado": "2025-09-14"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 46,
+    "fields": {
+        "lista_deseos": 16,
+        "pieza": 2,
+        "fecha_agregado": "2025-02-06"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 47,
+    "fields": {
+        "lista_deseos": 17,
+        "pieza": 2,
+        "fecha_agregado": "2025-04-02"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 48,
+    "fields": {
+        "lista_deseos": 17,
+        "pieza": 5,
+        "fecha_agregado": "2025-03-02"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 49,
+    "fields": {
+        "lista_deseos": 17,
+        "pieza": 2,
+        "fecha_agregado": "2025-08-06"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 50,
+    "fields": {
+        "lista_deseos": 18,
+        "pieza": 3,
+        "fecha_agregado": "2025-07-05"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 51,
+    "fields": {
+        "lista_deseos": 18,
+        "pieza": 4,
+        "fecha_agregado": "2025-08-06"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 52,
+    "fields": {
+        "lista_deseos": 18,
+        "pieza": 2,
+        "fecha_agregado": "2025-03-05"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 53,
+    "fields": {
+        "lista_deseos": 19,
+        "pieza": 4,
+        "fecha_agregado": "2025-07-07"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 54,
+    "fields": {
+        "lista_deseos": 19,
+        "pieza": 5,
+        "fecha_agregado": "2025-11-15"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 55,
+    "fields": {
+        "lista_deseos": 20,
+        "pieza": 4,
+        "fecha_agregado": "2025-04-06"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 56,
+    "fields": {
+        "lista_deseos": 20,
+        "pieza": 4,
+        "fecha_agregado": "2025-03-09"
+    }
+},
+{
+    "model": "proyecto.listadeseospieza",
+    "pk": 57,
+    "fields": {
+        "lista_deseos": 20,
+        "pieza": 3,
+        "fecha_agregado": "2025-04-28"
+    }
+},
+{
+    "model": "proyecto.descuento",
+    "pk": 1,
+    "fields": {
+        "codigo": "DSC-1462",
+        "nombre": "Fútbol",
+        "descripcion": "Media podrá hace n ciento. Sociales suelo aquel están información más una. Ese mejor porque formación semanas.\nEstaba mismos mucha asunto pone. Generales próximo sentido defensa humanos razones de.",
+        "tipo": "2",
+        "valor": "20.00",
+        "fecha_inicio": "2025-04-30",
+        "fecha_fin": "2025-12-23",
+        "usos_maximos": 100,
+        "usos_actuales": 0,
+        "estado": "1"
+    }
+},
+{
+    "model": "proyecto.descuento",
+    "pk": 2,
+    "fields": {
+        "codigo": "DSC-6383",
+        "nombre": "Sólo",
+        "descripcion": "Hacia agua allí. Respuesta suerte resulta acerca. Habría madrid marcha yo escuela memoria.\nCausa ocasiones trabajar libros aquellas aumento pocos superior. Ni pedro gran hombres gracias objetivo.",
+        "tipo": "1",
+        "valor": "15.00",
+        "fecha_inicio": "2025-05-09",
+        "fecha_fin": "2025-12-23",
+        "usos_maximos": 100,
+        "usos_actuales": 0,
+        "estado": "1"
+    }
+},
+{
+    "model": "proyecto.descuento",
+    "pk": 3,
+    "fields": {
+        "codigo": "DSC-7988",
+        "nombre": "Dejar",
+        "descripcion": "Volvió quedó atención puedo. Carrera fondo valor falta. Dado no reunión menos necesario del trabajo.\nCaracterísticas edad país estructura. Dijo local europea puede natural.",
+        "tipo": "2",
+        "valor": "16.00",
+        "fecha_inicio": "2025-02-25",
+        "fecha_fin": "2025-12-23",
+        "usos_maximos": 100,
+        "usos_actuales": 0,
+        "estado": "2"
+    }
+},
+{
+    "model": "proyecto.descuento",
+    "pk": 4,
+    "fields": {
+        "codigo": "DSC-2641",
+        "nombre": "Padre",
+        "descripcion": "Claro camino precio orden. Pasa paso hablar vuelta ii lópez segundo. Estaban ejemplo recuerdo lejos jorge pues. Salir mayores varias jefe millones tan lejos.",
+        "tipo": "2",
+        "valor": "28.00",
+        "fecha_inicio": "2025-11-05",
+        "fecha_fin": "2025-12-23",
+        "usos_maximos": 100,
+        "usos_actuales": 0,
+        "estado": "2"
+    }
+},
+{
+    "model": "proyecto.descuento",
+    "pk": 5,
+    "fields": {
+        "codigo": "DSC-5604",
+        "nombre": "Cuando",
+        "descripcion": "Diferencia las primera país. Solo d compañía mundo derecha medio comenzó sur.\nTipos sabe nadie suerte mundo. Haciendo tres mayor primeros cuales lugar artículo.",
+        "tipo": "1",
+        "valor": "10.00",
+        "fecha_inicio": "2025-01-01",
+        "fecha_fin": "2025-12-23",
+        "usos_maximos": 100,
+        "usos_actuales": 0,
+        "estado": "1"
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 1,
+    "fields": {
+        "cliente": 1,
+        "descuento": 5,
+        "fecha_asignado": "2025-03-15",
+        "veces_usado": 1
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 2,
+    "fields": {
+        "cliente": 2,
+        "descuento": 4,
+        "fecha_asignado": "2025-01-10",
+        "veces_usado": 3
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 3,
+    "fields": {
+        "cliente": 3,
+        "descuento": 2,
+        "fecha_asignado": "2025-04-14",
+        "veces_usado": 2
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 4,
+    "fields": {
+        "cliente": 4,
+        "descuento": 1,
+        "fecha_asignado": "2025-10-19",
+        "veces_usado": 5
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 5,
+    "fields": {
+        "cliente": 5,
+        "descuento": 1,
+        "fecha_asignado": "2025-11-06",
+        "veces_usado": 2
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 6,
+    "fields": {
+        "cliente": 6,
+        "descuento": 1,
+        "fecha_asignado": "2025-07-07",
+        "veces_usado": 2
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 7,
+    "fields": {
+        "cliente": 7,
+        "descuento": 3,
+        "fecha_asignado": "2025-05-02",
+        "veces_usado": 3
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 8,
+    "fields": {
+        "cliente": 8,
+        "descuento": 4,
+        "fecha_asignado": "2025-03-28",
+        "veces_usado": 4
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 9,
+    "fields": {
+        "cliente": 9,
+        "descuento": 1,
+        "fecha_asignado": "2025-09-10",
+        "veces_usado": 5
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 10,
+    "fields": {
+        "cliente": 10,
+        "descuento": 4,
+        "fecha_asignado": "2025-07-14",
+        "veces_usado": 0
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 11,
+    "fields": {
+        "cliente": 11,
+        "descuento": 3,
+        "fecha_asignado": "2025-04-20",
+        "veces_usado": 2
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 12,
+    "fields": {
+        "cliente": 12,
+        "descuento": 4,
+        "fecha_asignado": "2025-01-12",
+        "veces_usado": 1
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 13,
+    "fields": {
+        "cliente": 13,
+        "descuento": 2,
+        "fecha_asignado": "2025-04-29",
+        "veces_usado": 4
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 14,
+    "fields": {
+        "cliente": 14,
+        "descuento": 1,
+        "fecha_asignado": "2025-01-27",
+        "veces_usado": 4
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 15,
+    "fields": {
+        "cliente": 15,
+        "descuento": 4,
+        "fecha_asignado": "2025-09-05",
+        "veces_usado": 0
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 16,
+    "fields": {
+        "cliente": 16,
+        "descuento": 3,
+        "fecha_asignado": "2025-04-05",
+        "veces_usado": 1
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 17,
+    "fields": {
+        "cliente": 17,
+        "descuento": 3,
+        "fecha_asignado": "2025-08-26",
+        "veces_usado": 2
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 18,
+    "fields": {
+        "cliente": 18,
+        "descuento": 1,
+        "fecha_asignado": "2025-07-27",
+        "veces_usado": 4
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 19,
+    "fields": {
+        "cliente": 19,
+        "descuento": 1,
+        "fecha_asignado": "2025-08-28",
+        "veces_usado": 2
+    }
+},
+{
+    "model": "proyecto.clientedescuento",
+    "pk": 20,
+    "fields": {
+        "cliente": 20,
+        "descuento": 2,
+        "fecha_asignado": "2025-07-01",
+        "veces_usado": 4
+    }
+}
+]

@@ -1,15 +1,439 @@
 from django.db import models
+from django.contrib.auth.models import (
+    AbstractUser,
+)  # agregamos estos para la autenticacion
 
-class Producto(models.Model):
-    nombre= models.CharField(max_length=100)
-    version= models.CharField(max_length=100)
-    referencia= models.CharField(max_length=100)
-    ESTADO = [("N", "Nueva"), ("R", "Recuperada"), ("REC", "Reconstruida")]
-    estado = models.CharField(max_length=3, choices=ESTADO)
-    descripcion= models.TextField()
-    marca= models.CharField(max_length=100)
-    precio= models.FloatField(default=1.0) 
-    anio= models.IntegerField()
+
+# ============================================================
+# NIVEL 1: IDENTIDAD Y AUTENTICACIÓN
+# ============================================================
+
+class Usuario(AbstractUser):
+    ADMINISTRADOR = 1
+    EMPLEADO = 2
+    CLIENTE = 3
+    ROLES = [
+        (ADMINISTRADOR, "administrador"),
+        (EMPLEADO, "empleado"),
+        (CLIENTE, "cliente"),
+    ]
     
+    email = models.EmailField(unique=True)
+    rol = models.CharField(max_length=20, choices=ROLES)
+    fecha_registro = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return self.email
+
+
+
+class Cliente(models.Model):
+    usuario = models.OneToOneField(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name="cliente"
+    )
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=20)
+    direccion = models.CharField(max_length=255)
+    fecha_nacimiento = models.DateField()
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"
+    
+
+class Tienda(models.Model):
+    nombre = models.CharField(max_length=100)
+    direccion = models.CharField(max_length=255)
+    telefono = models.CharField(max_length=20)
+    email = models.EmailField()
+    horario = models.CharField(max_length=100)
+
     def __str__(self):
         return self.nombre
+
+
+class Vendedor(models.Model):
+    usuario = models.OneToOneField(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name="vendedor"
+    )
+    tienda = models.ForeignKey(
+        Tienda,
+        on_delete=models.CASCADE,
+        related_name="vendedores"
+    )
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=20)
+    direccion = models.CharField(max_length=255)
+    fecha_nacimiento = models.DateField()
+    fecha_contratacion = models.DateField()
+    comision_porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellido}"
+
+
+
+
+
+
+
+class Pieza(models.Model):
+    NUEVO = 1
+    USADO = 2
+    REACONDICIONADO = 3
+
+    ESTADO = [
+        (NUEVO, "Nuevo"),
+        (USADO, "Usado"),
+        (REACONDICIONADO, "Reacondicionado"),
+    ]
+
+    nombre = models.CharField(max_length=100)
+    referencia = models.CharField(max_length=100, unique=True)
+    version = models.CharField(max_length=50)
+    marca = models.CharField(max_length=50)
+    anio = models.IntegerField()
+    estado = models.CharField(max_length=20, choices=ESTADO)
+    precio_base = models.DecimalField(max_digits=10, decimal_places=2)
+    descripcion = models.TextField()
+
+    def __str__(self):
+        return self.nombre
+
+
+class Inventario(models.Model):
+    pieza = models.ForeignKey(
+        Pieza,
+        on_delete=models.CASCADE,
+        related_name="inventarios"
+    )
+    tienda = models.ForeignKey(
+        Tienda,
+        on_delete=models.CASCADE,
+        related_name="inventarios"
+    )
+    stock = models.IntegerField()
+    precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
+    ubicacion_almacen = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.pieza} en {self.tienda}"
+
+
+# ============================================================
+# NIVEL 3: OPERACIONES COMERCIALES
+# ============================================================
+
+class Pedido(models.Model):
+    PENDIENTE = 1
+    PAGADO = 2
+    ENVIADO = 3
+    ENTREGADO = 4
+    CANCELADO = 5
+
+    ESTADO = [
+        (PENDIENTE, "Pendiente"),
+        (PAGADO, "Pagado"),
+        (ENVIADO, "Enviado"),
+        (ENTREGADO, "Entregado"),
+        (CANCELADO, "Cancelado"),
+    ]
+
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        related_name="pedidos_cliente"
+    )
+    tienda = models.ForeignKey(
+        Tienda,
+        on_delete=models.CASCADE,
+        related_name="pedidos_tienda"
+    )
+    vendedor = models.ForeignKey(
+        Vendedor,
+        on_delete=models.CASCADE,
+        related_name="pedidos_vendedor"
+    )
+    fecha_pedido = models.DateField()
+    direccion_envio = models.CharField(max_length=255)
+    estado = models.CharField(max_length=20, choices=ESTADO)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Pedido {self.id}"
+
+
+class LineaPedido(models.Model):
+    pedido = models.ForeignKey(
+        Pedido,
+        on_delete=models.CASCADE,
+        related_name="lineas_pedido"
+    )
+    pieza = models.ForeignKey(
+        Pieza,
+        on_delete=models.CASCADE,
+        related_name="lineas_pedido"
+    )
+    cantidad = models.IntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    descuento_aplicado = models.DecimalField(max_digits=10, decimal_places=2)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Linea {self.id} del pedido {self.pedido.id}"
+
+
+# ============================================================
+# SISTEMA DE PAGOS
+# ============================================================
+
+class MetodoPago(models.Model):
+
+    #class TipoMetodo(models.TextChoices):
+    #    TARJETA = "TARJETA", "Tarjeta"
+    #    CUENTA = "CUENTA", "Cuenta Bancaria"
+    #    BILLETERA = "BILLETERA", "Billetera Digital"
+
+
+    TARJETA = 1
+    CUENTA = 2
+    BILLETERA = 3
+
+
+    TIPO_METODO = [
+        (TARJETA, "Tarjeta"),
+        (CUENTA, "Cuenta Bancaria"),
+        (BILLETERA, "Billetera Digital")
+    ]
+
+
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        related_name="metodos_pago"
+    )
+    tipo_metodo = models.CharField(max_length=20, choices=TIPO_METODO)
+    es_predeterminado = models.BooleanField(default=False) # Indica si es el método predeterminado
+    fecha_agregado = models.DateField()
+
+    def __str__(self):
+        return f"{self.tipo_metodo} de {self.cliente}"
+
+
+class Tarjeta(models.Model):
+    VISA = 1
+    MASTERCARD = 2
+    AMEX = 3
+
+
+    TIPO_TARJETA = [
+        (VISA, "Visa"),
+        (MASTERCARD, "Mastercard"),
+        (AMEX, "American Express")
+    ]
+
+
+    metodo_pago = models.OneToOneField(
+        MetodoPago,
+        on_delete=models.CASCADE,
+        related_name="tarjeta"
+    )
+    #TODO: MEJORAR EL CAMPO FECHA CADUCIDAD
+    num_tarjeta_encriptado = models.CharField(max_length=255)
+    propietario = models.CharField(max_length=100)
+    fecha_caducidad = models.CharField(max_length=7)  # Formato MM/AA
+    tipo_tarjeta = models.CharField(max_length=20, choices=TIPO_TARJETA)
+    moneda = models.CharField(max_length=10)
+
+
+class CuentaBancaria(models.Model):
+    metodo_pago = models.OneToOneField(
+        MetodoPago,
+        on_delete=models.CASCADE,
+        related_name="cuenta_bancaria"
+    )
+    iban = models.CharField(max_length=255)
+    banco = models.CharField(max_length=100)
+    moneda = models.CharField(max_length=10)
+
+    
+
+
+class BilleteraDigital(models.Model):
+    PAYPAL = 1
+    STRIPE = 2
+    GOOGLEPAY = 3
+
+
+    BILLETERADIGITAL = [
+        (PAYPAL, "PayPal"),
+        (STRIPE, "Stripe"),
+        (GOOGLEPAY, "Google Pay")
+    ]
+
+    metodo_pago = models.OneToOneField(
+        MetodoPago,
+        on_delete=models.CASCADE,
+        related_name="billetera_digital"
+    )
+    email = models.EmailField()
+    proveedor = models.CharField(max_length=20, choices=BILLETERADIGITAL)
+
+
+
+class Pago(models.Model):
+    PENDIENTE = 1
+    COMPLETADO = 2
+    FALLIDO = 3
+
+
+    ESTADO = [
+        (PENDIENTE, "PENDIENTE"),
+        (COMPLETADO, "COMPLETADO"),
+        (FALLIDO, "FALLIDO")
+    ]
+
+
+    pedido = models.ForeignKey(
+        Pedido,
+        on_delete=models.CASCADE,
+        related_name="pagos"
+    )
+    metodo_pago = models.ForeignKey(
+        MetodoPago,
+        on_delete=models.CASCADE,
+        related_name="pagos"
+    )
+    fecha_pago = models.DateField()
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    estado = models.CharField(max_length=20, choices=ESTADO)
+    numero_transaccion = models.CharField(max_length=100)
+
+
+# ============================================================
+# NIVEL 4: POST-VENTA
+# ============================================================
+
+class Devolucion(models.Model):
+    PENDIENTE = 1
+    APROBADA = 2
+    RECHAZADA = 3
+
+
+    ESTADO = [
+        (PENDIENTE, "Pendiente"),
+        (APROBADA, "Aprobada"),
+        (RECHAZADA, "Rechazada"),
+    ]
+
+    linea_pedido = models.ForeignKey(
+        LineaPedido,
+        on_delete=models.CASCADE,
+        related_name="devoluciones"
+    )
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        related_name="devoluciones"
+    )
+    fecha_solicitud = models.DateField()
+    fecha_aprobacion = models.DateField(null=True, blank=True)
+    motivo = models.TextField()
+    estado = models.CharField(max_length=20, choices=ESTADO)
+    cantidad_devuelta = models.IntegerField()
+    monto_reembolso = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class Valoracion(models.Model):
+    pieza = models.ForeignKey(
+        Pieza,
+        on_delete=models.CASCADE,
+        related_name="valoraciones"
+    )
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        related_name="valoraciones"
+    )
+    puntuacion = models.IntegerField()
+    titulo = models.CharField(max_length=100)
+    comentario = models.TextField()
+    fecha_valoracion = models.DateField()
+
+
+class ListaDeseos(models.Model):
+    cliente = models.OneToOneField(
+        Cliente,
+        on_delete=models.CASCADE,
+        related_name="lista_deseos"
+    )
+    nombre = models.CharField(max_length=100)
+    fecha_creacion = models.DateField()
+
+
+class ListaDeseosPieza(models.Model):
+    lista_deseos = models.ForeignKey(
+        ListaDeseos,
+        on_delete=models.CASCADE,
+        related_name="items"
+    )
+    pieza = models.ForeignKey(
+        Pieza,
+        on_delete=models.CASCADE,
+        related_name="listas_deseos"
+    )
+    fecha_agregado = models.DateField()
+
+
+# ============================================================
+# NIVEL 5: MARKETING
+# ============================================================
+
+class Descuento(models.Model):
+    PORCENTAJE = 1
+    FIJO = 2
+
+    TIPO = [
+        (PORCENTAJE, "Porcentaje"),
+        (FIJO, "Fijo"),
+    ]
+
+    ACTIVO = 1
+    INACTIVO = 2
+
+    ESTADO = [
+        (ACTIVO, "Activo"),
+        (INACTIVO, "Inactivo"),
+    ]
+
+
+    codigo = models.CharField(max_length=50, unique=True)
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    tipo = models.CharField(max_length=20, choices=TIPO)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    usos_maximos = models.IntegerField()
+    usos_actuales = models.IntegerField()
+    estado = models.CharField(max_length=20, choices=ESTADO)
+
+
+class ClienteDescuento(models.Model):
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        related_name="descuentos"
+    )
+    descuento = models.ForeignKey(
+        Descuento,
+        on_delete=models.CASCADE,
+        related_name="clientes"
+    )
+    fecha_asignado = models.DateField()
+    veces_usado = models.IntegerField()
