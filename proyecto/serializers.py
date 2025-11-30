@@ -1,3 +1,4 @@
+from datetime import date
 from rest_framework import serializers
 from .models import *
 
@@ -6,7 +7,7 @@ from .models import *
 # USUARIO / CLIENTE / VENDEDOR
 # ============================================================
 
-class UsuarioSerializer(serializers.HyperlinkedModelSerializer):
+class UsuarioSerializer(serializers.ModelSerializer):
     #class Meta:
     #    model = Usuario
     #    fields = "__all__"
@@ -23,7 +24,7 @@ class UsuarioSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class ClienteSerializer(serializers.HyperlinkedModelSerializer): #HyperlinkedModelSerializer: sirve para crear los enlaces en la API
+class ClienteSerializer(serializers.ModelSerializer): #HyperlinkedModelSerializer: sirve para crear los enlaces en la API
     usuario = UsuarioSerializer(read_only=True) #muestro los datos del usuario asociado al cliente
 
     class Meta:
@@ -193,4 +194,36 @@ class ClienteDescuentoSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ClienteDescuento
         fields = "__all__"
+
+
+# ============================================================
+# REGISTROS DE USUARIOS 
+# ============================================================
+class RegistroClienteSerializer(serializers.Serializer):
+    #Creamos primero el usuario
+    user_data = UsuarioSerializer()
+
+    #Luego Creamos el cliente con los datos de usuario
+    cliente_data = ClienteSerializer()
+
+    def create(self, validated_data):
+        #Separamos los datos de usuario y cliente
+        user_data = validated_data.pop("user_data") 
+        cliente_data = validated_data.pop("cliente_data") # Hasheamos el password
+
+        #Creamos el usuario (desempaquetando con **)
+        password = user_data.pop("password")
+        user = Usuario.objects.create(rol=Usuario.CLIENTE, **user_data)
+        user.set_password(password)
+        user.save()
+
+        Cliente.objects.create(usuario=user, **cliente_data)
+
+        return {
+            "user_data": user,
+            "cliente_data": cliente_data  # opcional: puedes serializar también el cliente si quieres
+        }
+
+
+
 

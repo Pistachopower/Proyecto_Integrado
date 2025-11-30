@@ -3,6 +3,7 @@ from .serializers import *
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import viewsets #importante importar viewsets
+from rest_framework.generics import CreateAPIView #importante para crear usuarios tipo cliente
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -80,3 +81,14 @@ class DescuentoViewSet(viewsets.ModelViewSet):
 class ClienteDescuentoViewSet(viewsets.ModelViewSet):
     queryset = ClienteDescuento.objects.all()
     serializer_class = ClienteDescuentoSerializer
+
+
+# ============================================================
+# CREATE CLIENTE
+# ============================================================
+
+
+class RegistroClienteViewSet(CreateAPIView):
+    #permission_classes = [AllowAny]
+    serializer_class = RegistroClienteSerializer
+
