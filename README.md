@@ -1,78 +1,107 @@
-Cada vez que trabajas con el proyecto
-Activar el entorno virtual:
-source myvenv/bin/activate
+# Proyecto Integrado - Documentación
 
-Activar el contenedor:
-docker ps
-docker start NOMBRE_CONTENEDOR
+## 🚀 Configuración Inicial
 
-Ve a la BD de Postgress e inicia el servicio
+### Requisitos Previos
+- Python 3.8+
+- Docker y Docker Compose
+- Git
 
-De acuerdo a los requisitos, se usa PostgreSQL como base de datos para el proyecto Django, porque 
-queremos agregar imagenes, pdf y otros tipos de docuementos. 
+### Configuración del Entorno
 
-En Visual Studio Code descargamos la siguiente extension para visualizar y editar datos:
-Database Client JDBC
+1. **Clonar el repositorio**
+   ```bash
+   git clone [URL_DEL_REPOSITORIO]
+   cd Proyecto_Integrado
+   ```
 
-Usamos un contenedor Docker para levantar PostgreSQL de manera sencilla y aislada.
+2. **Crear y activar entorno virtual**
+   ```bash
+   # Linux/Mac
+   python -m venv venv
+   source venv/bin/activate
+   
+   # Windows
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
 
+3. **Instalar dependencias**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-La instalacion de psycopg2-binary~=2.9.9 #conexion con postgresql 
-se hizo con esto: 
+## 🐋 Configuración con Docker
 
-Docker
-https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04-es
+### Iniciar servicios con Docker Compose
+```bash
+docker-compose up -d
+```
 
-Docker Compose
-https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04-es
+### Comandos útiles de Docker
+- Ver contenedores en ejecución: `docker ps`
+- Iniciar un contenedor: `docker start NOMBRE_CONTENEDOR`
+- Detener un contenedor: `docker stop NOMBRE_CONTENEDOR`
+- Ver logs: `docker logs NOMBRE_CONTENEDOR`
 
-Creamos un archivo docker-compose.yml con las configuraciones necesarias para levantar un contenedor con PostgreSQL.
+## 🗄️ Base de Datos PostgreSQL
 
-Borrar BD
-En tal caso, que haya que hacer un cambio en los modelos debes hacer los siguientes pasos:
-Detener todos los contenedores con el comando:
-    docker stop NOMBRE_CONTENEDOR
+### Credenciales por defecto
+- **Usuario:** postgres
+- **Contraseña:** postgres
+- **Base de datos:** postgres
+- **Puerto:** 5432
 
-Eliminamos los contenedores como los volumenes asociados:
-    docker system prune -a --volumes
+### Configuración del proyecto
+Crear archivo `.env` en la raíz del proyecto con las siguientes variables:
+```env
+POSTGRES_NAME=nombre_bd
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+```
 
-Hay que aplicar este comando cada ves que se quiera aplicar cambios o trabajar de nuevo con ella mediante el archivo de configuracion yml en docker compose:
-    docker compose up -d
+### Migraciones
+```bash
+# Crear migraciones
+python manage.py makemigrations
 
-Para iniciarlo nuevamente
-sudo docker start nombreContenedor 
+# Aplicar migraciones
+python manage.py migrate
 
-Ejecutar script de poblacion Faker: python manage.python manage.py shell < proyecto/poblador_datos_falsos.py
+# Poblar base de datos con datos de prueba
+python manage.py shell < proyecto/poblador_datos_falsos.py
+```
 
-Usuario Postgres: 
-Usuario: postgres
-Contraseña: postgres
+## 🔄 Actualización de Modelos
 
-Otra forma de actualizar cambios en tus modelos con la bd
-Vas a todas las tablas y las eliminas 
+Cuando realices cambios en los modelos:
+1. Detén los contenedores:
+   ```bash
+   docker-compose down
+   ```
+2. Elimina volúmenes (si es necesario):
+   ```bash
+   docker system prune -a --volumes
+   ```
+3. Reconstruye e inicia los servicios:
+   ```bash
+   docker-compose up -d --build
+   ```
+4. Aplica migraciones:
+   ```bash
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
 
-Abres la terminal y aplicar: 
-    python manage.python manage.py shell < proyecto/poblador_datos_falsos.py
+## 🛠️ Configuración de Django
 
-Hacer la migracion:
-    python manage.py migrate
-
-
-Crear un entorno virtual
-Colocamos el siguiente comando: pip install python-dotenv
-
-En el fichero requirements.txt agregamos la siguiente línea:
-python-dotenv~=1.2.1 #manejo de variables de entorno
-
-Creamos un fichero con extensión .env en la raiz del proyecto,
-dentro del fichero agregamos los parametros de configuracion de 
-de la bd y otros datos como la autenticacion.
-
-Ir a settings.py de mysite y agregar lo siguiente:
-Ejemplo de la configuracion personalizada de la BD con Postgres
-```{python}
+### Configuración de la base de datos en `settings.py`
+```python
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 
 DATABASES = {
@@ -82,10 +111,14 @@ DATABASES = {
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'), 
+        'PORT': os.getenv('POSTGRES_PORT'),
     }
 }
+
 ```
 
-Luego agregar los datos de configuración al archivo .env 
-
+## 📝 Recursos Útiles
+- [Guía de Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04-es)
+- [Guía de Docker Compose](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04-es)
+- [Documentación de Django](https://docs.djangoproject.com/)
+- [Documentación de PostgreSQL](https://www.postgresql.org/docs/)
