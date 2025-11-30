@@ -1,3 +1,12 @@
 Django~=5.1.1
 djangorestframework~=3.14.0
 django-cors-headers~=4.3.1
+django-filter~=24.3 #crear filtros en la web
+pillow~=12.0.0 #imagen
+djangorestframework-simplejwt~=5.4.0 #autenticacion con tokens  
+psycopg2-binary~=2.9.9 #conexion con postgresql 
+Faker~=18.9.0 #poblar base de datos con datos falsos
+python-dotenv~=1.2.1 #manejo de variables de entorno
+
+
+

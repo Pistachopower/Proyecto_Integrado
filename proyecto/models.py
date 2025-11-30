@@ -17,9 +17,13 @@ class Usuario(AbstractUser):
         (EMPLEADO, "empleado"),
         (CLIENTE, "cliente"),
     ]
+
+        
+    rol  = models.PositiveSmallIntegerField(
+        choices=ROLES
+    )
     
     email = models.EmailField(unique=True)
-    rol = models.CharField(max_length=20, choices=ROLES)
     fecha_registro = models.DateField(auto_now=True)
 
     def __str__(self):
@@ -93,12 +97,15 @@ class Pieza(models.Model):
         (REACONDICIONADO, "Reacondicionado"),
     ]
 
+    estado  = models.PositiveSmallIntegerField(
+        choices=ESTADO
+    )
     nombre = models.CharField(max_length=100)
     referencia = models.CharField(max_length=100, unique=True)
     version = models.CharField(max_length=50)
     marca = models.CharField(max_length=50)
     anio = models.IntegerField()
-    estado = models.CharField(max_length=20, choices=ESTADO)
+    #estado = models.CharField(max_length=20, choices=ESTADO)
     precio_base = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.TextField()
 
@@ -144,6 +151,12 @@ class Pedido(models.Model):
         (CANCELADO, "Cancelado"),
     ]
 
+    estado  = models.PositiveSmallIntegerField(
+        choices=ESTADO
+    )
+
+    
+
     cliente = models.ForeignKey(
         Cliente,
         on_delete=models.CASCADE,
@@ -161,7 +174,7 @@ class Pedido(models.Model):
     )
     fecha_pedido = models.DateField()
     direccion_envio = models.CharField(max_length=255)
-    estado = models.CharField(max_length=20, choices=ESTADO)
+    #estado = models.CharField(max_length=20, choices=ESTADO)
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
@@ -211,13 +224,16 @@ class MetodoPago(models.Model):
         (BILLETERA, "Billetera Digital")
     ]
 
+    tipo_metodo  = models.PositiveSmallIntegerField(
+        choices=TIPO_METODO
+    )
 
     cliente = models.ForeignKey(
         Cliente,
         on_delete=models.CASCADE,
         related_name="metodos_pago"
     )
-    tipo_metodo = models.CharField(max_length=20, choices=TIPO_METODO)
+    #tipo_metodo = models.CharField(max_length=20, choices=TIPO_METODO)
     es_predeterminado = models.BooleanField(default=False) # Indica si es el método predeterminado
     fecha_agregado = models.DateField()
 
@@ -237,17 +253,20 @@ class Tarjeta(models.Model):
         (AMEX, "American Express")
     ]
 
+    tipo_tarjeta  = models.PositiveSmallIntegerField(
+        choices=TIPO_TARJETA
+    )
+
 
     metodo_pago = models.OneToOneField(
         MetodoPago,
         on_delete=models.CASCADE,
         related_name="tarjeta"
     )
-    #TODO: MEJORAR EL CAMPO FECHA CADUCIDAD
     num_tarjeta_encriptado = models.CharField(max_length=255)
     propietario = models.CharField(max_length=100)
     fecha_caducidad = models.CharField(max_length=7)  # Formato MM/AA
-    tipo_tarjeta = models.CharField(max_length=20, choices=TIPO_TARJETA)
+    #tipo_tarjeta = models.CharField(max_length=20, choices=TIPO_TARJETA)
     moneda = models.CharField(max_length=10)
 
 
@@ -276,13 +295,17 @@ class BilleteraDigital(models.Model):
         (GOOGLEPAY, "Google Pay")
     ]
 
+    proveedor  = models.PositiveSmallIntegerField(
+        choices=BILLETERADIGITAL
+    )
+
     metodo_pago = models.OneToOneField(
         MetodoPago,
         on_delete=models.CASCADE,
         related_name="billetera_digital"
     )
     email = models.EmailField()
-    proveedor = models.CharField(max_length=20, choices=BILLETERADIGITAL)
+    #proveedor = models.CharField(max_length=20, choices=BILLETERADIGITAL)
 
 
 
@@ -298,6 +321,9 @@ class Pago(models.Model):
         (FALLIDO, "FALLIDO")
     ]
 
+    estado  = models.PositiveSmallIntegerField(
+        choices=ESTADO
+    )
 
     pedido = models.ForeignKey(
         Pedido,
@@ -311,7 +337,7 @@ class Pago(models.Model):
     )
     fecha_pago = models.DateField()
     monto = models.DecimalField(max_digits=10, decimal_places=2)
-    estado = models.CharField(max_length=20, choices=ESTADO)
+    #estado = models.CharField(max_length=20, choices=ESTADO)
     numero_transaccion = models.CharField(max_length=100)
 
 
@@ -331,6 +357,10 @@ class Devolucion(models.Model):
         (RECHAZADA, "Rechazada"),
     ]
 
+    estado  = models.PositiveSmallIntegerField(
+        choices=ESTADO
+    )
+
     linea_pedido = models.ForeignKey(
         LineaPedido,
         on_delete=models.CASCADE,
@@ -344,7 +374,7 @@ class Devolucion(models.Model):
     fecha_solicitud = models.DateField()
     fecha_aprobacion = models.DateField(null=True, blank=True)
     motivo = models.TextField()
-    estado = models.CharField(max_length=20, choices=ESTADO)
+    #estado = models.CharField(max_length=20, choices=ESTADO)
     cantidad_devuelta = models.IntegerField()
     monto_reembolso = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -403,6 +433,10 @@ class Descuento(models.Model):
         (FIJO, "Fijo"),
     ]
 
+    tipo  = models.PositiveSmallIntegerField(
+        choices=TIPO
+    )
+
     ACTIVO = 1
     INACTIVO = 2
 
@@ -411,17 +445,22 @@ class Descuento(models.Model):
         (INACTIVO, "Inactivo"),
     ]
 
+    estado  = models.PositiveSmallIntegerField(
+        choices=ESTADO
+    )
+
+    
 
     codigo = models.CharField(max_length=50, unique=True)
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
-    tipo = models.CharField(max_length=20, choices=TIPO)
+    #tipo = models.CharField(max_length=20, choices=TIPO)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     usos_maximos = models.IntegerField()
     usos_actuales = models.IntegerField()
-    estado = models.CharField(max_length=20, choices=ESTADO)
+    #estado = models.CharField(max_length=20, choices=ESTADO)
 
 
 class ClienteDescuento(models.Model):

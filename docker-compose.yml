@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16  #Utiliza la versión 16 de PostgreSQL
+    container_name: tienda_db # Nombre del contenedor
+    environment:
+      POSTGRES_DB: tienda
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432" #conexion de mi ordenador al contenedor
+    volumes:
+      - postgres_data:/var/lib/postgresql/data #aqui guardamos los datos de la base de datos 
+
+
+volumes:
+  postgres_data:
