@@ -31,4 +31,5 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('registro_cliente/', RegistroClienteViewSet.as_view(), name='registro_cliente'),
+
 ]

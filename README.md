@@ -117,8 +117,16 @@ DATABASES = {
 
 ```
 
+**Activar el entorno virtual**
+   ```bash
+   source myvenv/bin/activate
+   ```
+
+
 ## 📝 Recursos Útiles
 - [Guía de Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04-es)
 - [Guía de Docker Compose](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04-es)
 - [Documentación de Django](https://docs.djangoproject.com/)
 - [Documentación de PostgreSQL](https://www.postgresql.org/docs/)
+
+

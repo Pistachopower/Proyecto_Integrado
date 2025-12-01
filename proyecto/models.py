@@ -20,7 +20,7 @@ class Usuario(AbstractUser):
 
         
     rol  = models.PositiveSmallIntegerField(
-        choices=ROLES
+        choices=ROLES, default=CLIENTE
     )
     
     email = models.EmailField(unique=True)
