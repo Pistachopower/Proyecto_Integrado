@@ -150,20 +150,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'proyecto.Usuario' # Indica que voy a sobreescribir user model al usuario que tengo en mi modelo
 
-#Autenticación con OAuth2
-#OAUTH2_PROVIDER = {
-#    'SCOPES': {'read': 'Read scope', 'write': 'Write scope', 'groups': 'Acceso a los grupos'}
-#}
-#
-#REST_FRAMEWORK = {
-#    'DEFAULT_AUTHENTICATION_CLASSES': (
-#        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-#    ),
-#
-#    'DEFAULT_PERMISSION_CLASSES': (
-#        'rest_framework.permissions.IsAuthenticated',
-#    ),
-#}
+# 2. Configuración Django Rest Framework para que use JWT
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+   
+}
 
 
 

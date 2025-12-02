@@ -3,6 +3,12 @@ from .api_views import *
 from rest_framework.routers import DefaultRouter #
 from django.urls import include
 
+# ¡Importa las vistas que te da simplejwt!
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 router = DefaultRouter()  #Este router se encarga de crear mostrar los enlaces de la API ROOT
 
 #(r'usuario')aqui indico cómo se va a generar la url en la API ROOT | basename: hace la referencia entre el serializer y la url
@@ -31,5 +37,17 @@ urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('registro_cliente/', RegistroClienteViewSet.as_view(), name='registro_cliente'),
+
+
+    # --- ¡AQUÍ ESTÁ EL LOGIN! ---
+    # 1. La URL para "pedir los sellos" (Login)
+    # Cuando alguien envíe un POST aquí con "username" y "password"...
+    # TokenObtainPairView se encargará de darles los tokens.
+    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+
+    # 2. La URL para "renovar el sello de acceso"
+    # Cuando el token de acceso caduque, envían su "token de refresco" aquí...
+    # y TokenRefreshView les dará un token de acceso nuevo.
+    path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
 ]

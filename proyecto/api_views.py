@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import viewsets #importante importar viewsets
 from rest_framework.generics import CreateAPIView #importante para crear usuarios tipo cliente
+from rest_framework.permissions import IsAuthenticated  # Login
+from rest_framework.views import APIView # Login
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -92,3 +94,28 @@ class RegistroClienteViewSet(CreateAPIView):
     #permission_classes = [AllowAny]
     serializer_class = RegistroClienteSerializer
 
+
+class VerMiPerfilView(APIView):
+    # 1. ¡Aquí pones al portero!
+    # Esto le dice a Django: "Antes de dejar pasar a nadie,
+    # comprueba que traiga un "Token de Acceso" válido".
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # 2. Gracias a IsAuthenticated, "request.user"
+        # será el usuario que hizo login (el dueño del token).
+        usuario = request.user
+        
+        # 3. Buscamos al cliente asociado a ese usuario
+        # Usamos .get() porque sabemos que solo hay uno (OneToOneField)
+        try:
+            cliente = Cliente.objects.get(usuario=usuario)
+            
+            # 4. Creamos una "ficha" con los datos del cliente para devolverla
+            # Usamos tu ClienteSerializer para convertir el objeto a JSON
+            serializer = ClienteSerializer(cliente) 
+            
+            return Response(serializer.data)
+            
+        except Cliente.DoesNotExist:
+            return Response({"error": "No se encontró un perfil de cliente para este usuario."}, status=404)
