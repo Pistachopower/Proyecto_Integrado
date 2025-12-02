@@ -50,4 +50,6 @@ urlpatterns = [
     # y TokenRefreshView les dará un token de acceso nuevo.
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
+    path('mi-perfil/', VerMiPerfilView.as_view()),
+
 ]

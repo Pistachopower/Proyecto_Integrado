@@ -96,26 +96,16 @@ class RegistroClienteViewSet(CreateAPIView):
 
 
 class VerMiPerfilView(APIView):
-    # 1. ¡Aquí pones al portero!
-    # Esto le dice a Django: "Antes de dejar pasar a nadie,
-    # comprueba que traiga un "Token de Acceso" válido".
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]  
 
     def get(self, request):
-        # 2. Gracias a IsAuthenticated, "request.user"
-        # será el usuario que hizo login (el dueño del token).
-        usuario = request.user
-        
-        # 3. Buscamos al cliente asociado a ese usuario
-        # Usamos .get() porque sabemos que solo hay uno (OneToOneField)
+        # request.user es el usuario autenticado gracias al token
+        # Ahora buscamos el cliente relacionado a ese usuario
         try:
-            cliente = Cliente.objects.get(usuario=usuario)
-            
-            # 4. Creamos una "ficha" con los datos del cliente para devolverla
-            # Usamos tu ClienteSerializer para convertir el objeto a JSON
-            serializer = ClienteSerializer(cliente) 
-            
-            return Response(serializer.data)
-            
+            cliente = Cliente.objects.get(usuario=request.user)
         except Cliente.DoesNotExist:
-            return Response({"error": "No se encontró un perfil de cliente para este usuario."}, status=404)
+            return Response({"error": "El cliente no existe"}, status=404)
+
+        # Serializamos el cliente y lo enviamos al frontend
+        serializer = ClienteSerializer(cliente)
+        return Response(serializer.data)
