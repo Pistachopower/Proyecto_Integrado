@@ -106,6 +106,7 @@ class VerMiPerfilView(APIView):
         except Cliente.DoesNotExist:
             return Response({"error": "El cliente no existe"}, status=404)
 
-        # Serializamos el cliente y lo enviamos al frontend
-        serializer = ClienteSerializer(cliente)
+
+        # Agregamos context={'request': request} para que pueda crear los enlaces
+        serializer = ClienteSerializer(cliente, context={'request': request})
         return Response(serializer.data)
