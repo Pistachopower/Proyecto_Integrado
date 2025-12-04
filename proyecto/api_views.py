@@ -6,6 +6,13 @@ from rest_framework import viewsets #importante importar viewsets
 from rest_framework.generics import CreateAPIView #importante para crear usuarios tipo cliente
 from rest_framework.permissions import IsAuthenticated  # Login
 from rest_framework.views import APIView # Login
+from rest_framework import status # Logout
+from rest_framework_simplejwt.tokens import RefreshToken # Logout
+
+# ============================================================
+# CRUD CON DRF
+# ============================================================
+
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -86,7 +93,7 @@ class ClienteDescuentoViewSet(viewsets.ModelViewSet):
 
 
 # ============================================================
-# CREATE CLIENTE
+# LOGIN Y LOGOUT
 # ============================================================
 
 
@@ -110,3 +117,23 @@ class VerMiPerfilView(APIView):
         # Agregamos context={'request': request} para que pueda crear los enlaces
         serializer = ClienteSerializer(cliente, context={'request': request})
         return Response(serializer.data)
+
+
+class LogoutView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        try:
+            # Recibimos el token de refresco del cuerpo de la petición
+            refresh_token = request.data["refresh"]
+            
+            # Instanciamos el token
+            token = RefreshToken(refresh_token)
+            
+            # ¡Lo metemos en la lista negra!
+            token.blacklist()
+
+            return Response({"message": "Logout exitoso"}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            # Si el token no es válido o hay error, devolvemos 400
+            return Response(status=status.HTTP_400_BAD_REQUEST)

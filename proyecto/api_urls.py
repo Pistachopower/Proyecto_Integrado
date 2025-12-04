@@ -51,5 +51,6 @@ urlpatterns = [
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     path('mi-perfil/', VerMiPerfilView.as_view()),
+    path('logout/', LogoutView.as_view(), name='logout'),
 
 ]
