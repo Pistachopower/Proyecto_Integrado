@@ -159,9 +159,17 @@ AUTH_USER_MODEL = 'proyecto.Usuario' # Indica que voy a sobreescribir user model
 
 # 2. Configuración Django Rest Framework para que use JWT
 REST_FRAMEWORK = {
+
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',  # Para el panel de administración
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+
+
    
 }
 
@@ -170,7 +178,7 @@ from datetime import timedelta
 
 #
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120), # (Opcional) Cuánto dura el acceso
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120), #  Cuánto dura el acceso
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # (Opcional) Cuánto dura el refresh
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,               # ¡IMPORTANTE! Activa la lista negra

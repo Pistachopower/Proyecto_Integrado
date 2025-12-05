@@ -1,7 +1,7 @@
 import random
 from faker import Faker
 from datetime import datetime, timedelta
-from django.contrib.auth.hashers import make_password
+#from django.contrib.auth.hashers import  set_password
 
 from proyecto.models import (
     Usuario, Cliente, Tienda, Vendedor,
@@ -47,11 +47,15 @@ def crear_usuarios():
 
     # Administrador
     admin = Usuario.objects.create(
-        username="admin",
-        email="admin@tienda.com",
-        password=make_password("admin123"),
+        username="nelson",
+        email="nelson@tienda.com",
+        #
         rol=Usuario.ADMINISTRADOR,
+        is_superuser=True,
+        is_staff=True,
     )
+    admin.set_password("nelson")
+    admin.save()
 
     # Empleados / Vendedores
     empleados = []
@@ -60,9 +64,11 @@ def crear_usuarios():
         usuario = Usuario.objects.create(
             username=email.split("@")[0],
             email=email,
-            password=make_password("pass1234"),
+            #
             rol=Usuario.EMPLEADO,
         )
+        usuario.set_password("admin123")
+        usuario.save()
         empleados.append(usuario)
 
     # Clientes
@@ -72,9 +78,11 @@ def crear_usuarios():
         usuario = Usuario.objects.create(
             username=email.split("@")[0],
             email=email,
-            password=make_password("pass1234"),
+            #
             rol=Usuario.CLIENTE,
         )
+        usuario.set_password("admin123")
+        usuario.save()
         clientes.append(usuario)
 
     return admin, empleados, clientes

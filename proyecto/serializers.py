@@ -224,6 +224,12 @@ class RegistroClienteSerializer(serializers.Serializer):
             "cliente_data": cliente_data  # opcional: puedes serializar también el cliente si quieres
         }
 
+#        return {
+#            "user_data": UsuarioSerializer(user).data,
+#            "cliente_data": cliente_data
+#        }
+
+
 
 
 
