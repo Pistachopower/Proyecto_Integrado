@@ -207,12 +207,6 @@ class LineaPedido(models.Model):
 
 class MetodoPago(models.Model):
 
-    #class TipoMetodo(models.TextChoices):
-    #    TARJETA = "TARJETA", "Tarjeta"
-    #    CUENTA = "CUENTA", "Cuenta Bancaria"
-    #    BILLETERA = "BILLETERA", "Billetera Digital"
-
-
     TARJETA = 1
     CUENTA = 2
     BILLETERA = 3
@@ -454,13 +448,11 @@ class Descuento(models.Model):
     codigo = models.CharField(max_length=50, unique=True)
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
-    #tipo = models.CharField(max_length=20, choices=TIPO)
     valor = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
     usos_maximos = models.IntegerField()
     usos_actuales = models.IntegerField()
-    #estado = models.CharField(max_length=20, choices=ESTADO)
 
 
 class ClienteDescuento(models.Model):
