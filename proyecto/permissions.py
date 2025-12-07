@@ -5,19 +5,14 @@ from proyecto.models import Usuario
 # 🛠️ HERRAMIENTA DE AYUDA (Para no repetir código)
 # ==============================================================================
 
-def es_jefe(user):
-    """
-    Función simple que nos dice si el usuario es un 'Jefe' (Admin, Staff o Empleado).
-    Devuelve True si tiene poder, False si es un mortal.
-    """
-    # 1. ¿Es superusuario (Dios) o Staff (Admin de Django)?
-    es_admin_django = user.is_staff or user.is_superuser
-    
-    # 2. ¿Es un empleado de la tienda (según tu modelo Usuario)?
+def es_jefe(user):    
+    # 1. ¿Es un empleado de la tienda (según tu modelo Usuario)?
     # Usamos getattr por si acaso el usuario no tiene atributo 'rol' (seguridad extra)
-    es_empleado_tienda = getattr(user, 'rol', None) == Usuario.EMPLEADO
+    es_empleado_admin_tienda = getattr(user, 'rol', None) == Usuario.EMPLEADO or getattr(user, 'rol', None) == Usuario.ADMINISTRADOR
     
-    return es_admin_django or es_empleado_tienda
+    return es_empleado_admin_tienda
+    
+
 
 
 # ==============================================================================
@@ -104,8 +99,9 @@ class EsDuenioDeObjeto(permissions.BasePermission):
         # y ese 'cliente' tiene un campo 'usuario'.
         try:
             return obj.cliente.usuario == request.user
-        except AttributeError:
+        except AttributeError as errorNUevo:
             # Si el objeto no tiene campo 'cliente', prohibimos el paso por seguridad.
+            print(f"Error de permiso: {errorNUevo}")
             return False
 
 
@@ -127,3 +123,76 @@ class EsDuenioDirecto(permissions.BasePermission):
         # Aquí 'obj' es directamente el Cliente o el Vendedor.
         # Verificamos si su campo 'usuario' eres tú.
         return obj.usuario == request.user
+    
+
+class SoloVerLineaPedido(permissions.BasePermission):
+    """
+    👀 PORTERO NIVEL 5: SOLO VER LÍNEAS DE PEDIDO
+    Permite ver las líneas de pedido, pero no modificarlas.
+    """
+
+    def has_permission(self, request, view):
+        # Permitir solo métodos seguros (GET, HEAD, OPTIONS)
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        # Permitir solo métodos seguros (GET, HEAD, OPTIONS)
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return False
+    
+
+
+
+class PermisoGestionInventario(permissions.BasePermission):
+    """
+    🏭 PORTERO NIVEL INVENTARIO:
+    - ADMINISTRADOR: Puede hacer TODO (Crear, Borrar, Editar, Ver).
+    - EMPLEADO: Solo puede VER y EDITAR (No puede Crear ni Borrar).
+    - OTROS: Fuera.
+    """
+
+    def has_permission(self, request, view):
+        # 1. Obtenemos el rol del usuario de forma segura
+        rol = getattr(request.user, 'rol', None)
+
+        # 2. Si es ADMINISTRADOR -> Acceso TOTAL
+        if rol == Usuario.ADMINISTRADOR:
+            return True
+
+        # 3. Si es EMPLEADO -> Revisamos qué quiere hacer
+        if rol == Usuario.EMPLEADO:
+            # Si intenta CREAR (POST) -> PROHIBIDO ⛔
+            if request.method == 'POST':
+                return False
+            # Si intenta BORRAR (DELETE) -> PROHIBIDO ⛔
+            # (Aunque DELETE suele ir a has_object_permission, lo paramos aquí también por si acaso)
+            if request.method == 'DELETE':
+                return False
+            
+            # Si es GET (Ver), PUT o PATCH (Editar) -> ADELANTE ✅
+            return True
+
+        # 4. Cualquier otro (Cliente) -> FUERA ⛔
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        # 1. Obtenemos el rol
+        rol = getattr(request.user, 'rol', None)
+
+        # 2. Si es ADMINISTRADOR -> Acceso TOTAL
+        if rol == Usuario.ADMINISTRADOR:
+            return True
+
+        # 3. Si es EMPLEADO
+        if rol == Usuario.EMPLEADO:
+            # Si intenta BORRAR (DELETE) -> PROHIBIDO ⛔
+            if request.method == 'DELETE':
+                return False
+            
+            # Si es Editar (PUT/PATCH) o Ver (GET) -> ADELANTE ✅
+            return True
+
+        return False

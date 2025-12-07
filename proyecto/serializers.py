@@ -65,6 +65,36 @@ class InventarioSerializer(serializers.HyperlinkedModelSerializer):
         model = Inventario
         fields = "__all__"
 
+    def validate(self, data):
+        """
+        Control de seguridad para proteger el PRECIO DE VENTA.
+        """
+        # 1. Obtenemos el usuario de la petición
+        request = self.context.get('request')
+        user = request.user
+
+        # 2. Verificamos si es una actualización (si el objeto ya existe)
+        # self.instance es el objeto que está en la base de datos actualmente
+        if self.instance:
+            
+            # 3. Regla: Si es EMPLEADO, no puede tocar el precio
+            if user.rol == Usuario.EMPLEADO:
+                
+                # Verificamos si intentan enviar un nuevo 'precio_venta'
+                if 'precio_venta' in data:
+                    precio_nuevo = data['precio_venta']
+                    precio_actual = self.instance.precio_venta
+
+                    # Si el precio nuevo es diferente al actual -> ¡ERROR!
+                    if precio_nuevo != precio_actual:
+                        raise serializers.ValidationError({
+                            "precio_venta": "No tienes permisos para modificar el precio de venta."
+                        })
+
+        return data
+
+    
+
 
 # ============================================================
 # PEDIDOS / LINEAS DE PEDIDO

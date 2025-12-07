@@ -42,12 +42,12 @@ class TiendaViewSet(viewsets.ModelViewSet):
 class PiezaViewSet(viewsets.ModelViewSet):
     queryset = Pieza.objects.all()
     serializer_class = PiezaSerializer
-    permission_classes = [IsAuthenticated, SoloAdmin]
+    permission_classes = [IsAuthenticated, PermisoGestionInventario]
 
 class InventarioViewSet(viewsets.ModelViewSet):
     queryset = Inventario.objects.all()
     serializer_class = InventarioSerializer
-    permission_classes = [IsAuthenticated, SoloAdmin]
+    permission_classes = [IsAuthenticated, PermisoGestionInventario]
 
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all()
@@ -57,7 +57,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
 class LineaPedidoViewSet(viewsets.ModelViewSet):
     queryset = LineaPedido.objects.all()
     serializer_class = LineaPedidoSerializer
-    permission_classes = [IsAuthenticated]
+    http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
+    permission_classes = [IsAuthenticated, SoloVerLineaPedido]
 
 class MetodoPagoViewSet(viewsets.ModelViewSet):
     queryset = MetodoPago.objects.all()
@@ -97,17 +98,17 @@ class ValoracionViewSet(viewsets.ModelViewSet):
 class ListaDeseosViewSet(viewsets.ModelViewSet):
     queryset = ListaDeseos.objects.all()
     serializer_class = ListaDeseosSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
 
 class ListaDeseosPiezaViewSet(viewsets.ModelViewSet):
     queryset = ListaDeseosPieza.objects.all()
     serializer_class = ListaDeseosPiezaSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
 
 class DescuentoViewSet(viewsets.ModelViewSet):
     queryset = Descuento.objects.all()
     serializer_class = DescuentoSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, SoloAdmin]
 
 class ClienteDescuentoViewSet(viewsets.ModelViewSet):
     queryset = ClienteDescuento.objects.all()
