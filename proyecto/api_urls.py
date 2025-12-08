@@ -33,24 +33,19 @@ router.register(r'lista_deseos_pieza', ListaDeseosPiezaViewSet, basename='listad
 router.register(r'descuento', DescuentoViewSet, basename='descuento')
 router.register(r'cliente_descuento', ClienteDescuentoViewSet, basename='clientedescuento')
 
+from .api_views import LoginSessionView, LogoutSessionView # Importa las nuevas
+
 urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')), #inicio de sesion API ROOT
     path('registro_cliente/', RegistroClienteViewSet.as_view(), name='registro_cliente'),
-
-
-    # --- ¡AQUÍ ESTÁ EL LOGIN! ---
-    # 1. La URL para "pedir los sellos" (Login)
-    # Cuando alguien envíe un POST aquí con "username" y "password"...
-    # TokenObtainPairView se encargará de darles los tokens.
-    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-
-    # 2. La URL para "renovar el sello de acceso"
-    # Cuando el token de acceso caduque, envían su "token de refresco" aquí...
-    # y TokenRefreshView les dará un token de acceso nuevo.
-    path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
     path('mi-perfil/', VerMiPerfilView.as_view()),
-    path('logout/', LogoutView.as_view(), name='logout'),
+
+    # Rutas de Login/Logout NUEVAS
+    path('login/', LoginSessionView.as_view(), name='login_session'),
+    path('logout/', LogoutSessionView.as_view(), name='logout_session'),
+
+
+  
 
 ]

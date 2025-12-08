@@ -10,9 +10,10 @@ from rest_framework.views import APIView # Login
 from rest_framework import status # Logout
 from rest_framework_simplejwt.tokens import RefreshToken # Logout
 
-# ============================================================
-# CRUD CON DRF
-# ============================================================
+
+from django.contrib.auth import login, logout, authenticate
+from rest_framework import status
+from rest_framework.permissions import AllowAny, AllowAny
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -124,6 +125,9 @@ class ClienteDescuentoViewSet(viewsets.ModelViewSet):
 class RegistroClienteViewSet(CreateAPIView):
     serializer_class = RegistroClienteSerializer
 
+    permission_classes = [AllowAny]  # Permite el acceso sin autenticación
+
+
 
 class VerMiPerfilView(APIView):
 
@@ -144,21 +148,38 @@ class VerMiPerfilView(APIView):
         return Response(serializer.data)
 
 
-class LogoutView(APIView):
-    permission_classes = (IsAuthenticated,)
+
+
+
+class LoginSessionView(APIView):
+    permission_classes = [AllowAny] # Deja entrar a cualquiera para intentar loguearse
 
     def post(self, request):
-        try:
-            # Recibimos el token de refresco del cuerpo de la petición
-            refresh_token = request.data["refresh"]
-            
-            # Instanciamos el token
-            token = RefreshToken(refresh_token)
-            
-            # ¡Lo metemos en la lista negra!
-            token.blacklist()
+        # 1. Recogemos usuario y contraseña
+        username = request.data.get('username')
+        password = request.data.get('password')
 
-            return Response({"message": "Logout exitoso"}, status=status.HTTP_205_RESET_CONTENT)
-        except Exception as e:
-            # Si el token no es válido o hay error, devolvemos 400
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        # 2. Django verifica si existen
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            # 3. ¡LA MAGIA! Esto crea la sesión y mete la cookie en el navegador
+            login(request, user)
+            
+            return Response({
+                "message": "Sesión iniciada correctamente",
+                "user": user.username,
+                # Aquí puedes devolver el rol si quieres para usarlo en Vue
+                "rol": getattr(user, 'rol', None) 
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                {"error": "Credenciales inválidas"}, 
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+class LogoutSessionView(APIView):
+    def post(self, request):
+        # Esto borra la cookie y la sesión del servidor
+        logout(request)
+        return Response({"message": "Sesión cerrada"}, status=status.HTTP_200_OK)

@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-rneen%%$g57ob1h#ll+t%4r+yahrlyuaw@8fxuvc!@5^e7hf$q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -66,9 +66,30 @@ MIDDLEWARE = [
 
 ]
 
+# CAMBIO 1: Configuración de CORS y CSRF (Los permisos para Vue)
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8080'
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
 ]
+
+# ¡ESTO ES VITAL! Permite que las cookies viajen entre el puerto 8000 y 8080
+CORS_ALLOW_CREDENTIALS = True
+
+
+# Le decimos a Django que confíe en Vue para enviar formularios
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+]
+
+# CAMBIO 2: Relajar la seguridad para trabajar en LOCAL
+# Al poner esto en False, funcionan las cookies sin HTTPS
+SESSION_COOKIE_SECURE = False 
+CSRF_COOKIE_SECURE = False
+
+# Ajustes para que la cookie no se bloquee entre puertos distintos
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 ROOT_URLCONF = 'mysite.urls'
 
@@ -157,32 +178,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'proyecto.Usuario' # Indica que voy a sobreescribir user model al usuario que tengo en mi modelo
 
-# 2. Configuración Django Rest Framework para que use JWT
+# CAMBIO 3: Cambiar el motor de autenticación de DRF
 REST_FRAMEWORK = {
-
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
     ],
-
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',  # Para el panel de administración
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # Quitamos JWT y ponemos SessionAuthentication
+        'rest_framework.authentication.SessionAuthentication',
     ),
-
-
-   
 }
 
-# Logout con JWT - Lista negra
-from datetime import timedelta
 
-#
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=120), #  Cuánto dura el acceso
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # (Opcional) Cuánto dura el refresh
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,               # ¡IMPORTANTE! Activa la lista negra
-}
 
 
 
