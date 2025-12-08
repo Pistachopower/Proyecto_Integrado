@@ -50,10 +50,48 @@ class InventarioViewSet(viewsets.ModelViewSet):
     serializer_class = InventarioSerializer
     permission_classes = [IsAuthenticated, PermisoGestionInventario]
 
+#class PedidoViewSet(viewsets.ModelViewSet):
+#    queryset = Pedido.objects.all()
+#    serializer_class = PedidoSerializer
+#    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+
+
 class PedidoViewSet(viewsets.ModelViewSet):
-    queryset = Pedido.objects.all()
     serializer_class = PedidoSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    # CAMBIO IMPORTANTE:
+    # Quitamos 'EsDuenioDeObjeto' porque la seguridad la haremos filtrando la lista (get_queryset).
+    # Si dejáramos EsDuenioDeObjeto, el Vendedor no podría ver el detalle del pedido porque 
+    # ese permiso busca obj.cliente.usuario == request.user.
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        
+        # Seguridad extra: Si no está autenticado, lista vacía
+        if not user.is_authenticated:
+            return Pedido.objects.none()
+
+        # Obtenemos el rol del usuario
+        rol = getattr(user, 'rol', None)
+
+        # CASO 1: ADMINISTRADOR
+        # El jefe puede ver todos los pedidos del sistema
+        if user.is_staff or user.is_superuser:
+            return Pedido.objects.all()
+
+        # CASO 2: CLIENTE
+        # Filtramos: Dame los pedidos donde el cliente soy YO
+        if rol == Usuario.CLIENTE:
+            return Pedido.objects.filter(cliente__usuario=user)
+
+        # CASO 3: EMPLEADO (Vendedor)
+        # Filtramos: Dame los pedidos donde el vendedor asignado soy YO
+        if rol == Usuario.EMPLEADO:
+            return Pedido.objects.filter(vendedor__usuario=user)
+
+        # Por defecto, no devolver nada
+        return Pedido.objects.none()
+    
 
 class LineaPedidoViewSet(viewsets.ModelViewSet):
     queryset = LineaPedido.objects.all()
@@ -129,23 +167,54 @@ class RegistroClienteViewSet(CreateAPIView):
 
 
 
+# proyecto/api_views.py
+
 class VerMiPerfilView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    permission_classes = [IsAuthenticated]  
-
-    #Sobrescribo el método get para devolver los datos del cliente autenticado
     def get(self, request):
-        # request.user es el usuario autenticado gracias al token
-        # Ahora buscamos el cliente relacionado a ese usuario
-        try:
-            cliente = Cliente.objects.get(usuario=request.user)
-        except Cliente.DoesNotExist:
-            return Response({"error": "El cliente no existe"}, status=404)
+        usuario = request.user
+        
+        # CASO 1: ES UN CLIENTE
+        if usuario.rol == Usuario.CLIENTE:
+            try:
+                perfil = Cliente.objects.get(usuario=usuario)
+                serializer = ClienteSerializer(perfil, context={'request': request})
+                
+                # Truco: Añadimos el campo 'tipo_usuario' a la respuesta JSON
+                # para que Vue sepa qué pintar
+                data = serializer.data
+                data['tipo_usuario'] = 'cliente'
+                return Response(data)
+                
+            except Cliente.DoesNotExist:
+                return Response({"error": "Perfil de cliente no encontrado"}, status=404)
 
+        # CASO 2: ES UN EMPLEADO (VENDEDOR)
+        elif usuario.rol == Usuario.EMPLEADO:
+            try:
+                # Modelo Vendedor vinculado al usuario
+                perfil = Vendedor.objects.get(usuario=usuario)
+                serializer = VendedorSerializer(perfil, context={'request': request})
+                
+                data = serializer.data
+                data['tipo_usuario'] = 'empleado'
+                return Response(data)
+                
+            except Vendedor.DoesNotExist:
+                return Response({"error": "Perfil de vendedor no encontrado"}, status=404)
 
-        # Agregamos context={'request': request} para que pueda crear los enlaces
-        serializer = ClienteSerializer(cliente, context={'request': request})
-        return Response(serializer.data)
+        # CASO 3: ADMINISTRADOR (Opcional, si tiene perfil propio o devolvemos datos básicos)
+        elif usuario.is_staff or usuario.is_superuser:
+             return Response({
+                 "username": usuario.username,
+                 "email": usuario.email,
+                 "tipo_usuario": "admin",
+                 "nombre": "Administrador",
+                 "apellido": "Sistema"
+             })
+
+        return Response({"error": "Rol de usuario desconocido"}, status=400)
 
 
 
