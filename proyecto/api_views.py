@@ -50,47 +50,47 @@ class InventarioViewSet(viewsets.ModelViewSet):
     serializer_class = InventarioSerializer
     permission_classes = [IsAuthenticated, PermisoGestionInventario]
 
-#class PedidoViewSet(viewsets.ModelViewSet):
-#    queryset = Pedido.objects.all()
-#    serializer_class = PedidoSerializer
-#    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
-
-
 class PedidoViewSet(viewsets.ModelViewSet):
+    queryset = Pedido.objects.all()
     serializer_class = PedidoSerializer
-    # CAMBIO IMPORTANTE:
-    # Quitamos 'EsDuenioDeObjeto' porque la seguridad la haremos filtrando la lista (get_queryset).
-    # Si dejáramos EsDuenioDeObjeto, el Vendedor no podría ver el detalle del pedido porque 
-    # ese permiso busca obj.cliente.usuario == request.user.
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
 
-    def get_queryset(self):
-        user = self.request.user
-        
-        # Seguridad extra: Si no está autenticado, lista vacía
-        if not user.is_authenticated:
-            return Pedido.objects.none()
 
-        # Obtenemos el rol del usuario
-        rol = getattr(user, 'rol', None)
-
-        # CASO 1: ADMINISTRADOR
-        # El jefe puede ver todos los pedidos del sistema
-        if user.is_staff or user.is_superuser:
-            return Pedido.objects.all()
-
-        # CASO 2: CLIENTE
-        # Filtramos: Dame los pedidos donde el cliente soy YO
-        if rol == Usuario.CLIENTE:
-            return Pedido.objects.filter(cliente__usuario=user)
-
-        # CASO 3: EMPLEADO (Vendedor)
-        # Filtramos: Dame los pedidos donde el vendedor asignado soy YO
-        if rol == Usuario.EMPLEADO:
-            return Pedido.objects.filter(vendedor__usuario=user)
-
-        # Por defecto, no devolver nada
-        return Pedido.objects.none()
+#class PedidoViewSet(viewsets.ModelViewSet):
+#    serializer_class = PedidoSerializer
+#    # CAMBIO IMPORTANTE:
+#    # Quitamos 'EsDuenioDeObjeto' porque la seguridad la haremos filtrando la lista (get_queryset).
+#    # Si dejáramos EsDuenioDeObjeto, el Vendedor no podría ver el detalle del pedido porque 
+#    # ese permiso busca obj.cliente.usuario == request.user.
+#    permission_classes = [IsAuthenticated]
+#
+#    def get_queryset(self):
+#        user = self.request.user
+#        
+#        # Seguridad extra: Si no está autenticado, lista vacía
+#        if not user.is_authenticated:
+#            return Pedido.objects.none()
+#
+#        # Obtenemos el rol del usuario
+#        rol = getattr(user, 'rol', None)
+#
+#        # CASO 1: ADMINISTRADOR
+#        # El jefe puede ver todos los pedidos del sistema
+#        if user.is_staff or user.is_superuser:
+#            return Pedido.objects.all()
+#
+#        # CASO 2: CLIENTE
+#        # Filtramos: Dame los pedidos donde el cliente soy YO
+#        if rol == Usuario.CLIENTE:
+#            return Pedido.objects.filter(cliente__usuario=user)
+#
+#        # CASO 3: EMPLEADO (Vendedor)
+#        # Filtramos: Dame los pedidos donde el vendedor asignado soy YO
+#        if rol == Usuario.EMPLEADO:
+#            return Pedido.objects.filter(vendedor__usuario=user)
+#
+#        # Por defecto, no devolver nada
+#        return Pedido.objects.none()
     
 
 class LineaPedidoViewSet(viewsets.ModelViewSet):
