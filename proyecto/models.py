@@ -155,8 +155,6 @@ class Pedido(models.Model):
         choices=ESTADO
     )
 
-    
-
     cliente = models.ForeignKey(
         Cliente,
         on_delete=models.CASCADE,
