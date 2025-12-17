@@ -56,7 +56,7 @@ class VendedorSerializer(serializers.HyperlinkedModelSerializer):
 class PiezaSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Pieza
-        fields = "__all__"
+        fields = ['id', 'nombre', 'marca', 'anio', 'precio_base', 'descripcion', 'estado', 'referencia', 'version']
 
 
 class InventarioSerializer(serializers.HyperlinkedModelSerializer):
