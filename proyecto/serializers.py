@@ -24,13 +24,15 @@ class UsuarioSerializer(serializers.ModelSerializer):
         ]
 
 
-class ClienteSerializer(serializers.ModelSerializer): #HyperlinkedModelSerializer: sirve para crear los enlaces en la API
+class ClienteSerializer(serializers.ModelSerializer): 
     usuario = UsuarioSerializer(read_only=True) #muestro los datos del usuario asociado al cliente
 
     class Meta:
         model = Cliente
         fields = "__all__"
 
+
+        
 
 class TiendaSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -73,9 +75,9 @@ class InventarioSerializer(serializers.HyperlinkedModelSerializer):
         request = self.context.get('request')
         user = request.user
 
-        # 2. Verificamos si es una actualización (si el objeto ya existe)
-        # self.instance es el objeto que está en la base de datos actualmente
-        if self.instance:
+        
+        # 2. self.instance es el objeto que está en la base de datos actualmente
+        if self.instance: ## Solo se ejecuta si es PUT o PATCH
             
             # 3. Regla: Si es EMPLEADO, no puede tocar el precio
             if user.rol == Usuario.EMPLEADO:
@@ -251,13 +253,10 @@ class RegistroClienteSerializer(serializers.Serializer):
 
         return {
             "user_data": user,
-            "cliente_data": cliente_data  # opcional: puedes serializar también el cliente si quieres
+            "cliente_data": cliente_data 
         }
 
-#        return {
-#            "user_data": UsuarioSerializer(user).data,
-#            "cliente_data": cliente_data
-#        }
+
 
 
 

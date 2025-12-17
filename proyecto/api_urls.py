@@ -2,18 +2,18 @@ from django.urls import path
 from .api_views import *
 from rest_framework.routers import DefaultRouter #
 from django.urls import include
+from .api_views import LoginSessionView, LogoutSessionView 
 
 # ¡Importa las vistas que te da simplejwt!
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+#from rest_framework_simplejwt.views import (
+#    TokenObtainPairView,
+#    TokenRefreshView,
+#)
 
 router = DefaultRouter()  #Este router se encarga de crear mostrar los enlaces de la API ROOT
 
 #(r'usuario')aqui indico cómo se va a generar la url en la API ROOT | basename: hace la referencia entre el serializer y la url
 router.register(r'usuario', UsuarioViewSet, basename='usuario') 
-
 router.register(r'cliente', ClienteViewSet, basename='cliente')
 router.register(r'vendedor', VendedorViewSet, basename='vendedor')
 router.register(r'tienda', TiendaViewSet, basename='tienda')
@@ -33,7 +33,7 @@ router.register(r'lista_deseos_pieza', ListaDeseosPiezaViewSet, basename='listad
 router.register(r'descuento', DescuentoViewSet, basename='descuento')
 router.register(r'cliente_descuento', ClienteDescuentoViewSet, basename='clientedescuento')
 
-from .api_views import LoginSessionView, LogoutSessionView # Importa las nuevas
+
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -41,11 +41,8 @@ urlpatterns = [
     path('registro_cliente/', RegistroClienteViewSet.as_view(), name='registro_cliente'),
     path('mi-perfil/', VerMiPerfilView.as_view()),
 
-    # Rutas de Login/Logout NUEVAS
+    # Rutas de Login/Logout 
     path('login/', LoginSessionView.as_view(), name='login_session'),
     path('logout/', LogoutSessionView.as_view(), name='logout_session'),
-
-
-  
 
 ]
