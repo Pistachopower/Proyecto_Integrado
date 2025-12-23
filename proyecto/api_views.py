@@ -40,11 +40,12 @@ class TiendaViewSet(viewsets.ModelViewSet):
     serializer_class = TiendaSerializer
     permission_classes = [IsAuthenticated, SoloAdmin]
 
-#TODO : Permitir que cualquiera pueda ver las piezas
+#TODO: CAMBIAR EL NOMBRE DEL PERMISO
 class PiezaViewSet(viewsets.ModelViewSet):
     queryset = Pieza.objects.all()
     serializer_class = PiezaSerializer
-    permission_classes = [IsAuthenticated, PermisoGestionInventario]
+    http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
+    permission_classes = [AllowAny,SoloVerPiezasLineaPedido]
 
 class InventarioViewSet(viewsets.ModelViewSet):
     queryset = Inventario.objects.all()
@@ -93,12 +94,12 @@ class PedidoViewSet(viewsets.ModelViewSet):
 #        # Por defecto, no devolver nada
 #        return Pedido.objects.none()
     
-
+#TODO: CAMBIAR EL NOMBRE DEL PERMISO
 class LineaPedidoViewSet(viewsets.ModelViewSet):
     queryset = LineaPedido.objects.all()
     serializer_class = LineaPedidoSerializer
     http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
-    permission_classes = [IsAuthenticated, SoloVerLineaPedido]
+    permission_classes = [IsAuthenticated, SoloVerPiezasLineaPedido]
 
 class MetodoPagoViewSet(viewsets.ModelViewSet):
     queryset = MetodoPago.objects.all()

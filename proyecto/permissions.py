@@ -98,9 +98,9 @@ class EsDuenioDirecto(permissions.BasePermission):
         return obj.usuario == request.user
     
 
-class SoloVerLineaPedido(permissions.BasePermission):
+class SoloVerPiezasLineaPedido(permissions.BasePermission):
     """
-    SOLO VER LÍNEAS DE PEDIDO
+    SOLO VER LÍNEAS DE PEDIDO y Piezas.
     Permite ver las líneas de pedido, pero no modificarlas.
     """
 
