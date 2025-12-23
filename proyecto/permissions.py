@@ -111,13 +111,11 @@ class SoloVerPiezasLineaPedido(permissions.BasePermission):
         return False
 
     def has_object_permission(self, request, view, obj):
-        # Permitir solo métodos seguros (GET, HEAD, OPTIONS)
-        if request.method in permissions.SAFE_METHODS:
+        if es_jefe(request.user):
             return True
-        return False
+        
+        return obj.pedido.cliente.usuario == request.user
     
-
-
 
 class PermisoGestionInventario(permissions.BasePermission):
     """

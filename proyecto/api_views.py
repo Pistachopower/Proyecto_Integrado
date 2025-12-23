@@ -3,7 +3,7 @@ from .models import *
 from .serializers import *
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework import viewsets #importante importar viewsets
+from rest_framework import viewsets,filters #importante importar viewsets
 from rest_framework.generics import CreateAPIView #importante para crear usuarios tipo cliente
 from rest_framework.permissions import IsAuthenticated  # Login
 from rest_framework.views import APIView # Login
@@ -13,7 +13,8 @@ from rest_framework_simplejwt.tokens import RefreshToken # Logout
 
 from django.contrib.auth import login, logout, authenticate
 from rest_framework import status
-from rest_framework.permissions import AllowAny, AllowAny
+from rest_framework.permissions import AllowAny
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
@@ -55,7 +56,15 @@ class InventarioViewSet(viewsets.ModelViewSet):
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all()
     serializer_class = PedidoSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    #permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+
+    #Permite filtrar los pedidos por cliente_id
+    filter_backends=[
+        DjangoFilterBackend,
+    ]
+
+    filterset_fields=[
+        'cliente_id'   ]
 
 
 #class PedidoViewSet(viewsets.ModelViewSet):
@@ -94,17 +103,29 @@ class PedidoViewSet(viewsets.ModelViewSet):
 #        # Por defecto, no devolver nada
 #        return Pedido.objects.none()
     
-#TODO: CAMBIAR EL NOMBRE DEL PERMISO
+
 class LineaPedidoViewSet(viewsets.ModelViewSet):
     queryset = LineaPedido.objects.all()
     serializer_class = LineaPedidoSerializer
     http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
+    #permission_classes = [IsAuthenticated, SoloVerPiezasLineaPedido]
     permission_classes = [IsAuthenticated, SoloVerPiezasLineaPedido]
+
+
+
 
 class MetodoPagoViewSet(viewsets.ModelViewSet):
     queryset = MetodoPago.objects.all()
     serializer_class = MetodoPagoSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    #permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+
+    filter_backends=[
+        DjangoFilterBackend,
+    ]
+
+    filterset_fields=[
+        'cliente_id'   ]
+    
 
 class TarjetaViewSet(viewsets.ModelViewSet):
     queryset = Tarjeta.objects.all()
@@ -134,7 +155,15 @@ class DevolucionViewSet(viewsets.ModelViewSet):
 class ValoracionViewSet(viewsets.ModelViewSet):
     queryset = Valoracion.objects.all()
     serializer_class = ValoracionSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    #permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+
+    #Permite filtrar las valoraciones por cliente_id
+    filter_backends=[
+        DjangoFilterBackend,
+    ]
+
+    filterset_fields=[
+        'cliente_id'   ]
 
 class ListaDeseosViewSet(viewsets.ModelViewSet):
     queryset = ListaDeseos.objects.all()

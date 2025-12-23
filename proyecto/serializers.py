@@ -110,6 +110,52 @@ class LineaPedidoSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
+    def to_representation(self, instance):
+        """
+        Método principal: Genera el JSON y aplica filtros de seguridad.
+        """
+        # 1. Obtenemos el objeto linea pedido (instance) de la bd en formato dict  para convertirlo a JSON
+        data = super().to_representation(instance)
+
+        # 2. Si el usuario es cliente, limpiamos los datos sensibles
+        if self.es_cliente():
+            data = self.filtrar_datos_para_cliente_lineaPedido(data, instance)
+
+        return data
+
+    # ------------------------------------------------------------------
+    # MÉTODOS AUXILIARES (HELPER METHODS)
+    # ------------------------------------------------------------------
+
+    def es_cliente(self):
+        """Devuelve True si quien hace la petición es un CLIENTE."""
+        datosUser = self.context.get('request')
+        if datosUser and datosUser.user.is_authenticated:
+            #getattr: obtiene el atributo 'rol' del usuario, si no existe devuelve None
+            es_cliente= getattr(datosUser.user, 'rol', None) == Usuario.CLIENTE
+            return es_cliente
+        return False
+
+    def filtrar_datos_para_cliente_lineaPedido(self, data, instance):
+        """Reemplaza los objetos complejos por información que interesa enviar al cliente."""
+        
+        # Simplificar Tienda (Solo nombre)
+        if instance.pieza:
+            data['pieza'] = {
+                "nombre": instance.pieza.nombre,   
+                "marca": instance.pieza.marca,
+                "anio": instance.pieza.anio,
+                "descripcion": instance.pieza.descripcion,
+                "estado": instance.pieza.estado,
+
+
+            }
+        else:
+            data['pieza'] = None
+
+        return data
+
+
 class PedidoSerializer(serializers.HyperlinkedModelSerializer):
     cliente = ClienteSerializer(read_only=True)
     tienda = TiendaSerializer(read_only=True)

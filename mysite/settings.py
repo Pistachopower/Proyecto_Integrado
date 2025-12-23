@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'proyecto',
     'rest_framework',
     'corsheaders',
+    'django_filters',
 
     #Para la lógica del logout con JWT
     'rest_framework_simplejwt', 

@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter #
 from django.urls import include
 from .api_views import LoginSessionView, LogoutSessionView 
 
+
 # ¡Importa las vistas que te da simplejwt!
 #from rest_framework_simplejwt.views import (
 #    TokenObtainPairView,
