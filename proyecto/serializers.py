@@ -120,6 +120,56 @@ class PedidoSerializer(serializers.HyperlinkedModelSerializer):
         model = Pedido
         fields = "__all__"
 
+     
+    def to_representation(self, instance):
+        """
+        Método principal: Genera el JSON y aplica filtros de seguridad.
+        """
+        # 1. Obtenemos el objeto pedido (instance) de la bd en formato dict  para convertirlo a JSON
+        data = super().to_representation(instance)
+
+        # 2. Si el usuario es cliente, limpiamos los datos sensibles
+        if self.es_cliente():
+            data = self.filtrar_datos_para_cliente(data, instance)
+
+        return data
+
+    # ------------------------------------------------------------------
+    # MÉTODOS AUXILIARES (HELPER METHODS)
+    # ------------------------------------------------------------------
+
+    def es_cliente(self):
+        """Devuelve True si quien hace la petición es un CLIENTE."""
+        datosUser = self.context.get('request')
+        if datosUser and datosUser.user.is_authenticated:
+            #getattr: obtiene el atributo 'rol' del usuario, si no existe devuelve None
+            es_cliente= getattr(datosUser.user, 'rol', None) == Usuario.CLIENTE
+            return es_cliente
+        return False
+
+    def filtrar_datos_para_cliente(self, data, instance):
+        """Reemplaza los objetos complejos por información que interesa enviar al cliente."""
+        
+        # Simplificar Tienda (Solo nombre)
+        if instance.tienda:
+            data['tienda'] = {
+                "nombre": instance.tienda.nombre
+            }
+        else:
+            data['tienda'] = None
+
+        # Simplificar Vendedor (Solo nombre y apellido)
+        if instance.vendedor:
+            data['vendedor'] = {
+                "nombre": instance.vendedor.nombre,
+                "apellido": instance.vendedor.apellido
+            }
+        else:
+            data['vendedor'] = None
+
+        return data
+
+
 
 # ============================================================
 # METODOS DE PAGO

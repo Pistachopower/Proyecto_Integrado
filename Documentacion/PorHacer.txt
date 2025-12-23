@@ -1,0 +1,22 @@
+Cambiar en el codigo repositorio
+Hacer:
+#TODO : Permitir que cualquiera pueda ver las piezas
+class PiezaViewSet(viewsets.ModelViewSet):
+    queryset = Pieza.objects.all()
+    serializer_class = PiezaSerializer
+    permission_classes = [IsAuthenticated, PermisoGestionInventario]
+
+
+
+Volver 
+Descargar el codigo anterior
+
+Los permisos de usuario controlarlo en el serializador
+
+Resolver lo que muestra el backend en el serializador y qué enviar al frontend 
+
+Necesito en el frontend obtener el cliente del usuario conectado mediante id y guardar los datos del cliente en el store,
+luego mediante el id obtenido hacer la peticion a los pedido pasandole ese id al backend. 
+
+Lo que tengo
+Luego de obtener el perfil del empleado obtener el cliente de ese usuario
