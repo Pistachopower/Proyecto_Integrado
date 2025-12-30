@@ -17,8 +17,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+# --- 1. AGREGA ESTAS DOS IMPORTACIONES ---
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('proyecto.api_urls')),
 
 ]
+
+# --- 2. AGREGA ESTE BLOQUE AL FINAL ---
+# Esto le dice a Django: "Si estamos en modo DEBUG, sirve los archivos de MEDIA_URL buscándolos en MEDIA_ROOT"
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

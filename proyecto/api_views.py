@@ -218,6 +218,7 @@ class VerMiPerfilView(APIView):
                 data['tipo_usuario'] = 'cliente'
                 return Response(data)
                 
+                
             except Cliente.DoesNotExist:
                 return Response({"error": "Perfil de cliente no encontrado"}, status=404)
 
@@ -246,9 +247,99 @@ class VerMiPerfilView(APIView):
              })
 
         return Response({"error": "Rol de usuario desconocido"}, status=400)
+    
+    def put(self, request):
+        """
+        Actualiza los datos del Usuario (email) y del Perfil específico (Cliente/Vendedor).
+        """
+        usuario = request.user
+        data = request.data # Los datos que envía el frontend (Vue)
+
+        # ---------------------------------------------------------
+        # PASO 1: ACTUALIZACIÓN DE DATOS DE CUENTA (Modelo Usuario)
+        # ---------------------------------------------------------
+        # Verificamos si quieren cambiar el email
+        nuevo_email = data.get('email')
+        
+        if nuevo_email and nuevo_email != usuario.email:
+            # Comprobamos que el email no esté usado por OTRA persona
+            if Usuario.objects.filter(email=nuevo_email).exclude(pk=usuario.pk).exists():
+                return Response(
+                    {"email": ["Correo inválido."]},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            usuario.email = nuevo_email
+            usuario.save() # Guardamos el cambio en la tabla Usuario
+
+        # Verificamos si quieren cambiar el nombre del usuario
+        nuevo_username = data.get('username')
+        
+        if nuevo_username != usuario.username:
+            return Response(
+                {"username": ["No se puede cambiar el nombre de usuario."]},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+           
+        
+
+        # ---------------------------------------------------------
+        # PASO 2: ACTUALIZACIÓN DE DATOS DE PERFIL (Modelo Cliente/Vendedor)
+        # ---------------------------------------------------------
+        
+        # CASO A: ES UN CLIENTE
+        if usuario.rol == Usuario.CLIENTE:
+            try:
+                perfil = Cliente.objects.get(usuario=usuario)
+                
+                # Usamos el Serializer para validar y guardar los datos del perfil
+                # partial=True permite enviar solo el nombre sin tener que enviar todo lo demás
+                serializer = ClienteSerializer(perfil, data=data, partial=True, context={'request': request})
+                
+                if serializer.is_valid():
+                    serializer.save()
+                    
+                    # Preparamos respuesta
+                    respuesta_data = serializer.data
+                    respuesta_data['tipo_usuario'] = 'cliente'
+                    # Aseguramos que el email devuelto sea el actualizado
+                    respuesta_data['email'] = usuario.email 
+                    
+                    return Response(respuesta_data)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            except Cliente.DoesNotExist:
+                return Response({"error": "Perfil de cliente no encontrado"}, status=404)
+
+        # CASO B: ES UN EMPLEADO
+        elif usuario.rol == Usuario.EMPLEADO:
+            try:
+                perfil = Vendedor.objects.get(usuario=usuario)
+                
+                serializer = VendedorSerializer(perfil, data=data, partial=True)
+                
+                if serializer.is_valid():
+                    serializer.save()
+                    
+                    respuesta_data = serializer.data
+                    respuesta_data['tipo_usuario'] = 'empleado'
+                    respuesta_data['email'] = usuario.email
+                    
+                    return Response(respuesta_data)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                
+            except Vendedor.DoesNotExist:
+                return Response({"error": "Perfil de vendedor no encontrado"}, status=404)
+
+        return Response({"error": "No se pueden editar datos de Administrador aquí"}, status=403)
 
 
-
+class ImagenPiezaViewSet(viewsets.ModelViewSet):
+    queryset = ImagenPieza.objects.all()
+    serializer_class = ImagenPiezaSerializer
+    permission_classes = [AllowAny]
 
 
 class LoginSessionView(APIView):

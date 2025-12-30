@@ -82,10 +82,6 @@ class Vendedor(models.Model):
 
 
 
-
-
-
-
 class Pieza(models.Model):
     NUEVO = 1
     USADO = 2
@@ -105,12 +101,27 @@ class Pieza(models.Model):
     version = models.CharField(max_length=50)
     marca = models.CharField(max_length=50)
     anio = models.IntegerField()
-    #estado = models.CharField(max_length=20, choices=ESTADO)
     precio_base = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.TextField()
+    imagen= models.ImageField(upload_to='imagenes_piezas/', blank=True, null=True)
 
     def __str__(self):
         return self.nombre
+    
+
+class ImagenPieza(models.Model):
+    pieza = models.ForeignKey(
+        Pieza,
+        on_delete=models.CASCADE,
+        related_name="imagenes"
+    )
+    url_imagen = models.ImageField(upload_to='imagenes_piezas/', blank=True, null=True)
+    descripcion = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return f"Imagen de {self.pieza.nombre}"
+    
+
 
 
 class Inventario(models.Model):
@@ -135,6 +146,7 @@ class Inventario(models.Model):
 # ============================================================
 # NIVEL 3: OPERACIONES COMERCIALES
 # ============================================================
+
 
 class Pedido(models.Model):
     PENDIENTE = 1

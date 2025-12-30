@@ -21,6 +21,7 @@ admin.site.register(ListaDeseos)
 admin.site.register(ListaDeseosPieza)
 admin.site.register(Descuento)
 admin.site.register(ClienteDescuento)
+admin.site.register(ImagenPieza)
 
 
 

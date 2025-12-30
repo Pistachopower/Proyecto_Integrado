@@ -33,7 +33,7 @@ router.register(r'lista_deseo', ListaDeseosViewSet, basename='listadeseos')
 router.register(r'lista_deseos_pieza', ListaDeseosPiezaViewSet, basename='listadeseospieza')
 router.register(r'descuento', DescuentoViewSet, basename='descuento')
 router.register(r'cliente_descuento', ClienteDescuentoViewSet, basename='clientedescuento')
-
+router.register(r'imagen_pieza', ImagenPiezaViewSet, basename='imagenpieza')
 
 
 urlpatterns = [
@@ -45,5 +45,7 @@ urlpatterns = [
     # Rutas de Login/Logout 
     path('login/', LoginSessionView.as_view(), name='login_session'),
     path('logout/', LogoutSessionView.as_view(), name='logout_session'),
+
+    
 
 ]

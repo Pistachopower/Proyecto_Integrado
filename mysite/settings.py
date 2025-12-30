@@ -172,6 +172,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# URL pública para acceder (lo que se ve en el navegador)
+MEDIA_URL = '/media/'
+
+# Ruta física en tu disco duro donde se guardan los archivos
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
