@@ -67,41 +67,6 @@ class PedidoViewSet(viewsets.ModelViewSet):
         'cliente_id'   ]
 
 
-#class PedidoViewSet(viewsets.ModelViewSet):
-#    serializer_class = PedidoSerializer
-#    # CAMBIO IMPORTANTE:
-#    # Quitamos 'EsDuenioDeObjeto' porque la seguridad la haremos filtrando la lista (get_queryset).
-#    # Si dejáramos EsDuenioDeObjeto, el Vendedor no podría ver el detalle del pedido porque 
-#    # ese permiso busca obj.cliente.usuario == request.user.
-#    permission_classes = [IsAuthenticated]
-#
-#    def get_queryset(self):
-#        user = self.request.user
-#        
-#        # Seguridad extra: Si no está autenticado, lista vacía
-#        if not user.is_authenticated:
-#            return Pedido.objects.none()
-#
-#        # Obtenemos el rol del usuario
-#        rol = getattr(user, 'rol', None)
-#
-#        # CASO 1: ADMINISTRADOR
-#        # El jefe puede ver todos los pedidos del sistema
-#        if user.is_staff or user.is_superuser:
-#            return Pedido.objects.all()
-#
-#        # CASO 2: CLIENTE
-#        # Filtramos: Dame los pedidos donde el cliente soy YO
-#        if rol == Usuario.CLIENTE:
-#            return Pedido.objects.filter(cliente__usuario=user)
-#
-#        # CASO 3: EMPLEADO (Vendedor)
-#        # Filtramos: Dame los pedidos donde el vendedor asignado soy YO
-#        if rol == Usuario.EMPLEADO:
-#            return Pedido.objects.filter(vendedor__usuario=user)
-#
-#        # Por defecto, no devolver nada
-#        return Pedido.objects.none()
     
 
 class LineaPedidoViewSet(viewsets.ModelViewSet):
@@ -125,6 +90,29 @@ class MetodoPagoViewSet(viewsets.ModelViewSet):
 
     filterset_fields=[
         'cliente_id'   ]
+    
+
+# ============================================================
+# METODO DE PAGO PARA CLIENTE
+# ============================================================
+class MetodoPagoClienteViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Filtramos para que el usuario solo vea SUS métodos
+        return MetodoPago.objects.filter(cliente=self.request.user.cliente)
+
+    def get_serializer_class(self):
+        # Usamos el serializador complejo solo para CREAR (POST)
+        if self.action == 'create':
+            return CrearMetodoPagoUnificadoSerializer
+        # Usamos tu serializador original para LISTAR/VER (GET)
+        return MetodoPagoSerializer
+
+    # No necesitamos sobrescribir perform_create porque lo manejamos en el serializer,
+    # pero el serializer necesita el 'request' en el contexto, 
+    # y ModelViewSet lo pasa automáticamente.
+
     
 
 class TarjetaViewSet(viewsets.ModelViewSet):

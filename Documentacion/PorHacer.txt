@@ -1,0 +1,4 @@
+Por hacer 
+De los metodos de pago cliente:
+Agregar el método update y controlar que solo haya un método predeterminado (sobreescribir el predeterminado anterior)
+

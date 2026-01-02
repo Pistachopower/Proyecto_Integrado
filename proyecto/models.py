@@ -239,7 +239,7 @@ class MetodoPago(models.Model):
     )
     #tipo_metodo = models.CharField(max_length=20, choices=TIPO_METODO)
     es_predeterminado = models.BooleanField(default=False) # Indica si es el método predeterminado
-    fecha_agregado = models.DateField()
+    fecha_agregado = models.DateField(auto_now=True)
 
     def __str__(self):
         return f"{self.tipo_metodo} de {self.cliente}"

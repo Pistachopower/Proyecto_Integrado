@@ -228,8 +228,8 @@ class PedidoSerializer(serializers.HyperlinkedModelSerializer):
 # METODOS DE PAGO
 # ============================================================
 
-class MetodoPagoSerializer(serializers.HyperlinkedModelSerializer):
-    cliente = ClienteSerializer(read_only=True)
+class MetodoPagoSerializer(serializers.ModelSerializer):
+    #cliente = ClienteSerializer()
 
     class Meta:
         model = MetodoPago
@@ -258,6 +258,141 @@ class BilleteraDigitalSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = BilleteraDigital
         fields = "__all__"
+
+
+# ============================================================
+# METODO DE PAGO PARA CLIENTE
+# ============================================================
+# --- Serializadores Auxiliares para validar los datos hijos ---
+class TarjetaInputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tarjeta
+        exclude = ['metodo_pago']
+        # RELAJAMOS LAS REGLAS: Hacemos todo opcional aquí
+        extra_kwargs = {
+            'num_tarjeta_encriptado': {'required': False},
+            'propietario': {'required': False},
+            'fecha_caducidad': {'required': False},
+            'moneda': {'required': False},
+            'tipo_tarjeta': {'required': False}, 
+        }
+
+class CuentaBancariaInputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CuentaBancaria
+        exclude = ['metodo_pago']
+        # RELAJAMOS LAS REGLAS
+        extra_kwargs = {
+            'iban': {'required': False},
+            'banco': {'required': False},
+            'moneda': {'required': False},
+        }
+
+class BilleteraDigitalInputSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BilleteraDigital
+        exclude = ['metodo_pago']
+        # RELAJAMOS LAS REGLAS
+        extra_kwargs = {
+            'email': {'required': False},
+            'proveedor': {'required': False},
+        }
+
+# --- EL SERIALIZADOR MAESTRO ---
+class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
+    # Permitimos null para que el frontend pueda enviar null si quiere
+    detalles_tarjeta = TarjetaInputSerializer(required=False, allow_null=True)
+    detalles_cuenta = CuentaBancariaInputSerializer(required=False, allow_null=True)
+    detalles_billetera = BilleteraDigitalInputSerializer(required=False, allow_null=True)
+
+    class Meta:
+        model = MetodoPago
+        fields = [
+            'tipo_metodo', 
+            'es_predeterminado', 
+            'detalles_tarjeta', 
+            'detalles_cuenta', 
+            'detalles_billetera'
+        ]
+
+    def validate(self, data):
+        tipo = data.get('tipo_metodo')
+
+        # --- VALIDACIÓN CONDICIONAL (Aquí es donde ocurre la magia) ---
+        
+        # CASO 1: TARJETA
+        if tipo == MetodoPago.TARJETA:
+            tarjeta_data = data.get('detalles_tarjeta')
+            if not tarjeta_data:
+                raise serializers.ValidationError({"detalles_tarjeta": "Faltan los datos de la tarjeta."})
+            
+            # Validación manual de campos críticos (porque los hicimos opcionales arriba)
+            errores_tarjeta = {}
+            if not tarjeta_data.get('num_tarjeta_encriptado'):
+                errores_tarjeta['num_tarjeta_encriptado'] = "Este campo es requerido."
+            if not tarjeta_data.get('propietario'):
+                errores_tarjeta['propietario'] = "Este campo es requerido."
+            
+            if errores_tarjeta:
+                raise serializers.ValidationError({"detalles_tarjeta": errores_tarjeta})
+
+        # CASO 2: CUENTA BANCARIA
+        elif tipo == MetodoPago.CUENTA:
+            cuenta_data = data.get('detalles_cuenta')
+            if not cuenta_data:
+                raise serializers.ValidationError({"detalles_cuenta": "Faltan los datos de la cuenta bancaria."})
+            
+            errores_cuenta = {}
+            if not cuenta_data.get('iban'):
+                errores_cuenta['iban'] = "El IBAN es obligatorio."
+            if not cuenta_data.get('banco'):
+                errores_cuenta['banco'] = "El nombre del banco es obligatorio."
+            
+            if errores_cuenta:
+                raise serializers.ValidationError({"detalles_cuenta": errores_cuenta})
+
+        # CASO 3: BILLETERA DIGITAL
+        elif tipo == MetodoPago.BILLETERA:
+            billetera_data = data.get('detalles_billetera')
+            if not billetera_data:
+                raise serializers.ValidationError({"detalles_billetera": "Faltan los datos de la billetera."})
+            
+            if not billetera_data.get('email'):
+                 raise serializers.ValidationError({"detalles_billetera": {"email": "El email es obligatorio."}})
+
+        return data
+
+    def create(self, validated_data):
+        # ... (El método create sigue igual que en la respuesta anterior) ...
+        datos_tarjeta = validated_data.pop('detalles_tarjeta', None)
+        datos_cuenta = validated_data.pop('detalles_cuenta', None)
+        datos_billetera = validated_data.pop('detalles_billetera', None)
+
+        #TODO: Es posible que de error porque hay que hacer una query al usuario autenticado
+        cliente = self.context['request'].user.cliente 
+
+        # --- LÓGICA DE PREDETERMINADO ---
+        # Verificamos si ya existe algún método de pago para este cliente
+        ya_tiene_metodos = MetodoPago.objects.filter(cliente=cliente).exists()
+
+        if not ya_tiene_metodos:
+            # Caso A: Es el primer método que agrega en su vida -> OBLIGATORIO TRUE
+            validated_data['es_predeterminado'] = True
+        else:
+            # Caso B: Ya tiene otros métodos -> OBLIGATORIO FALSE (el nuevo no quita al anterior)
+            validated_data['es_predeterminado'] = False
+        # --------------------------------
+        
+        metodo_pago = MetodoPago.objects.create(cliente=cliente, **validated_data)
+
+        if metodo_pago.tipo_metodo == MetodoPago.TARJETA and datos_tarjeta:
+            Tarjeta.objects.create(metodo_pago=metodo_pago, **datos_tarjeta)
+        elif metodo_pago.tipo_metodo == MetodoPago.CUENTA and datos_cuenta:
+            CuentaBancaria.objects.create(metodo_pago=metodo_pago, **datos_cuenta)
+        elif metodo_pago.tipo_metodo == MetodoPago.BILLETERA and datos_billetera:
+            BilleteraDigital.objects.create(metodo_pago=metodo_pago, **datos_billetera)
+
+        return metodo_pago
 
 
 # ============================================================

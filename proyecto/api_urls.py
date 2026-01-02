@@ -23,6 +23,10 @@ router.register(r'inventario', InventarioViewSet, basename='inventario')
 router.register(r'pedido', PedidoViewSet, basename='pedido')
 router.register(r'lineas_pedido', LineaPedidoViewSet, basename='lineapedido')
 router.register(r'metodo_pago', MetodoPagoViewSet, basename='metodopago')
+
+router.register(r'metodo_pago_cliente', MetodoPagoClienteViewSet, basename='metodopagocliente')
+
+
 router.register(r'tarjeta', TarjetaViewSet, basename='tarjeta')
 router.register(r'cuenta_bancaria', CuentaBancariaViewSet, basename='cuentabancaria')
 router.register(r'billetera_digital', BilleteraDigitalViewSet, basename='billeteradigital')
@@ -36,6 +40,7 @@ router.register(r'cliente_descuento', ClienteDescuentoViewSet, basename='cliente
 router.register(r'imagen_pieza', ImagenPiezaViewSet, basename='imagenpieza')
 
 
+
 urlpatterns = [
     path('', include(router.urls)),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')), #inicio de sesion API ROOT
@@ -45,7 +50,5 @@ urlpatterns = [
     # Rutas de Login/Logout 
     path('login/', LoginSessionView.as_view(), name='login_session'),
     path('logout/', LogoutSessionView.as_view(), name='logout_session'),
-
-    
 
 ]
