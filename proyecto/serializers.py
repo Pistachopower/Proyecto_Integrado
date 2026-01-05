@@ -315,21 +315,62 @@ class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
             'detalles_billetera'
         ]
 
+
+    
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.tipo_metodo == MetodoPago.TARJETA:
+            tarjeta = getattr(instance, 'tarjeta', None)
+            if tarjeta:
+                data['detalles_tarjeta'] = TarjetaSerializer(tarjeta, context=self.context).data
+            else:
+                data['detalles_tarjeta'] = None
+            data['detalles_cuenta'] = None
+            data['detalles_billetera'] = None
+        elif instance.tipo_metodo == MetodoPago.CUENTA:
+            cuenta = getattr(instance, 'cuenta_bancaria', None)
+            if cuenta:
+                data['detalles_cuenta'] = CuentaBancariaSerializer(cuenta, context=self.context).data
+            else:
+                data['detalles_cuenta'] = None
+            data['detalles_tarjeta'] = None
+            data['detalles_billetera'] = None
+        elif instance.tipo_metodo == MetodoPago.BILLETERA:
+            billetera = getattr(instance, 'billetera_digital', None)
+            if billetera:
+                data['detalles_billetera'] = BilleteraDigitalSerializer(billetera, context=self.context).data
+            else:
+                data['detalles_billetera'] = None
+            data['detalles_tarjeta'] = None
+            data['detalles_cuenta'] = None
+        else:
+            data['detalles_tarjeta'] = None
+            data['detalles_cuenta'] = None
+            data['detalles_billetera'] = None
+        return data
+    
+    
+
+
+
     def validate(self, data):
         tipo = data.get('tipo_metodo')
 
-        # --- VALIDACIÓN CONDICIONAL (Aquí es donde ocurre la magia) ---
+        # --- VALIDACIÓN CONDICIONAL ---
         
         # CASO 1: TARJETA
         if tipo == MetodoPago.TARJETA:
             tarjeta_data = data.get('detalles_tarjeta')
+            
             if not tarjeta_data:
                 raise serializers.ValidationError({"detalles_tarjeta": "Faltan los datos de la tarjeta."})
             
             # Validación manual de campos críticos (porque los hicimos opcionales arriba)
             errores_tarjeta = {}
+
             if not tarjeta_data.get('num_tarjeta_encriptado'):
                 errores_tarjeta['num_tarjeta_encriptado'] = "Este campo es requerido."
+            
             if not tarjeta_data.get('propietario'):
                 errores_tarjeta['propietario'] = "Este campo es requerido."
             
@@ -359,11 +400,14 @@ class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
             
             if not billetera_data.get('email'):
                  raise serializers.ValidationError({"detalles_billetera": {"email": "El email es obligatorio."}})
+            
+        else:
+            raise serializers.ValidationError({"tipo_metodo": "Tipo de método de pago no válido."})
+
 
         return data
 
     def create(self, validated_data):
-        # ... (El método create sigue igual que en la respuesta anterior) ...
         datos_tarjeta = validated_data.pop('detalles_tarjeta', None)
         datos_cuenta = validated_data.pop('detalles_cuenta', None)
         datos_billetera = validated_data.pop('detalles_billetera', None)
@@ -371,17 +415,24 @@ class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
         #TODO: Es posible que de error porque hay que hacer una query al usuario autenticado
         cliente = self.context['request'].user.cliente 
 
+        #TODO: Quitar es predeterminado por ahora 
         # --- LÓGICA DE PREDETERMINADO ---
         # Verificamos si ya existe algún método de pago para este cliente
-        ya_tiene_metodos = MetodoPago.objects.filter(cliente=cliente).exists()
+        # ya_tiene_metodos = MetodoPago.objects.filter(cliente=cliente).exists()
+        # es_predeterminado_input = validated_data.get('es_predeterminado', False)
 
-        if not ya_tiene_metodos:
-            # Caso A: Es el primer método que agrega en su vida -> OBLIGATORIO TRUE
-            validated_data['es_predeterminado'] = True
-        else:
-            # Caso B: Ya tiene otros métodos -> OBLIGATORIO FALSE (el nuevo no quita al anterior)
-            validated_data['es_predeterminado'] = False
-        # --------------------------------
+        # if not ya_tiene_metodos:
+        #     # Caso A: Es el primer método que agrega en su vida -> OBLIGATORIO TRUE
+        #     validated_data['es_predeterminado'] = True
+        
+        # elif es_predeterminado_input:
+        #     # Caso B: Ya tiene otros, pero quiere que este sea el predeterminado
+        #     # Ponemos en False los demás métodos del cliente
+        #     MetodoPago.objects.filter(cliente=cliente, es_predeterminado=True).update(es_predeterminado=False)
+        #     validated_data['es_predeterminado'] = True
+        # else:
+        #     # Caso C: Ya tiene otros y no solicita ser predeterminado
+        #     validated_data['es_predeterminado'] = False
         
         metodo_pago = MetodoPago.objects.create(cliente=cliente, **validated_data)
 
@@ -393,6 +444,27 @@ class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
             BilleteraDigital.objects.create(metodo_pago=metodo_pago, **datos_billetera)
 
         return metodo_pago
+
+    def destroy(self):
+        instance = self.instance
+        # 1. Validación: No permitir borrar si tiene pagos asociados (historial financiero)
+        if instance.pagos.exists():
+            raise serializers.ValidationError({"detail": "No se puede eliminar este método de pago porque tiene historial de pagos asociados."})
+
+        era_predeterminado = instance.es_predeterminado
+        cliente = instance.cliente
+
+        # 2. Eliminamos el registro
+        # Al eliminar el MetodoPago, se eliminan automáticamente los detalles (Tarjeta/Cuenta/Billetera) por el CASCADE del modelo
+        instance.delete()
+
+        # 3. Si borramos el predeterminado, asignamos uno nuevo (el más reciente que quede)
+        if era_predeterminado:
+            nuevo_default = MetodoPago.objects.filter(cliente=cliente).order_by('-id').first()
+            if nuevo_default:
+                nuevo_default.es_predeterminado = True
+                nuevo_default.save()
+
 
 
 # ============================================================
@@ -493,10 +565,3 @@ class RegistroClienteSerializer(serializers.Serializer):
             "user_data": user,
             "cliente_data": cliente_data 
         }
-
-
-
-
-
-
-

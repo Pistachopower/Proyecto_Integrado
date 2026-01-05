@@ -96,22 +96,37 @@ class MetodoPagoViewSet(viewsets.ModelViewSet):
 # METODO DE PAGO PARA CLIENTE
 # ============================================================
 class MetodoPagoClienteViewSet(viewsets.ModelViewSet):
+    
     permission_classes = [permissions.IsAuthenticated]
+
+    filter_backends=[
+        DjangoFilterBackend,
+    ]
+
+    filterset_fields=[
+        'cliente_id'   ]
+
 
     def get_queryset(self):
         # Filtramos para que el usuario solo vea SUS métodos
         return MetodoPago.objects.filter(cliente=self.request.user.cliente)
 
     def get_serializer_class(self):
-        # Usamos el serializador complejo solo para CREAR (POST)
-        if self.action == 'create':
+        # Usamos el serializador complejo para CREAR (POST) y ACTUALIZAR (PUT/PATCH)
+        if self.action in ['create', 'update', 'partial_update', 'retrieve', 'list']:
+
             return CrearMetodoPagoUnificadoSerializer
-        # Usamos tu serializador original para LISTAR/VER (GET)
+        # Usamos el serializador original para LISTAR/VER (GET)
         return MetodoPagoSerializer
 
-    # No necesitamos sobrescribir perform_create porque lo manejamos en el serializer,
-    # pero el serializer necesita el 'request' en el contexto, 
-    # y ModelViewSet lo pasa automáticamente.
+
+    def perform_destroy(self, instance):
+        """
+        Maneja la eliminación de un método de pago.
+        IMPORTANTE: Pasamos el contexto con el request para evitar errores con HyperlinkedIdentityField.
+        """
+        serializer = CrearMetodoPagoUnificadoSerializer(instance, context=self.get_serializer_context())
+        serializer.destroy()
 
     
 
