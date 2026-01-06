@@ -308,6 +308,7 @@ class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = MetodoPago
         fields = [
+            'id', 
             'tipo_metodo', 
             'es_predeterminado', 
             'detalles_tarjeta', 
@@ -414,25 +415,6 @@ class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
 
         #TODO: Es posible que de error porque hay que hacer una query al usuario autenticado
         cliente = self.context['request'].user.cliente 
-
-        #TODO: Quitar es predeterminado por ahora 
-        # --- LÓGICA DE PREDETERMINADO ---
-        # Verificamos si ya existe algún método de pago para este cliente
-        # ya_tiene_metodos = MetodoPago.objects.filter(cliente=cliente).exists()
-        # es_predeterminado_input = validated_data.get('es_predeterminado', False)
-
-        # if not ya_tiene_metodos:
-        #     # Caso A: Es el primer método que agrega en su vida -> OBLIGATORIO TRUE
-        #     validated_data['es_predeterminado'] = True
-        
-        # elif es_predeterminado_input:
-        #     # Caso B: Ya tiene otros, pero quiere que este sea el predeterminado
-        #     # Ponemos en False los demás métodos del cliente
-        #     MetodoPago.objects.filter(cliente=cliente, es_predeterminado=True).update(es_predeterminado=False)
-        #     validated_data['es_predeterminado'] = True
-        # else:
-        #     # Caso C: Ya tiene otros y no solicita ser predeterminado
-        #     validated_data['es_predeterminado'] = False
         
         metodo_pago = MetodoPago.objects.create(cliente=cliente, **validated_data)
 

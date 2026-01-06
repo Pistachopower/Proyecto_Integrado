@@ -2,7 +2,11 @@ from proyecto.permissions import *
 from .models import *
 from .serializers import *
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import action, api_view
+from django.shortcuts import get_object_or_404
+from rest_framework import permissions
+from rest_framework import status
+from rest_framework.viewsets import ViewSet
 from rest_framework import viewsets,filters #importante importar viewsets
 from rest_framework.generics import CreateAPIView #importante para crear usuarios tipo cliente
 from rest_framework.permissions import IsAuthenticated  # Login
@@ -46,7 +50,7 @@ class PiezaViewSet(viewsets.ModelViewSet):
     queryset = Pieza.objects.all()
     serializer_class = PiezaSerializer
     http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
-    permission_classes = [AllowAny,SoloVerPiezasLineaPedido]
+    permission_classes = [AllowAny] #TODO: Permitir ver piezas pero no crear/modificar/borrar (admin,empleado) 
 
 class InventarioViewSet(viewsets.ModelViewSet):
     queryset = Inventario.objects.all()
@@ -377,3 +381,119 @@ class LogoutSessionView(APIView):
         # Esto borra la cookie y la sesión del servidor
         logout(request)
         return Response({"message": "Sesión cerrada"}, status=status.HTTP_200_OK)
+
+
+# ===================== CARRITO EN SESIÓN =====================
+class CarritoViewSet(ViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def _get_carrito(self, request):
+        return request.session.get('carrito', {})
+
+    def _save_carrito(self, request, carrito):
+        request.session['carrito'] = carrito
+        request.session.modified = True # Asegura que Django guarde los cambios en la sesión
+
+    def list(self, request):
+        """Obtener el carrito actual con info de piezas"""
+        from .models import Pieza, ImagenPieza
+        carrito = self._get_carrito(request)
+        resultado = []
+        for pieza_id, info in carrito.items():
+            try:
+                pieza = Pieza.objects.get(id=pieza_id)
+                # Buscar imagen principal: primero ImagenPieza, si no, el campo imagen de Pieza
+                imagen_principal = None
+                imagen_obj = ImagenPieza.objects.filter(pieza=pieza).first()
+                if imagen_obj and imagen_obj.url_imagen:
+                    imagen_principal = request.build_absolute_uri(imagen_obj.url_imagen.url)
+                elif pieza.imagen:
+                    imagen_principal = request.build_absolute_uri(pieza.imagen.url)
+                
+                resultado.append({
+                    'id': pieza.id,
+                    'cantidad': info['cantidad'],
+                    'nombre': pieza.nombre,
+                    'imagen': imagen_principal
+                })
+            except Pieza.DoesNotExist:
+                continue
+        return Response(resultado)
+
+    def create(self, request):
+        """Agregar o actualizar una pieza en el carrito"""
+        pieza_id = str(request.data.get('pieza_id'))
+        cantidad = int(request.data.get('cantidad', 1))
+        
+        if cantidad < 1:
+            return Response({'error': 'Cantidad debe ser mayor a 0'}, status=400)
+        
+        carrito = self._get_carrito(request)
+        # Puedes agregar más info si lo deseas (precio, nombre, etc)
+        carrito[pieza_id] = {'cantidad': cantidad}
+        self._save_carrito(request, carrito) #guardar en sesión
+        return Response({'message': 'Pieza agregada/actualizada', 'carrito': carrito})
+
+    def destroy(self, request, pk=None):
+        """Eliminar una pieza del carrito"""
+        carrito = self._get_carrito(request)
+        pieza_id = str(pk)
+        if pieza_id in carrito:
+            del carrito[pieza_id]
+            self._save_carrito(request, carrito)
+            return Response({'message': 'Pieza eliminada', 'carrito': carrito})
+        return Response({'error': 'Pieza no encontrada en el carrito'}, status=404)
+
+    @action(detail=False, methods=['post'])
+    def vaciar(self, request):
+        """Vaciar el carrito"""
+        self._save_carrito(request, {})
+        return Response({'message': 'Carrito vaciado'})
+
+    @action(detail=False, methods=['post'])
+    def finalizar(self, request):
+        """Finalizar compra: crea Pedido y LineaPedido, limpia carrito"""
+        from .models import Pedido, LineaPedido, Pieza, Cliente, Tienda, Vendedor
+        from decimal import Decimal
+        carrito = self._get_carrito(request)
+        if not carrito:
+            return Response({'error': 'El carrito está vacío'}, status=400)
+        user = request.user
+        try:
+            cliente = user.cliente
+        except Exception:
+            return Response({'error': 'El usuario no es cliente'}, status=400)
+        # Asumimos una tienda y vendedor por defecto (ajustar según lógica de negocio)
+        tienda = Tienda.objects.first()
+        vendedor = Vendedor.objects.first()
+        if not tienda or not vendedor:
+            return Response({'error': 'No hay tienda o vendedor configurado'}, status=400)
+        total = Decimal('0.00')
+        lineas = []
+        for pieza_id, info in carrito.items():
+            pieza = get_object_or_404(Pieza, id=pieza_id)
+            cantidad = int(info['cantidad'])
+            precio_unitario = pieza.precio_base
+            subtotal = precio_unitario * cantidad
+            total += subtotal
+            lineas.append({'pieza': pieza, 'cantidad': cantidad, 'precio_unitario': precio_unitario, 'subtotal': subtotal})
+        pedido = Pedido.objects.create(
+            estado=Pedido.PENDIENTE,
+            cliente=cliente,
+            tienda=tienda,
+            vendedor=vendedor,
+            fecha_pedido=None,  # Puedes poner date.today() si lo deseas
+            direccion_envio='(por definir)',
+            total=total
+        )
+        for l in lineas:
+            LineaPedido.objects.create(
+                pedido=pedido,
+                pieza=l['pieza'],
+                cantidad=l['cantidad'],
+                precio_unitario=l['precio_unitario'],
+                descuento_aplicado=0,
+                subtotal=l['subtotal']
+            )
+        self._save_carrito(request, {})
+        return Response({'message': 'Compra finalizada', 'pedido_id': pedido.id})

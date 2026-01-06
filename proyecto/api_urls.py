@@ -32,6 +32,8 @@ router.register(r'imagen_pieza', ImagenPiezaViewSet, basename='imagenpieza')
 # Ruta para métodos de pago específicos del cliente
 router.register(r'metodo_pago_cliente', MetodoPagoClienteViewSet, basename='metodopagocliente')
 
+# Carrito en sesión
+router.register(r'carrito', CarritoViewSet, basename='carrito')
 
 urlpatterns = [
     path('', include(router.urls)),
