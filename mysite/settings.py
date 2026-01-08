@@ -91,6 +91,7 @@ CSRF_COOKIE_SECURE = False
 # Ajustes para que la cookie no se bloquee entre puertos distintos
 SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 días
 
 ROOT_URLCONF = 'mysite.urls'
 

@@ -388,6 +388,7 @@ class CarritoViewSet(ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def _get_carrito(self, request):
+        print(request.user)
         return request.session.get('carrito', {})
 
     def _save_carrito(self, request, carrito):
@@ -398,7 +399,9 @@ class CarritoViewSet(ViewSet):
         """Obtener el carrito actual con info de piezas"""
         from .models import Pieza, ImagenPieza
         carrito = self._get_carrito(request)
-        resultado = []
+        resultado = {}
+        items = []
+        precio_total = 0
         for pieza_id, info in carrito.items():
             try:
                 pieza = Pieza.objects.get(id=pieza_id)
@@ -410,14 +413,23 @@ class CarritoViewSet(ViewSet):
                 elif pieza.imagen:
                     imagen_principal = request.build_absolute_uri(pieza.imagen.url)
                 
-                resultado.append({
+                items.append({
                     'id': pieza.id,
                     'cantidad': info['cantidad'],
                     'nombre': pieza.nombre,
-                    'imagen': imagen_principal
+                    'imagen': imagen_principal,
+                    'precio': pieza.precio_base,
+                    'precio_total_piezas': pieza.precio_base * info['cantidad'],
+                    
+
                 })
+                precio_total += pieza.precio_base * info['cantidad']
+
             except Pieza.DoesNotExist:
                 continue
+
+        resultado['items'] = items
+        resultado['precio_total'] = precio_total
         return Response(resultado)
 
     def create(self, request):
@@ -497,3 +509,17 @@ class CarritoViewSet(ViewSet):
             )
         self._save_carrito(request, {})
         return Response({'message': 'Compra finalizada', 'pedido_id': pedido.id})
+    
+
+
+# En tu views.py o un archivo similar
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+
+@require_http_methods(["GET"])
+def auth_status(request):
+    """Verifica si el usuario está autenticado"""
+    if request.user.is_authenticated:
+        return JsonResponse({'authenticated': True})
+    
+    return JsonResponse({'authenticated': False}, status=403)
