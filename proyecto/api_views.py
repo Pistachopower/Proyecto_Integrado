@@ -50,6 +50,18 @@ class PiezaViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny] #TODO: Permitir ver piezas pero no crear/modificar/borrar (admin,empleado) 
 
 
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def piezas_aleatorias(self, request):
+          """
+          Devuelve 5 piezas aleatorias.
+
+          GET /api/piezas/aleatorias/
+          """
+          from django.db.models.functions import Random
+          piezas_aleatorias = Pieza.objects.all().order_by(Random())[:6]
+          serializer = PiezaSerializer(piezas_aleatorias, many=True, context={'request': request})
+          return Response(serializer.data)
+    
 
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all()

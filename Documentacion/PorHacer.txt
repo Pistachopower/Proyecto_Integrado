@@ -1,3 +1,25 @@
+Cliente
+Agregar comentario y valoraciones (agregar la media de todas las valoraciones sobre un producto) (consultar todas las valoraciones sobre x producto)
+
+Permisos
+
+Descuento 
+
+Devolucion (cambiar el estado)
+
+Cuando termine la compra crear un pdf con la factura
+
+Lista de deseo
+
+Vendedor 
+Permisos
+CRUD de vendedor
+Agregar productos con un csv
+
+Pendiente 
+Definir si se trabaja con pieza o con inventario y tienda, es decir, que sólo se trabaje con el precio que aparece en pieza y no los modelos inventario y tienda
+
+
 Por hacer 
 De los metodos de pago cliente:
 Agregar el método update y controlar que solo haya un método predeterminado (sobreescribir el predeterminado anterior)
@@ -8,3 +30,6 @@ Post (Agregar)
   "pieza_id": 1,
   "cantidad": 3
 }
+
+Antes
+Necesito saber qué es lo que necesita
