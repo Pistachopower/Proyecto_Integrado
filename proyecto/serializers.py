@@ -17,7 +17,12 @@ class UsuarioSerializer(serializers.ModelSerializer):
             'url',
             'id',
             'username',
+            'first_name',
+            'last_name',
             'email',
+            'telefono',
+            'direccion',
+            'fecha_nacimiento',
             'password',
             'date_joined',
             'is_staff',
@@ -25,32 +30,27 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
 
 class ClienteSerializer(serializers.ModelSerializer): 
-    usuario = UsuarioSerializer(read_only=True) #muestro los datos del usuario asociado al cliente
+    usuario = UsuarioSerializer(read_only=True)
 
     class Meta:
         model = Cliente
-        fields = "__all__"
+        fields = ['id', 'usuario']
 
 
         
 
-class TiendaSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Tienda
-        fields = "__all__"
 
 
 class VendedorSerializer(serializers.HyperlinkedModelSerializer):
     usuario = UsuarioSerializer(read_only=True)
-    tienda = TiendaSerializer(read_only=True)
 
     class Meta:
         model = Vendedor
-        fields = "__all__"
+        fields = ['id', 'usuario', 'fecha_contratacion', 'comision_porcentaje']
 
 
 # ============================================================
-# PIEZAS E INVENTARIO
+# PIEZAS 
 # ============================================================
 
 class PiezaSerializer(serializers.HyperlinkedModelSerializer):
@@ -66,41 +66,7 @@ class ImagenPiezaSerializer(serializers.HyperlinkedModelSerializer):
         model = ImagenPieza
         fields = "__all__"
 
-class InventarioSerializer(serializers.HyperlinkedModelSerializer):
-    pieza = PiezaSerializer(read_only=True)
-    tienda = TiendaSerializer(read_only=True)
 
-    class Meta:
-        model = Inventario
-        fields = "__all__"
-
-    def validate(self, data):
-        """
-        Control de seguridad para proteger el PRECIO DE VENTA.
-        """
-        # 1. Obtenemos el usuario de la petición
-        request = self.context.get('request')
-        user = request.user
-
-        
-        # 2. self.instance es el objeto que está en la base de datos actualmente
-        if self.instance: ## Solo se ejecuta si es PUT o PATCH
-            
-            # 3. Regla: Si es EMPLEADO, no puede tocar el precio
-            if user.rol == Usuario.EMPLEADO:
-                
-                # Verificamos si intentan enviar un nuevo 'precio_venta'
-                if 'precio_venta' in data:
-                    precio_nuevo = data['precio_venta']
-                    precio_actual = self.instance.precio_venta
-
-                    # Si el precio nuevo es diferente al actual -> ¡ERROR!
-                    if precio_nuevo != precio_actual:
-                        raise serializers.ValidationError({
-                            "precio_venta": "No tienes permisos para modificar el precio de venta."
-                        })
-
-        return data
 
     
 
@@ -165,7 +131,6 @@ class LineaPedidoSerializer(serializers.HyperlinkedModelSerializer):
 
 class PedidoSerializer(serializers.HyperlinkedModelSerializer):
     cliente = ClienteSerializer(read_only=True)
-    tienda = TiendaSerializer(read_only=True)
     vendedor = VendedorSerializer(read_only=True)
     lineas_pedido = LineaPedidoSerializer(many=True, read_only=True)
 
@@ -202,24 +167,14 @@ class PedidoSerializer(serializers.HyperlinkedModelSerializer):
 
     def filtrar_datos_para_cliente(self, data, instance):
         """Reemplaza los objetos complejos por información que interesa enviar al cliente."""
-        
-        # Simplificar Tienda (Solo nombre)
-        if instance.tienda:
-            data['tienda'] = {
-                "nombre": instance.tienda.nombre
-            }
-        else:
-            data['tienda'] = None
-
         # Simplificar Vendedor (Solo nombre y apellido)
-        if instance.vendedor:
+        if instance.vendedor and instance.vendedor.usuario:
             data['vendedor'] = {
-                "nombre": instance.vendedor.nombre,
-                "apellido": instance.vendedor.apellido
+                "nombre": instance.vendedor.usuario.first_name,
+                "apellido": instance.vendedor.usuario.last_name
             }
         else:
             data['vendedor'] = None
-
         return data
 
 

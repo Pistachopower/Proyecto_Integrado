@@ -24,6 +24,9 @@ class Usuario(AbstractUser):
     )
     
     email = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=20)
+    direccion = models.CharField(max_length=255)
+    fecha_nacimiento = models.DateField(null=True, blank=True)
     fecha_registro = models.DateField(auto_now=True)
 
     def __str__(self):
@@ -37,25 +40,11 @@ class Cliente(models.Model):
         on_delete=models.CASCADE,
         related_name="cliente"
     )
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=20)
-    direccion = models.CharField(max_length=255)
-    fecha_nacimiento = models.DateField()
 
     def __str__(self):
-        return f"{self.nombre} {self.apellido}"
+        return f"{self.usuario.first_name} {self.usuario.last_name}"
     
 
-class Tienda(models.Model):
-    nombre = models.CharField(max_length=100)
-    direccion = models.CharField(max_length=255)
-    telefono = models.CharField(max_length=20)
-    email = models.EmailField()
-    horario = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nombre
 
 
 class Vendedor(models.Model):
@@ -64,21 +53,11 @@ class Vendedor(models.Model):
         on_delete=models.CASCADE,
         related_name="vendedor"
     )
-    tienda = models.ForeignKey(
-        Tienda,
-        on_delete=models.CASCADE,
-        related_name="vendedores"
-    )
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=20)
-    direccion = models.CharField(max_length=255)
-    fecha_nacimiento = models.DateField()
     fecha_contratacion = models.DateField()
     comision_porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
-        return f"{self.nombre} {self.apellido}"
+        return f"{self.usuario.first_name} {self.usuario.last_name}"
 
 
 
@@ -104,6 +83,7 @@ class Pieza(models.Model):
     precio_base = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.TextField()
     imagen= models.ImageField(upload_to='imagenes_piezas/', blank=True, null=True)
+    stock = models.IntegerField(default=0)
 
     def __str__(self):
         return self.nombre
@@ -124,23 +104,7 @@ class ImagenPieza(models.Model):
 
 
 
-class Inventario(models.Model):
-    pieza = models.ForeignKey(
-        Pieza,
-        on_delete=models.CASCADE,
-        related_name="inventarios"
-    )
-    tienda = models.ForeignKey(
-        Tienda,
-        on_delete=models.CASCADE,
-        related_name="inventarios"
-    )
-    stock = models.IntegerField()
-    precio_venta = models.DecimalField(max_digits=10, decimal_places=2)
-    ubicacion_almacen = models.CharField(max_length=100)
 
-    def __str__(self):
-        return f"{self.pieza} en {self.tienda}"
 
 
 # ============================================================
@@ -172,11 +136,6 @@ class Pedido(models.Model):
         on_delete=models.CASCADE,
         related_name="pedidos_cliente"
     )
-    tienda = models.ForeignKey(
-        Tienda,
-        on_delete=models.CASCADE,
-        related_name="pedidos_tienda"
-    )
     vendedor = models.ForeignKey(
         Vendedor,
         on_delete=models.CASCADE,
@@ -184,7 +143,6 @@ class Pedido(models.Model):
     )
     fecha_pedido = models.DateField()
     direccion_envio = models.CharField(max_length=255)
-    #estado = models.CharField(max_length=20, choices=ESTADO)
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):

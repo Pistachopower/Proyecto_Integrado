@@ -4,10 +4,8 @@ from django.contrib import admin
 from .models import *
 admin.site.register(Usuario)
 admin.site.register(Cliente)
-admin.site.register(Tienda)
 admin.site.register(Vendedor)
 admin.site.register(Pieza)
-admin.site.register(Inventario)
 admin.site.register(Pedido)
 admin.site.register(LineaPedido)
 admin.site.register(MetodoPago)

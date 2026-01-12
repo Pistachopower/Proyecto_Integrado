@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 #from django.contrib.auth.hashers import  set_password
 
 from proyecto.models import (
-    Usuario, Cliente, Tienda, Vendedor,
-    Pieza, Inventario,
+    Usuario, Cliente, Vendedor,
+    Pieza,
     Pedido, LineaPedido,
     MetodoPago, Tarjeta, CuentaBancaria, BilleteraDigital,
     Pago, Devolucion,
@@ -59,13 +59,28 @@ def crear_usuarios():
 
     # Empleados / Vendedores
     empleados = []
+    import unicodedata
+    def limpiar_texto(texto):
+        texto = unicodedata.normalize('NFKD', texto).encode('ascii', 'ignore').decode('ascii')
+        texto = texto.replace(' ', '').replace("'", "")
+        return texto
+
     for _ in range(5):
-        email = fake.unique.email()
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        first_name_clean = limpiar_texto(first_name.lower())
+        last_name_clean = limpiar_texto(last_name.lower())
+        username = f"{first_name_clean}.{last_name_clean}"
+        email = f"{username}@tienda.com"
         usuario = Usuario.objects.create(
-            username=email.split("@")[0],
+            username=username,
             email=email,
-            #
             rol=Usuario.EMPLEADO,
+            first_name=first_name,
+            last_name=last_name,
+            telefono=fake.phone_number(),
+            direccion=fake.address(),
+            fecha_nacimiento=fake.date_of_birth(minimum_age=20, maximum_age=65),
         )
         usuario.set_password("admin123")
         usuario.save()
@@ -74,12 +89,21 @@ def crear_usuarios():
     # Clientes
     clientes = []
     for _ in range(20):
-        email = fake.unique.email()
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        first_name_clean = limpiar_texto(first_name.lower())
+        last_name_clean = limpiar_texto(last_name.lower())
+        username = f"{first_name_clean}.{last_name_clean}"
+        email = f"{username}@tienda.com"
         usuario = Usuario.objects.create(
-            username=email.split("@")[0],
+            username=username,
             email=email,
-            #
             rol=Usuario.CLIENTE,
+            first_name=first_name,
+            last_name=last_name,
+            telefono=fake.phone_number(),
+            direccion=fake.address(),
+            fecha_nacimiento=fake.date_of_birth(minimum_age=18, maximum_age=80),
         )
         usuario.set_password("admin123")
         usuario.save()
@@ -91,7 +115,7 @@ def crear_usuarios():
 # ============================================================
 # CREAR CLIENTES Y VENDEDORES
 # ============================================================
-def crear_clientes_y_vendedores(empleados, clientes, tiendas):
+def crear_clientes_y_vendedores(empleados, clientes):
     print("Creando clientes y vendedores...")
 
     clientes_creados = []
@@ -99,26 +123,13 @@ def crear_clientes_y_vendedores(empleados, clientes, tiendas):
 
     # Clientes
     for u in clientes:
-        c = Cliente.objects.create(
-            usuario=u,
-            nombre=fake.first_name(),
-            apellido=fake.last_name(),
-            telefono=fake.phone_number(),
-            direccion=fake.address(),
-            fecha_nacimiento=fake.date_of_birth(minimum_age=18, maximum_age=80),
-        )
+        c = Cliente.objects.create(usuario=u)
         clientes_creados.append(c)
 
-    # Vendedores asignados a tiendas
+    # Vendedores
     for u in empleados:
         v = Vendedor.objects.create(
             usuario=u,
-            tienda=random.choice(tiendas),
-            nombre=fake.first_name(),
-            apellido=fake.last_name(),
-            telefono=fake.phone_number(),
-            direccion=fake.address(),
-            fecha_nacimiento=fake.date_of_birth(minimum_age=20, maximum_age=65),
             fecha_contratacion=fake.date_between(start_date="-3y", end_date="today"),
             comision_porcentaje=random.randint(1, 10),
         )
@@ -130,19 +141,7 @@ def crear_clientes_y_vendedores(empleados, clientes, tiendas):
 # ============================================================
 # CREAR TIENDAS
 # ============================================================
-def crear_tiendas():
-    print("Creando tiendas...")
-    tiendas = []
-    for _ in range(3):
-        tienda = Tienda.objects.create(
-            nombre="Tienda " + fake.city(),
-            direccion=fake.address(),
-            telefono=fake.phone_number(),
-            email=fake.company_email(),
-            horario="09:00 - 18:00",
-        )
-        tiendas.append(tienda)
-    return tiendas
+
 
 
 # ============================================================
@@ -169,40 +168,30 @@ def crear_piezas():
 # ============================================================
 # CREAR INVENTARIO
 # ============================================================
-def crear_inventario(tiendas, piezas):
-    print("Creando inventario...")
-    inventarios = []
-    for tienda in tiendas:
-        for pieza in piezas:
-            inv = Inventario.objects.create(
-                tienda=tienda,
-                pieza=pieza,
-                stock=random.randint(0, 20),
-                precio_venta=pieza.precio_base * random.uniform(1.1, 1.5),
-                ubicacion_almacen="Estante " + fake.random_letter().upper(),
-            )
-            inventarios.append(inv)
-    return inventarios
+
+def poblar_stock_piezas(piezas):
+    print("Asignando stock a piezas...")
+    for pieza in piezas:
+        pieza.stock = random.randint(0, 20)
+        pieza.save()
 
 
 # ============================================================
 # CREAR PEDIDOS + LÍNEAS DE PEDIDO
 # ============================================================
-def crear_pedidos(clientes, vendedores, tiendas, piezas):
+def crear_pedidos(clientes, vendedores, piezas):
     print("Creando pedidos...")
     pedidos = []
 
     for _ in range(40):
         cliente = random.choice(clientes)
         vendedor = random.choice(vendedores)
-        tienda = random.choice(tiendas)
 
         pedido = Pedido.objects.create(
             cliente=cliente,
-            tienda=tienda,
             vendedor=vendedor,
             fecha_pedido=fake.date_this_year(),
-            direccion_envio=cliente.direccion,
+            direccion_envio=cliente.usuario.direccion,
             estado=random.choice([1, 2, 3, 4, 5]),
             total=0,  # Se actualiza luego
         )
@@ -260,7 +249,7 @@ def crear_metodos_pago(clientes):
                 Tarjeta.objects.create(
                     metodo_pago=metodo,
                     num_tarjeta_encriptado=fake.credit_card_number(),
-                    propietario=c.nombre + " " + c.apellido,
+                    propietario=c.usuario.first_name + " " + c.usuario.last_name,
                     fecha_caducidad=fake.credit_card_expire(),
                     tipo_tarjeta=random.choice([1, 2, 3]),
                     moneda="EUR",
@@ -351,7 +340,7 @@ def crear_listas_deseos(clientes, piezas):
     for c in clientes:
         lista = ListaDeseos.objects.create(
             cliente=c,
-            nombre="Lista de " + c.nombre,
+            nombre="Lista de " + c.usuario.first_name,
             fecha_creacion=fake.date_this_year(),
         )
 
@@ -400,16 +389,18 @@ def crear_descuentos(clientes):
 # ============================================================
 # MAIN
 # ============================================================
+
 print("========== INICIANDO GENERACIÓN DE DATOS ==========")
 
 admin, empleados, clientes_usuario = crear_usuarios()
-tiendas = crear_tiendas()
-clientes, vendedores = crear_clientes_y_vendedores(empleados, clientes_usuario, tiendas)
+clientes, vendedores = crear_clientes_y_vendedores(empleados, clientes_usuario)
+
 
 piezas = crear_piezas()
-inventario = crear_inventario(tiendas, piezas)
+poblar_stock_piezas(piezas)
+pedidos = crear_pedidos(clientes, vendedores, piezas)
 
-pedidos = crear_pedidos(clientes, vendedores, tiendas, piezas)
+pedidos = crear_pedidos(clientes, vendedores, piezas)
 
 metodos_pago = crear_metodos_pago(clientes)
 crear_pagos(pedidos, metodos_pago)

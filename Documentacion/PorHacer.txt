@@ -2,3 +2,9 @@ Por hacer
 De los metodos de pago cliente:
 Agregar el método update y controlar que solo haya un método predeterminado (sobreescribir el predeterminado anterior)
 
+Peticion carrito
+Post (Agregar)
+{
+  "pieza_id": 1,
+  "cantidad": 3
+}

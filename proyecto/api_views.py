@@ -32,7 +32,7 @@ class ClienteViewSet(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
     serializer_class = ClienteSerializer
     http_method_names = ['get', 'post', 'put', 'delete']
-    permission_classes = [IsAuthenticated, EsDuenioDirecto]  # Requiere autenticación para acceder a este ViewSet
+    permission_classes = [IsAuthenticated, EsDuenioDirecto]
 
 
 class VendedorViewSet(viewsets.ModelViewSet):
@@ -40,10 +40,7 @@ class VendedorViewSet(viewsets.ModelViewSet):
     serializer_class = VendedorSerializer
     permission_classes = [IsAuthenticated, EsDuenioDirecto]
 
-class TiendaViewSet(viewsets.ModelViewSet): 
-    queryset = Tienda.objects.all()
-    serializer_class = TiendaSerializer
-    permission_classes = [IsAuthenticated, SoloAdmin]
+
 
 #TODO: CAMBIAR EL NOMBRE DEL PERMISO
 class PiezaViewSet(viewsets.ModelViewSet):
@@ -52,10 +49,7 @@ class PiezaViewSet(viewsets.ModelViewSet):
     http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
     permission_classes = [AllowAny] #TODO: Permitir ver piezas pero no crear/modificar/borrar (admin,empleado) 
 
-class InventarioViewSet(viewsets.ModelViewSet):
-    queryset = Inventario.objects.all()
-    serializer_class = InventarioSerializer
-    permission_classes = [IsAuthenticated, PermisoGestionInventario]
+
 
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all()
@@ -301,7 +295,7 @@ class VerMiPerfilView(APIView):
                 
                 # Usamos el Serializer para validar y guardar los datos del perfil
                 # partial=True permite enviar solo el nombre sin tener que enviar todo lo demás
-                serializer = ClienteSerializer(perfil, data=data, partial=True, context={'request': request})
+                serializer = UsuarioSerializer(perfil.usuario, data=data, partial=True, context={'request': request})
                 
                 if serializer.is_valid():
                     serializer.save()
@@ -468,20 +462,26 @@ class CarritoViewSet(ViewSet):
         from .models import Pedido, LineaPedido, Pieza, Cliente, Tienda, Vendedor
         from decimal import Decimal
         carrito = self._get_carrito(request)
+        
         if not carrito:
             return Response({'error': 'El carrito está vacío'}, status=400)
         user = request.user
+        
         try:
             cliente = user.cliente
+        
         except Exception:
             return Response({'error': 'El usuario no es cliente'}, status=400)
-        # Asumimos una tienda y vendedor por defecto (ajustar según lógica de negocio)
+        
         tienda = Tienda.objects.first()
         vendedor = Vendedor.objects.first()
+
         if not tienda or not vendedor:
             return Response({'error': 'No hay tienda o vendedor configurado'}, status=400)
+        
         total = Decimal('0.00')
         lineas = []
+        
         for pieza_id, info in carrito.items():
             pieza = get_object_or_404(Pieza, id=pieza_id)
             cantidad = int(info['cantidad'])
@@ -489,12 +489,13 @@ class CarritoViewSet(ViewSet):
             subtotal = precio_unitario * cantidad
             total += subtotal
             lineas.append({'pieza': pieza, 'cantidad': cantidad, 'precio_unitario': precio_unitario, 'subtotal': subtotal})
+        
         pedido = Pedido.objects.create(
             estado=Pedido.PENDIENTE,
             cliente=cliente,
             tienda=tienda,
             vendedor=vendedor,
-            fecha_pedido=None,  # Puedes poner date.today() si lo deseas
+            fecha_pedido=None,  # Puedes poner date.today() si quieres 
             direccion_envio='(por definir)',
             total=total
         )
@@ -512,14 +513,15 @@ class CarritoViewSet(ViewSet):
     
 
 
-# En tu views.py o un archivo similar
+# ==================== ESTADO DE AUTENTICACIÓN ====================
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 
 @require_http_methods(["GET"])
 def auth_status(request):
-    """Verifica si el usuario está autenticado"""
+    """Verifica si el usuario está autenticado basado en las cookies de sesión."""
     if request.user.is_authenticated:
-        return JsonResponse({'authenticated': True})
+        return JsonResponse({
+            'authenticated': request.user.is_authenticated})
     
     return JsonResponse({'authenticated': False}, status=403)
