@@ -53,19 +53,50 @@ class PiezaViewSet(viewsets.ModelViewSet):
     http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
     permission_classes = [AllowAny] #TODO: Permitir ver piezas pero no crear/modificar/borrar (admin,empleado) 
 
-
-    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
-    def piezas_aleatorias(self, request):
-          """
-          Devuelve 5 piezas aleatorias.
-
-          GET /api/piezas/aleatorias/
-          """
-          from django.db.models.functions import Random
-          piezas_aleatorias = Pieza.objects.all().order_by(Random())[:6]
-          serializer = PiezaSerializer(piezas_aleatorias, many=True, context={'request': request})
-          return Response(serializer.data)
     
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def por_marca(self, request):
+        """
+        Devuelve piezas de la misma marca, excluyendo la pieza actual.
+        
+        GET /api/piezas/por_marca/?pieza_id=1&limite=6
+        
+        Parámetros query:
+        - pieza_id (requerido): ID de la pieza actual para obtener su marca
+        - limite: Número de piezas a devolver (default=6)
+        """
+        pieza_id = request.query_params.get('pieza_id', None)
+        limite = int(request.query_params.get('limite', 6))
+        
+        if not pieza_id:
+            return Response(
+                {'error': 'El parámetro "pieza_id" es requerido'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            pieza_actual = Pieza.objects.get(id=pieza_id)
+        except Pieza.DoesNotExist:
+            return Response(
+                {'error': f'Pieza con ID {pieza_id} no encontrada'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Filtrar piezas de la misma marca, excluyendo la pieza actual
+        #__iexact: muestre las piezas sin importar mayúsculas o minúsculas
+        piezas = Pieza.objects.filter(
+            marca__iexact=pieza_actual.marca
+        ).exclude(
+            id=pieza_id
+        )[:limite]
+        
+        if not piezas.exists():
+            # Si no hay piezas de la misma marca, devolver aleatorias
+            from django.db.models.functions import Random
+            piezas = Pieza.objects.exclude(id=pieza_id).order_by(Random())[:limite]
+        
+        serializer = PiezaSerializer(piezas, many=True, context={'request': request})
+        return Response(serializer.data)
   
 
 
