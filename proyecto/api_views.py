@@ -41,6 +41,10 @@ class VendedorViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, EsDuenioDirecto]
 
 
+class CategoriaPiezaViewSet(viewsets.ModelViewSet):
+    queryset = CategoriaPieza.objects.all()
+    serializer_class = CategoriaPiezaSerializer
+    permission_classes = [AllowAny]  # Permite acceso público para ver categorías de piezas
 
 #TODO: CAMBIAR EL NOMBRE DEL PERMISO
 class PiezaViewSet(viewsets.ModelViewSet):
@@ -62,6 +66,8 @@ class PiezaViewSet(viewsets.ModelViewSet):
           serializer = PiezaSerializer(piezas_aleatorias, many=True, context={'request': request})
           return Response(serializer.data)
     
+  
+
 
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all()

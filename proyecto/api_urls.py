@@ -11,6 +11,7 @@ router = DefaultRouter()  #Este router se encarga de crear mostrar los enlaces d
 router.register(r'usuario', UsuarioViewSet, basename='usuario') 
 router.register(r'cliente', ClienteViewSet, basename='cliente')
 router.register(r'vendedor', VendedorViewSet, basename='vendedor')
+router.register(r'categoria_pieza', CategoriaPiezaViewSet, basename='categoriapieza')
 router.register(r'pieza', PiezaViewSet, basename='pieza')
 router.register(r'pedido', PedidoViewSet, basename='pedido')
 router.register(r'lineas_pedido', LineaPedidoViewSet, basename='lineapedido')

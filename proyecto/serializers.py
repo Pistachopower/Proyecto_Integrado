@@ -49,6 +49,21 @@ class VendedorSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['id', 'usuario', 'fecha_contratacion', 'comision_porcentaje']
 
 
+
+
+# ============================================================
+# CATEGORIA_PIEZAS 
+# ============================================================
+
+class CategoriaPiezaSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = CategoriaPieza
+        fields = "__all__"
+
+
+
+
+
 # ============================================================
 # PIEZAS 
 # ============================================================

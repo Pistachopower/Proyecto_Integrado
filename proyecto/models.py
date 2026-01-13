@@ -60,6 +60,14 @@ class Vendedor(models.Model):
         return f"{self.usuario.first_name} {self.usuario.last_name}"
 
 
+class CategoriaPieza(models.Model):
+    nombre = models.CharField(max_length=100)
+    imagen_categoria = models.ImageField(upload_to='categorias/', blank=True, null=True)  # Para mostrar en UI
+    descripcion = models.TextField()
+
+
+    def __str__(self):
+        return self.nombre
 
 class Pieza(models.Model):
     NUEVO = 1
@@ -84,9 +92,17 @@ class Pieza(models.Model):
     descripcion = models.TextField()
     imagen= models.ImageField(upload_to='imagenes_piezas/', blank=True, null=True)
     stock = models.IntegerField(default=0)
+    categoria= models.ForeignKey(
+        CategoriaPieza,
+        on_delete=models.CASCADE,
+        related_name="categoria_piezas",
+        null=True,
+    )
+    
 
     def __str__(self):
         return self.nombre
+    
     
 
 class ImagenPieza(models.Model):
