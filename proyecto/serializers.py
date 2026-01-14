@@ -445,13 +445,32 @@ class DevolucionSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
+#class ValoracionSerializer(serializers.HyperlinkedModelSerializer):
+#    pieza = PiezaSerializer(read_only=True)
+#    cliente = ClienteSerializer(read_only=True)
+#
+#    class Meta:
+#        model = Valoracion
+#        fields = "__all__"
+
 class ValoracionSerializer(serializers.HyperlinkedModelSerializer):
     pieza = PiezaSerializer(read_only=True)
     cliente = ClienteSerializer(read_only=True)
+    
+    """serializers.SerializerMethodField() es un campo especial de Django REST 
+    Framework que permite agregar campos calculados o personalizados a un 
+    serializer sin que existan como atributos reales en el modelo."""
+    nombre_cliente = serializers.SerializerMethodField()
 
     class Meta:
         model = Valoracion
         fields = "__all__"
+    
+    def get_nombre_cliente(self, obj):
+        """Devuelve el nombre completo del cliente"""
+        if obj.cliente and obj.cliente.usuario:
+            return f"{obj.cliente.usuario.first_name} {obj.cliente.usuario.last_name}"
+        return "Usuario Anónimo"
 
 
 class ListaDeseosPiezaSerializer(serializers.HyperlinkedModelSerializer):
