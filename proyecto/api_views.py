@@ -53,6 +53,8 @@ class PiezaViewSet(viewsets.ModelViewSet):
     http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
     permission_classes = [AllowAny] #TODO: Permitir ver piezas pero no crear/modificar/borrar (admin,empleado) 
 
+    filter_backends= [DjangoFilterBackend]
+    filterset_fields= ['categoria'] #Permite filtrar las piezas por categoría
     
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def por_marca(self, request):
