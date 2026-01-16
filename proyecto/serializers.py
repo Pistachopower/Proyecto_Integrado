@@ -58,7 +58,7 @@ class VendedorSerializer(serializers.HyperlinkedModelSerializer):
 class CategoriaPiezaSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = CategoriaPieza
-        fields = "__all__"
+        fields = ['id', 'nombre', 'imagen_categoria']
 
 
 
