@@ -100,6 +100,44 @@ class PiezaViewSet(viewsets.ModelViewSet):
         serializer = PiezaSerializer(piezas, many=True, context={'request': request})
         return Response(serializer.data)
   
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def otros_filtros(self, request):
+        """
+        Filtra piezas por estado.
+
+        GET /api/piezas/otros_filtros/?estado=activo&estado=pendiente
+        GET /api/piezas/otros_filtros/?estado=activo
+
+        Parámetros query:
+        - estado: Estado de la pieza (puede repetirse para múltiples valores)
+        - busqueda: Búsqueda por nombre
+        """
+        # Recibe MÚLTIPLES valores: ['activo', 'pendiente']
+        estados = request.query_params.getlist('estado')
+        busqueda = request.query_params.get('busqueda', None)
+        stock = request.query_params.get('stock', None)
+        marca= request.query_params.get('marca', None)
+
+
+        piezas = Pieza.objects.all()
+
+        # Filtrar por estados (si hay)
+        if estados:
+            piezas = piezas.filter(estado__in=estados)
+
+        # Filtrar por búsqueda (si hay)
+        if busqueda:
+            piezas = piezas.filter(nombre__icontains=busqueda)
+
+        if stock.lower() == 'true'.lower():
+            piezas = piezas.filter(stock__gt=0)
+
+        if marca:
+            piezas = piezas.filter(marca__iexact=marca)
+            
+
+        serializer = PiezaSerializer(piezas, many=True, context={'request': request})
+        return Response(serializer.data)
 
 
 class PedidoViewSet(viewsets.ModelViewSet):
