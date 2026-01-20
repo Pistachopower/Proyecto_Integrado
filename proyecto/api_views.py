@@ -4,9 +4,10 @@ from .serializers import *
 from rest_framework.response import Response
 from rest_framework.decorators import action, api_view
 from django.shortcuts import get_object_or_404
+from django.db.models import Avg
 from rest_framework import permissions
 from rest_framework import status
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ViewSet, permissions, DjangoFilterBackend
 from rest_framework import viewsets,filters #importante importar viewsets
 from rest_framework.generics import CreateAPIView #importante para crear usuarios tipo cliente
 from rest_framework.permissions import IsAuthenticated  # Login

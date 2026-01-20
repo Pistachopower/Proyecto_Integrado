@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from proyecto.models import Usuario
+from proyecto.models import *
 
 
 def es_jefe(user):    
@@ -165,3 +165,29 @@ class PermisoGestionInventario(permissions.BasePermission):
             return True
 
         return False
+    
+
+#Permiso comentario y valoracion cliente 
+class PuedeEditarValoracion(permissions.BasePermission):
+    """
+    Permite editar una valoración solo si:
+    1. El usuario es el propietario de la valoración
+    2. El usuario compró el producto (tiene LineaPedido con esa pieza)
+    3. El pedido está en estado ENVIADO (3) o posterior
+    """
+    
+    message = "No puedes editar esta valoración. Debes ser el propietario y tener el pedido enviado."
+
+    def has_object_permission(self, request, view, obj):
+        # 1. Verificar que es el dueño de la valoración
+        if obj.cliente.usuario != request.user:
+            return False
+        
+        # 2. Verificar que ha comprado el producto Y el pedido está ENVIADO (3) o más
+        compra_existe = LineaPedido.objects.filter(
+            pieza=obj.pieza,  # La misma pieza que se valora
+            pedido__cliente__usuario=request.user,  # Del usuario actual
+            pedido__estado__gte=Pedido.ENVIADO  # Estado >= ENVIADO (3)
+        ).exists()
+        
+        return compra_existe
