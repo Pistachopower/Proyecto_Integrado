@@ -18,7 +18,7 @@ from rest_framework_simplejwt.tokens import RefreshToken # Logout
 from django.contrib.auth import login, logout, authenticate
 from rest_framework import status
 from rest_framework.permissions import AllowAny
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters.rest_framework import DjangoFilterBackend # Filtros para los ViewSets
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
