@@ -445,33 +445,88 @@ class DevolucionSerializer(serializers.HyperlinkedModelSerializer):
         fields = "__all__"
 
 
+
 #class ValoracionSerializer(serializers.HyperlinkedModelSerializer):
 #    pieza = PiezaSerializer(read_only=True)
 #    cliente = ClienteSerializer(read_only=True)
+#    
+#    """serializers.SerializerMethodField() es un campo especial de Django REST 
+#    Framework que permite agregar campos calculados o personalizados a un 
+#    serializer sin que existan como atributos reales en el modelo."""
+#    nombre_cliente = serializers.SerializerMethodField()
 #
 #    class Meta:
 #        model = Valoracion
 #        fields = "__all__"
+#    
+#    def get_nombre_cliente(self, obj):
+#        """Devuelve el nombre completo del cliente"""
+#        if obj.cliente and obj.cliente.usuario:
+#            return f"{obj.cliente.usuario.first_name} {obj.cliente.usuario.last_name}"
+#        return "Usuario Anónimo"
 
-class ValoracionSerializer(serializers.HyperlinkedModelSerializer):
-    pieza = PiezaSerializer(read_only=True)
-    cliente = ClienteSerializer(read_only=True)
+
+
+class ValoracionSerializer(serializers.ModelSerializer):
+    """
+    Serializer para mostrar y editar valoraciones.
+    """
+    #Obtenemos el nombre de la pieza asociada a la valoración
+    #con el campo personalizado 'nombre_pieza'  
+    nombre_pieza = serializers.CharField(source='pieza.nombre', read_only=True)
+    nombre_cliente = serializers.CharField(source='cliente.usuario.first_name', read_only=True)
     
-    """serializers.SerializerMethodField() es un campo especial de Django REST 
-    Framework que permite agregar campos calculados o personalizados a un 
-    serializer sin que existan como atributos reales en el modelo."""
-    nombre_cliente = serializers.SerializerMethodField()
 
+    
     class Meta:
         model = Valoracion
-        fields = "__all__"
-    
-    def get_nombre_cliente(self, obj):
-        """Devuelve el nombre completo del cliente"""
-        if obj.cliente and obj.cliente.usuario:
-            return f"{obj.cliente.usuario.first_name} {obj.cliente.usuario.last_name}"
-        return "Usuario Anónimo"
+        fields = [
+            'id',
+            'pieza_id',
+            'nombre_pieza',
+            'nombre_cliente',
+            'puntuacion',
+            'titulo',
+            'comentario',
+            'fecha_valoracion',
+            'cliente'
+        ]
+        #Evitamos que se puedan modificar estos campos
+        read_only_fields = ['id', 'pieza', 'nombre_pieza', 'nombre_cliente', 'cliente', 'fecha_valoracion']
 
+
+
+
+
+    def validate_puntuacion(self, value):
+        """
+        Validar que la puntuación esté entre 1 y 5
+        """
+        if value < 1 or value > 5:
+            raise serializers.ValidationError(
+                "La puntuación debe estar entre 1 y 5."
+            )
+        return value
+
+    def validate_titulo(self, value):
+        """
+        Validar que el título no esté vacío
+        """
+        if not value or len(value.strip()) == 0:
+            raise serializers.ValidationError(
+                "El título no puede estar vacío."
+            )
+        return value
+
+    def validate_comentario(self, value):
+        """
+        Validar que el comentario no esté vacío
+        """
+        if not value or len(value.strip()) == 0:
+            raise serializers.ValidationError(
+                "El comentario no puede estar vacío."
+            )
+        return value
 
 class ListaDeseosPiezaSerializer(serializers.HyperlinkedModelSerializer):
     pieza = PiezaSerializer(read_only=True)

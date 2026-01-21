@@ -13,13 +13,11 @@ from rest_framework.permissions import IsAuthenticated  # Login
 from rest_framework.views import APIView # Login
 from rest_framework import status # Logout
 from rest_framework_simplejwt.tokens import RefreshToken # Logout
-
-
 from django.contrib.auth import login, logout, authenticate
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend # Filtros para los ViewSets
-
+from django.db.models import Avg
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -242,97 +240,205 @@ class DevolucionViewSet(viewsets.ModelViewSet):
     serializer_class = DevolucionSerializer
     permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
 
+
+    
 #class ValoracionViewSet(viewsets.ModelViewSet):
 #    queryset = Valoracion.objects.all()
 #    serializer_class = ValoracionSerializer
-#    #permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
-#
-#    #Permite filtrar las valoraciones por cliente_id
+#    
 #    filter_backends=[
 #        DjangoFilterBackend,
 #    ]
 #
 #    filterset_fields=[
-#        'cliente_id'   ]
-    
+#        'cliente_id' 
+#    ]
+#
+#    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+#    def por_pieza(self, request):
+#        """
+#        Obtiene todas las valoraciones de una pieza específica.
+#
+#        GET /api/v1/valoracion/por_pieza/?pieza_id=1
+#
+#        Parámetros query:
+#        - pieza_id (requerido): ID de la pieza
+#
+#        Respuesta:
+#        {
+#            "pieza": { ... },
+#            "promedio_puntuacion": 4.5,
+#            "total_valoraciones": 10,
+#            "valoraciones": [ ... ]
+#        }
+#        """
+#
+#        pieza_id = request.query_params.get('pieza_id', None)
+#
+#        if not pieza_id:
+#            return Response(
+#                {'error': 'El parámetro "pieza_id" es requerido'},
+#                status=status.HTTP_400_BAD_REQUEST
+#            )
+#
+#        try:
+#            pieza = Pieza.objects.get(id=pieza_id)
+#        
+#        except Pieza.DoesNotExist:
+#            return Response(
+#                {'error': f'Pieza con ID {pieza_id} no encontrada'},
+#                status=status.HTTP_404_NOT_FOUND
+#            )
+#
+#        # Obtener todas las valoraciones de la pieza
+#        #Las ordena por fecha DESCENDENTE (más recientes primero con -fecha_valoracion)
+#        valoraciones = Valoracion.objects.filter(pieza=pieza).order_by('-fecha_valoracion')
+#
+#        # Calcular promedio de puntuación
+#        from django.db.models import Avg
+#        promedio = valoraciones.aggregate(Avg('puntuacion'))['puntuacion__avg']
+#
+#        # Serializar las valoraciones
+#        serializer = ValoracionSerializer(valoraciones, many=True, context={'request': request})
+#
+#        # Variable 1: Promedio redondeado a 2 decimales (si hay valoraciones, sino 0)
+#        promedio_puntuacion = round(promedio, 2) if promedio else 0
+#
+#        # Variable 2: Total de valoraciones
+#        total_valoraciones = valoraciones.count()
+#
+#        # Variable 3: Datos serializados de las valoraciones
+#        valoraciones_data = serializer.data
+#
+#        # Serializar la pieza
+#        pieza_data = PiezaSerializer(pieza, context={'request': request}).data
+#
+#        # Retornar Response con las variables
+#        return Response({
+#            'pieza': pieza_data,
+#            'promedio_puntuacion': promedio_puntuacion,
+#            'total_valoraciones': total_valoraciones,
+#            'valoraciones': valoraciones_data
+#        })
+
+
+
+
+
+
 class ValoracionViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gestionar valoraciones/comentarios de piezas.
+    
+    - GET /api/v1/valoracion/ -> Lista todas las valoraciones (público)
+    - GET /api/v1/valoracion/{id}/ -> Detalle de una valoración (público)
+    - PUT /api/v1/valoracion/{id}/ -> Editar valoración (solo si es dueño + pedido enviado)
+    - DELETE /api/v1/valoracion/{id}/ -> Eliminar valoración (solo si es dueño)
+    """
+    
     queryset = Valoracion.objects.all()
     serializer_class = ValoracionSerializer
-    
-    filter_backends=[
-        DjangoFilterBackend,
-    ]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['cliente_id', 'pieza_id']
 
-    filterset_fields=[
-        'cliente_id' 
-    ]
+    #Funciona
+    def perform_update(self, serializer):
+        """
+        Se ejecuta después de validar permisos y antes de guardar cambios
+        """
+        serializer.save()
 
-    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    #FUNCIONA
+    #Obtiene las valoraciones de una pieza específica componente frontend C_Valoraciones
+    @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
     def por_pieza(self, request):
         """
-        Obtiene todas las valoraciones de una pieza específica.
-
+        Endpoint personalizado para obtener valoraciones de una pieza específica.
+        
         GET /api/v1/valoracion/por_pieza/?pieza_id=1
-
-        Parámetros query:
-        - pieza_id (requerido): ID de la pieza
-
-        Respuesta:
-        {
-            "pieza": { ... },
-            "promedio_puntuacion": 4.5,
-            "total_valoraciones": 10,
-            "valoraciones": [ ... ]
-        }
+        
+        Devuelve:
+        - Información de la pieza
+        - Promedio de puntuación
+        - Total de valoraciones
+        - Lista de todas las valoraciones
         """
-
         pieza_id = request.query_params.get('pieza_id', None)
 
+        # Validar que se proporcione el parámetro
         if not pieza_id:
             return Response(
                 {'error': 'El parámetro "pieza_id" es requerido'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Verificar que la pieza existe
         try:
             pieza = Pieza.objects.get(id=pieza_id)
-        
         except Pieza.DoesNotExist:
             return Response(
                 {'error': f'Pieza con ID {pieza_id} no encontrada'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        # Obtener todas las valoraciones de la pieza
-        #Las ordena por fecha DESCENDENTE (más recientes primero con -fecha_valoracion)
-        valoraciones = Valoracion.objects.filter(pieza=pieza).order_by('-fecha_valoracion')
+        # Obtener todas las valoraciones de la pieza de mayor a menor fecha
+        valoraciones = Valoracion.objects.filter(
+            pieza=pieza
+        ).order_by('-fecha_valoracion')
 
         # Calcular promedio de puntuación
-        from django.db.models import Avg
-        promedio = valoraciones.aggregate(Avg('puntuacion'))['puntuacion__avg']
+        promedio = valoraciones.aggregate(
+            Avg('puntuacion')
+        )['puntuacion__avg']
 
-        # Serializar las valoraciones
-        serializer = ValoracionSerializer(valoraciones, many=True, context={'request': request})
+        # Serializar datos
+        serializer = ValoracionSerializer(
+            valoraciones,
+            many=True,
+            context={'request': request}
+        )
 
-        # Variable 1: Promedio redondeado a 2 decimales (si hay valoraciones, sino 0)
-        promedio_puntuacion = round(promedio, 2) if promedio else 0
-
-        # Variable 2: Total de valoraciones
-        total_valoraciones = valoraciones.count()
-
-        # Variable 3: Datos serializados de las valoraciones
-        valoraciones_data = serializer.data
-
-        # Serializar la pieza
-        pieza_data = PiezaSerializer(pieza, context={'request': request}).data
-
-        # Retornar Response con las variables
         return Response({
-            'pieza': pieza_data,
-            'promedio_puntuacion': promedio_puntuacion,
-            'total_valoraciones': total_valoraciones,
-            'valoraciones': valoraciones_data
+            'pieza': PiezaSerializer(pieza, context={'request': request}).data,
+            'promedio_puntuacion': round(promedio, 2) if promedio else 0,
+            'total_valoraciones': valoraciones.count(),
+            'valoraciones': serializer.data
         })
+
+    #FUNCIONA
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def mis_valoraciones(self, request):
+        """
+        Endpoint para que un cliente vea sus propias valoraciones.
+        
+        GET /api/v1/valoracion/mis_valoraciones/
+        """
+        try:
+            cliente = request.user.cliente
+        except:
+            return Response(
+                {'error': 'El usuario no es un cliente'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        valoraciones = Valoracion.objects.filter(
+            cliente=cliente
+        ).order_by('-fecha_valoracion')
+
+        serializer = ValoracionSerializer(
+            valoraciones,
+            many=True,
+            context={'request': request}
+        )
+
+        return Response({
+            'usuario': request.user.email,
+            'total_valoraciones': valoraciones.count(),
+            'valoraciones': serializer.data
+        })
+
+
+
 
 class ListaDeseosViewSet(viewsets.ModelViewSet):
     queryset = ListaDeseos.objects.all()
