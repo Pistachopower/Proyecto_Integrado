@@ -512,9 +512,9 @@ class ValoracionSerializer(serializers.ModelSerializer):
         """
         Validar que el título no esté vacío
         """
-        if not value or len(value.strip()) == 0:
+        if not value or len(value.strip()) <= 1:
             raise serializers.ValidationError(
-                "El título no puede estar vacío."
+                "El título no puede estar vacío o debe tener más de 1 carácter."
             )
         return value
 
@@ -522,9 +522,9 @@ class ValoracionSerializer(serializers.ModelSerializer):
         """
         Validar que el comentario no esté vacío
         """
-        if not value or len(value.strip()) == 0:
+        if not value or len(value.strip()) <= 1:
             raise serializers.ValidationError(
-                "El comentario no puede estar vacío."
+                "El comentario no puede estar vacío o debe tener más de 1 carácter."
             )
         return value
 

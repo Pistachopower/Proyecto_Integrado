@@ -332,7 +332,7 @@ class ValoracionViewSet(viewsets.ModelViewSet):
     
     - GET /api/v1/valoracion/ -> Lista todas las valoraciones (público)
     - GET /api/v1/valoracion/{id}/ -> Detalle de una valoración (público)
-    - PUT /api/v1/valoracion/{id}/ -> Editar valoración (solo si es dueño + pedido enviado)
+    - PUT /api/v1/valoracion/{id}/ -> Editar valoración (solo si es dueño)
     - DELETE /api/v1/valoracion/{id}/ -> Eliminar valoración (solo si es dueño)
     """
     
@@ -340,15 +340,22 @@ class ValoracionViewSet(viewsets.ModelViewSet):
     serializer_class = ValoracionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cliente_id', 'pieza_id']
+    permission_classes = [EsDuenioValoracion] 
 
-    #Funciona
+
     def perform_update(self, serializer):
         """
-        Se ejecuta después de validar permisos y antes de guardar cambios
+       Actualiza una valoración.
         """
         serializer.save()
 
-    #FUNCIONA
+
+    def perform_destroy(self, instance):
+        """
+        Elimina una valoración.
+        """
+        instance.delete()
+
     #Obtiene las valoraciones de una pieza específica componente frontend C_Valoraciones
     @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
     def por_pieza(self, request):
@@ -406,36 +413,36 @@ class ValoracionViewSet(viewsets.ModelViewSet):
         })
 
     #FUNCIONA
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
-    def mis_valoraciones(self, request):
-        """
-        Endpoint para que un cliente vea sus propias valoraciones.
+    # @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    # def mis_valoraciones(self, request):
+    #     """
+    #     Endpoint para que un cliente vea sus propias valoraciones.
         
-        GET /api/v1/valoracion/mis_valoraciones/
-        """
-        try:
-            cliente = request.user.cliente
-        except:
-            return Response(
-                {'error': 'El usuario no es un cliente'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    #     GET /api/v1/valoracion/mis_valoraciones/
+    #     """
+    #     try:
+    #         cliente = request.user.cliente
+    #     except:
+    #         return Response(
+    #             {'error': 'El usuario no es un cliente'},
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
 
-        valoraciones = Valoracion.objects.filter(
-            cliente=cliente
-        ).order_by('-fecha_valoracion')
+    #     valoraciones = Valoracion.objects.filter(
+    #         cliente=cliente
+    #     ).order_by('-fecha_valoracion')
 
-        serializer = ValoracionSerializer(
-            valoraciones,
-            many=True,
-            context={'request': request}
-        )
+    #     serializer = ValoracionSerializer(
+    #         valoraciones,
+    #         many=True,
+    #         context={'request': request}
+    #     )
 
-        return Response({
-            'usuario': request.user.email,
-            'total_valoraciones': valoraciones.count(),
-            'valoraciones': serializer.data
-        })
+    #     return Response({
+    #         'usuario': request.user.email,
+    #         'total_valoraciones': valoraciones.count(),
+    #         'valoraciones': serializer.data
+    #     })
 
 
 

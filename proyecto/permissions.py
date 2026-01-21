@@ -168,26 +168,14 @@ class PermisoGestionInventario(permissions.BasePermission):
     
 
 #Implementacion update valoraciones y comentarios
-class PuedeEditarValoracion(permissions.BasePermission):
+class EsDuenioValoracion(permissions.BasePermission):
     """
-    Permite editar una valoración solo si:
-    1. El usuario es el propietario de la valoración
-    2. El usuario compró el producto (tiene LineaPedido con esa pieza)
-    3. El pedido está en estado ENVIADO (3) o posterior
+    Permiso para que solo el propietario de la valoración pueda editarla/eliminarla.
     """
-    
-    message = "No puedes editar esta valoración. Debes ser el propietario y tener el pedido enviado."
-
     def has_object_permission(self, request, view, obj):
-        # 1. Verificar que es el dueño de la valoración
-        if obj.cliente.usuario != request.user:
-            return False
+        # GET, HEAD, OPTIONS: permitir a todos
+        if request.method in permissions.SAFE_METHODS:
+            return True
         
-        # 2. Verificar que ha comprado el producto Y el pedido está ENVIADO (3) o más
-        compra_existe = LineaPedido.objects.filter(
-            pieza=obj.pieza,  # La misma pieza que se valora
-            pedido__cliente__usuario=request.user,  # Del usuario actual
-            pedido__estado__gte=Pedido.ENVIADO  # Estado >= ENVIADO (3)
-        ).exists()
-        
-        return compra_existe
+        # PUT, DELETE: solo si es el dueño
+        return obj.cliente.usuario == request.user
