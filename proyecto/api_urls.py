@@ -2,7 +2,7 @@ from django.urls import path
 from .api_views import *
 from rest_framework.routers import DefaultRouter #
 from django.urls import include
-from .api_views import LoginSessionView, LogoutSessionView 
+from .api_views import LoginSessionView, LogoutSessionView, ValoracionViewSet
 
 
 
