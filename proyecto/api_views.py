@@ -624,8 +624,36 @@ class ImagenPiezaViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
 
+#class LoginSessionView(APIView):
+#    permission_classes = [AllowAny] # Deja entrar a cualquiera para intentar loguearse
+#
+#    def post(self, request):
+#        # 1. Recogemos usuario y contraseña
+#        username = request.data.get('username')
+#        password = request.data.get('password')
+#
+#        # 2. Django verifica si existen
+#        user = authenticate(request, username=username, password=password)
+#
+#        if user is not None:
+#            # 3. Esto crea la sesión y mete la cookie en el navegador
+#            login(request, user)
+#            
+#            return Response({
+#                "message": "Sesión iniciada correctamente",
+#                "user": user.username,
+#                # Aquí puedes devolver el rol si quieres para usarlo en Vue
+#                "rol": getattr(user, 'rol', None) 
+#            }, status=status.HTTP_200_OK)
+#        else:
+#            return Response(
+#                {"error": "Credenciales inválidas"}, 
+#                status=status.HTTP_401_UNAUTHORIZED
+#            )
+
+
 class LoginSessionView(APIView):
-    permission_classes = [AllowAny] # Deja entrar a cualquiera para intentar loguearse
+    permission_classes = [AllowAny]
 
     def post(self, request):
         # 1. Recogemos usuario y contraseña
@@ -636,20 +664,66 @@ class LoginSessionView(APIView):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            # 3. ¡LA MAGIA! Esto crea la sesión y mete la cookie en el navegador
+            # 3. Crear la sesión
             login(request, user)
+            
+            # 4. Determinar el tipo de usuario y obtener su perfil
+            tipo_usuario = None
+            perfil_data = {}
+            
+            # CASO 1: ES UN CLIENTE
+            if user.rol == Usuario.CLIENTE:
+                try:
+                    cliente = Cliente.objects.get(usuario=user)
+                    tipo_usuario = 'cliente'
+                    serializer = ClienteSerializer(cliente, context={'request': request})
+                    perfil_data = serializer.data
+                except Cliente.DoesNotExist:
+                    return Response(
+                        {"error": "Cliente no encontrado para este usuario"}, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            
+            # CASO 2: ES UN VENDEDOR (EMPLEADO)
+            elif user.rol == Usuario.EMPLEADO:
+                try:
+                    vendedor = Vendedor.objects.get(usuario=user)
+                    tipo_usuario = 'vendedor'
+                    serializer = VendedorSerializer(vendedor, context={'request': request})
+                    perfil_data = serializer.data
+                except Vendedor.DoesNotExist:
+                    return Response(
+                        {"error": "Vendedor no encontrado para este usuario"}, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            
+            # CASO 3: ES UN ADMINISTRADOR
+            elif user.rol == Usuario.ADMINISTRADOR:
+                tipo_usuario = 'admin'
+                perfil_data = {
+                    "username": user.username,
+                    "email": user.email,
+                    "nombre": user.first_name,
+                    "apellido": user.last_name,
+                    "telefono": user.telefono,
+                    "direccion": user.direccion
+                }
             
             return Response({
                 "message": "Sesión iniciada correctamente",
                 "user": user.username,
-                # Aquí puedes devolver el rol si quieres para usarlo en Vue
-                "rol": getattr(user, 'rol', None) 
+                "email": user.email,
+                "tipo_usuario": tipo_usuario,
+                "perfil": perfil_data
             }, status=status.HTTP_200_OK)
         else:
             return Response(
                 {"error": "Credenciales inválidas"}, 
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
+
+
 
 class LogoutSessionView(APIView):
     def post(self, request):
