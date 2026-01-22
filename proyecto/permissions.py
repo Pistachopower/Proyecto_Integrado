@@ -167,7 +167,6 @@ class PermisoGestionInventario(permissions.BasePermission):
         return False
     
 
-<<<<<<< HEAD
 #Permiso comentario y valoracion cliente 
 class PuedeEditarValoracion(permissions.BasePermission):
     """
@@ -192,17 +191,3 @@ class PuedeEditarValoracion(permissions.BasePermission):
         ).exists()
         
         return compra_existe
-=======
-#Implementacion update valoraciones y comentarios
-class EsDuenioValoracion(permissions.BasePermission):
-    """
-    Permiso para que solo el propietario de la valoración pueda editarla/eliminarla.
-    """
-    def has_object_permission(self, request, view, obj):
-        # GET, HEAD, OPTIONS: permitir a todos
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        
-        # PUT, DELETE: solo si es el dueño
-        return obj.cliente.usuario == request.user
->>>>>>> implementacion_valoracion
