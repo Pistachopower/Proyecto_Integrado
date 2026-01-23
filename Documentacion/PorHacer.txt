@@ -33,3 +33,7 @@ Post (Agregar)
 
 Antes
 Necesito saber qué es lo que necesita
+
+
+HOY
+PROBAR LAS VALIDACIONES DEL REGISTRO DE USUARIOS

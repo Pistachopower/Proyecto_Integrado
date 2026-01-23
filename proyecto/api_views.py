@@ -480,8 +480,8 @@ class RegistroClienteViewSet(CreateAPIView):
 
 
 
-# proyecto/api_views.py
 
+#TO: DO: REVISAR Y COMPROBAR FUNCIONAMIENTO
 class VerMiPerfilView(APIView):
     permission_classes = [IsAuthenticated]
 
