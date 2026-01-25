@@ -11,6 +11,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data #aqui guardamos los datos de la base de datos 
 
+  #Servicio para levantar la aplicación Django utilizando Gunicorn y Nginx
+  # web:
+  #   build: .
+  #   container_name: tienda_web
+  #   command: > sh -c "python manage.py migrate && gunicorn proyecto.wsgi:application --bind 0.0.0.0:8000"
+  #   depends_on:
+  #     - postgres
+  #   ports:
+  #     - "8000:8000" 
+ 
+
 
 volumes:
   postgres_data:

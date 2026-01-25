@@ -196,6 +196,31 @@ class PedidoSerializer(serializers.HyperlinkedModelSerializer):
 
 
 
+class PedidoSimpleSerializer(serializers.ModelSerializer):
+    """
+    Serializador simplificado de Pedido con los datos más relevantes para perfil vendedor.
+    """
+    cliente_nombre = serializers.CharField(source='cliente.usuario.first_name', read_only=True)
+    cliente_apellido = serializers.CharField(source='cliente.usuario.last_name', read_only=True)
+    cliente_email = serializers.CharField(source='cliente.usuario.email', read_only=True)
+    vendedor_nombre = serializers.CharField(source='vendedor.usuario.first_name', read_only=True)
+    lineas_pedido = LineaPedidoSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Pedido
+        fields = [
+            'id',
+            'cliente_nombre',
+            'cliente_apellido',
+            'cliente_email',
+            'vendedor_nombre',
+            'estado',
+            'fecha_pedido',
+            'direccion_envio',
+            'total',
+            'lineas_pedido'
+        ]
+
 # ============================================================
 # METODOS DE PAGO
 # ============================================================

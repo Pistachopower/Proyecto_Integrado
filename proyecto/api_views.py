@@ -103,7 +103,7 @@ class VendedorViewSet(viewsets.ModelViewSet):
             
             print(f"Total Pedidos encontrados: {pedidos.count()}")
             
-            serializer = PedidoSerializer(pedidos, many=True, context={'request': request})
+            serializer = PedidoSimpleSerializer(pedidos, many=True, context={'request': request})
             
             return Response({
                 'pedidos': serializer.data
@@ -125,7 +125,7 @@ class CategoriaPiezaViewSet(viewsets.ModelViewSet):
 class PiezaViewSet(viewsets.ModelViewSet):
     queryset = Pieza.objects.all()
     serializer_class = PiezaSerializer
-    http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
+    # http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
     permission_classes = [AllowAny] #TODO: Permitir ver piezas pero no crear/modificar/borrar (admin,empleado) 
 
     filter_backends= [DjangoFilterBackend]
