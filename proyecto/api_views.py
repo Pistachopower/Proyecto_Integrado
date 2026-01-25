@@ -33,7 +33,7 @@ class ClienteViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'put', 'delete']
     permission_classes = [IsAuthenticated, EsDuenioDirecto]
 
-    #Para el dashboard
+    #Para el dashboard vendedor - obtener clientes asociados a un vendedor específico
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def clientes_vendedor(self, request):
         """ 
@@ -54,7 +54,11 @@ class ClienteViewSet(viewsets.ModelViewSet):
             vendedor = Vendedor.objects.get(id=id_vendedor)
 
             # Obtenemos todos los clientes asociados a este vendedor mediante pedidos (relacion inversa)
+            #Cliente -> Pedido: campo vendedor de Pedido
             clientes = Cliente.objects.filter(pedidos_cliente__vendedor=vendedor).distinct()
+            print(f"Total Clientes encontrados: {clientes.count()}")
+
+
         
             serializer = ClienteSerializer(clientes, many=True, context={'request': request})
             
@@ -64,14 +68,52 @@ class ClienteViewSet(viewsets.ModelViewSet):
             return Response(
                 {'error': f'Vendedor con ID {id_vendedor} no encontrado'},
                 status=status.HTTP_404_NOT_FOUND
-            )  
-    
+            ) 
+
+
 
 
 class VendedorViewSet(viewsets.ModelViewSet):
     queryset = Vendedor.objects.all()
     serializer_class = VendedorSerializer
     permission_classes = [IsAuthenticated, EsDuenioDirecto]
+
+    #Para el dashboard vendedor - obtener pedidos asociados a un vendedor específico
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def pedidos_vendedor(self, request):
+        """
+        Obtiene todos los pedidos asociados a un vendedor específico.
+        
+        GET /api/v1/vendedor/pedidos_vendedor/?vendedor_id=1
+        """
+        
+        id_vendedor = request.query_params.get('vendedor_id', None)
+        
+        if not id_vendedor:
+            return Response(
+                {'error': 'El parámetro "vendedor_id" es requerido'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            vendedor = Vendedor.objects.get(id=id_vendedor)
+            
+            # Obtener todos los pedidos del vendedor usando el related_name
+            pedidos = vendedor.pedidos_vendedor.all()
+            
+            print(f"Total Pedidos encontrados: {pedidos.count()}")
+            
+            serializer = PedidoSerializer(pedidos, many=True, context={'request': request})
+            
+            return Response({
+                'pedidos': serializer.data
+            })
+        
+        except Vendedor.DoesNotExist:
+            return Response(
+                {'error': f'Vendedor con ID {id_vendedor} no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            ) 
 
 
 class CategoriaPiezaViewSet(viewsets.ModelViewSet):
