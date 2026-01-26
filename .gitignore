@@ -4,6 +4,8 @@
 .env
 
 
+
+
 myvenv/
 
 
@@ -77,3 +79,9 @@ $RECYCLE.BIN/
 
 
 *.code-workspace
+
+#Python
+__pycache__/
+
+#
+media/
