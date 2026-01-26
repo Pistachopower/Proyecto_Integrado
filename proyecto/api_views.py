@@ -2,7 +2,7 @@ from proyecto.permissions import *
 from .models import *
 from .serializers import *
 from rest_framework.response import Response
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 from rest_framework import permissions
@@ -33,11 +33,87 @@ class ClienteViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'put', 'delete']
     permission_classes = [IsAuthenticated, EsDuenioDirecto]
 
+    #Para el dashboard vendedor - obtener clientes asociados a un vendedor específico
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def clientes_vendedor(self, request):
+        """ 
+        Obtiene todos los clientes asociados a un vendedor específico mediante pedidos.
+        
+        GET /api/v1/cliente/clientes_vendedor/?vendedor_id=1
+        """
+        
+        id_vendedor = request.query_params.get('vendedor_id', None)
+
+        if not id_vendedor:
+            return Response(
+                {'error': 'El parámetro "vendedor_id" es requerido'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            vendedor = Vendedor.objects.get(id=id_vendedor)
+
+            # Obtenemos todos los clientes asociados a este vendedor mediante pedidos (relacion inversa)
+            #Cliente -> Pedido: campo vendedor de Pedido
+            clientes = Cliente.objects.filter(pedidos_cliente__vendedor=vendedor).distinct()
+            print(f"Total Clientes encontrados: {clientes.count()}")
+
+
+        
+            serializer = ClienteSerializer(clientes, many=True, context={'request': request})
+            
+            return Response(serializer.data)
+
+        except Vendedor.DoesNotExist:
+            return Response(
+                {'error': f'Vendedor con ID {id_vendedor} no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            ) 
+
+
+
 
 class VendedorViewSet(viewsets.ModelViewSet):
     queryset = Vendedor.objects.all()
     serializer_class = VendedorSerializer
     permission_classes = [IsAuthenticated, EsDuenioDirecto]
+
+    #Para el dashboard vendedor - obtener pedidos asociados a un vendedor específico
+    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    def pedidos_vendedor(self, request):
+        """
+        Obtiene todos los pedidos asociados a un vendedor específico.
+        
+        GET /api/v1/vendedor/pedidos_vendedor/?vendedor_id=1
+        """
+        
+        id_vendedor = request.query_params.get('vendedor_id', None)
+        
+        if not id_vendedor:
+            return Response(
+                {'error': 'El parámetro "vendedor_id" es requerido'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            vendedor = Vendedor.objects.get(id=id_vendedor)
+            
+            # Obtener todos los pedidos del vendedor usando el related_name
+            pedidos = vendedor.pedidos_vendedor.all()
+            
+            print(f"Total Pedidos encontrados: {pedidos.count()}")
+            
+            serializer = PedidoSimpleSerializer(pedidos, many=True, context={'request': request})
+            
+            return Response({
+                'pedidos': serializer.data
+            })
+        
+        except Vendedor.DoesNotExist:
+            return Response(
+                {'error': f'Vendedor con ID {id_vendedor} no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            ) 
 
 
 class CategoriaPiezaViewSet(viewsets.ModelViewSet):
@@ -47,9 +123,14 @@ class CategoriaPiezaViewSet(viewsets.ModelViewSet):
 
 #TODO: CAMBIAR EL NOMBRE DEL PERMISO
 class PiezaViewSet(viewsets.ModelViewSet):
+    """
+    Obtener una pieza específica.
+        
+    GET /api/v1/pieza/id/
+    """
     queryset = Pieza.objects.all()
     serializer_class = PiezaSerializer
-    http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
+    # http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
     permission_classes = [AllowAny] #TODO: Permitir ver piezas pero no crear/modificar/borrar (admin,empleado) 
 
     filter_backends= [DjangoFilterBackend]
@@ -99,6 +180,7 @@ class PiezaViewSet(viewsets.ModelViewSet):
         serializer = PiezaSerializer(piezas, many=True, context={'request': request})
         return Response(serializer.data)
   
+    #TODO: REVISAR Y PROBAR FUNCIONAMIENTO
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def otros_filtros(self, request):
         """
@@ -341,7 +423,10 @@ class ValoracionViewSet(viewsets.ModelViewSet):
     serializer_class = ValoracionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cliente_id', 'pieza_id']
+<<<<<<< HEAD
     
+=======
+>>>>>>> implementacion_loginEmpleado
 
 
     def perform_update(self, serializer):
@@ -481,8 +566,8 @@ class RegistroClienteViewSet(CreateAPIView):
 
 
 
-# proyecto/api_views.py
 
+#TO: DO: REVISAR Y COMPROBAR FUNCIONAMIENTO
 class VerMiPerfilView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -567,7 +652,7 @@ class VerMiPerfilView(APIView):
         
 
         # ---------------------------------------------------------
-        # PASO 2: ACTUALIZACIÓN DE DATOS DE PERFIL (Modelo Cliente/Vendedor)
+        # PASO 2: ACTUALIZACIÓN DE DATOS DE PERFIL (Modelo Vendedor)
         # ---------------------------------------------------------
         
         # CASO A: ES UN CLIENTE
@@ -600,7 +685,7 @@ class VerMiPerfilView(APIView):
             try:
                 perfil = Vendedor.objects.get(usuario=usuario)
                 
-                serializer = VendedorSerializer(perfil, data=data, partial=True)
+                serializer = UsuarioSerializer(perfil.usuario, data=data, partial=True, context={'request': request})
                 
                 if serializer.is_valid():
                     serializer.save()
@@ -668,54 +753,10 @@ class LoginSessionView(APIView):
             # 3. Crear la sesión
             login(request, user)
             
-            # 4. Determinar el tipo de usuario y obtener su perfil
-            tipo_usuario = None
-            perfil_data = {}
-            
-            # CASO 1: ES UN CLIENTE
-            if user.rol == Usuario.CLIENTE:
-                try:
-                    cliente = Cliente.objects.get(usuario=user)
-                    tipo_usuario = 'cliente'
-                    serializer = ClienteSerializer(cliente, context={'request': request})
-                    perfil_data = serializer.data
-                except Cliente.DoesNotExist:
-                    return Response(
-                        {"error": "Cliente no encontrado para este usuario"}, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-            
-            # CASO 2: ES UN VENDEDOR (EMPLEADO)
-            elif user.rol == Usuario.EMPLEADO:
-                try:
-                    vendedor = Vendedor.objects.get(usuario=user)
-                    tipo_usuario = 'vendedor'
-                    serializer = VendedorSerializer(vendedor, context={'request': request})
-                    perfil_data = serializer.data
-                except Vendedor.DoesNotExist:
-                    return Response(
-                        {"error": "Vendedor no encontrado para este usuario"}, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-            
-            # CASO 3: ES UN ADMINISTRADOR
-            elif user.rol == Usuario.ADMINISTRADOR:
-                tipo_usuario = 'admin'
-                perfil_data = {
-                    "username": user.username,
-                    "email": user.email,
-                    "nombre": user.first_name,
-                    "apellido": user.last_name,
-                    "telefono": user.telefono,
-                    "direccion": user.direccion
-                }
-            
+            #Si la autenticación es correcta, devolvemos is_authenticated=True y un status 200
             return Response({
                 "message": "Sesión iniciada correctamente",
-                "user": user.username,
-                "email": user.email,
-                "tipo_usuario": tipo_usuario,
-                "perfil": perfil_data
+               "is_authenticated": True,
             }, status=status.HTTP_200_OK)
         else:
             return Response(
@@ -731,6 +772,8 @@ class LogoutSessionView(APIView):
         # Esto borra la cookie y la sesión del servidor
         logout(request)
         return Response({"message": "Sesión cerrada"}, status=status.HTTP_200_OK)
+    
+    
 
 
 # ===================== CARRITO EN SESIÓN =====================
@@ -873,11 +916,12 @@ class CarritoViewSet(ViewSet):
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 
+#Para comprobar si el usuario ha iniciado sesión basado en las cookies de sesión
 @require_http_methods(["GET"])
 def auth_status(request):
     """Verifica si el usuario está autenticado basado en las cookies de sesión."""
     if request.user.is_authenticated:
         return JsonResponse({
-            'authenticated': request.user.is_authenticated})
+            'is_authenticated': request.user.is_authenticated})
     
-    return JsonResponse({'authenticated': False}, status=403)
+    return JsonResponse({'is_authenticated': False}, status=403)

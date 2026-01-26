@@ -7,7 +7,14 @@ from django.contrib.auth.models import (
 # ============================================================
 # NIVEL 1: IDENTIDAD Y AUTENTICACIÓN
 # ============================================================
+"""
+Pagado: representa que el usuario pagó.
+pendiente: el vendedor tiene que preparar el producto.
+cancelado: el cliente cancela el pedido. Sólo antes de ser enviado.
+enviado: cuando el vendedor envía el producto al cliente.
+entregado: el cliente recibe el producto.
 
+"""
 class Usuario(AbstractUser):
     ADMINISTRADOR = 1
     EMPLEADO = 2
@@ -166,6 +173,15 @@ class Pedido(models.Model):
 
 
 class LineaPedido(models.Model):
+    ENTREGADO = 1
+    DEVUELTO = 2
+
+
+    ESTADO = [
+        (ENTREGADO, "Entregado"),
+        (DEVUELTO, "Devuelto"),
+    
+    ]
     pedido = models.ForeignKey(
         Pedido,
         on_delete=models.CASCADE,
@@ -179,7 +195,8 @@ class LineaPedido(models.Model):
     cantidad = models.IntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     descuento_aplicado = models.DecimalField(max_digits=10, decimal_places=2)
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2) #Sin iva ni descuentos ni gastos de envio
+    estado  = models.PositiveSmallIntegerField(choices=ESTADO, null=True, blank=True)
 
     def __str__(self):
         return f"Linea {self.id} del pedido {self.pedido.id}"

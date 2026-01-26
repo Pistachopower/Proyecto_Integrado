@@ -1,7 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 from .api_views import *
 from rest_framework.routers import DefaultRouter #
-from django.urls import include
 from .api_views import LoginSessionView, LogoutSessionView, ValoracionViewSet
 
 
@@ -43,6 +42,7 @@ urlpatterns = [
     # Rutas de Login/Logout 
     path('login/', LoginSessionView.as_view(), name='login_session'),
     path('logout/', LogoutSessionView.as_view(), name='logout_session'),
+
 
     # En tu urls.py
     path('auth/status/', auth_status),

@@ -13,11 +13,7 @@ Lista de deseo
 
 Vendedor 
 Permisos
-CRUD de vendedor
 Agregar productos con un csv
-
-Pendiente 
-Definir si se trabaja con pieza o con inventario y tienda, es decir, que sólo se trabaje con el precio que aparece en pieza y no los modelos inventario y tienda
 
 
 Por hacer 
@@ -33,3 +29,8 @@ Post (Agregar)
 
 Antes
 Necesito saber qué es lo que necesita
+
+
+HOY
+#TODO: REVISAR Y PROBAR FUNCIONAMIENTO
+@action(detail=False, methods=['get'], permission_classes=[AllowAny])
