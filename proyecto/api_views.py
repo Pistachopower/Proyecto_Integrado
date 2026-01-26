@@ -123,6 +123,11 @@ class CategoriaPiezaViewSet(viewsets.ModelViewSet):
 
 #TODO: CAMBIAR EL NOMBRE DEL PERMISO
 class PiezaViewSet(viewsets.ModelViewSet):
+    """
+    Obtener una pieza específica.
+        
+    GET /api/v1/pieza/id/
+    """
     queryset = Pieza.objects.all()
     serializer_class = PiezaSerializer
     # http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
@@ -175,6 +180,7 @@ class PiezaViewSet(viewsets.ModelViewSet):
         serializer = PiezaSerializer(piezas, many=True, context={'request': request})
         return Response(serializer.data)
   
+    #TODO: REVISAR Y PROBAR FUNCIONAMIENTO
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def otros_filtros(self, request):
         """
@@ -762,6 +768,8 @@ class LogoutSessionView(APIView):
         # Esto borra la cookie y la sesión del servidor
         logout(request)
         return Response({"message": "Sesión cerrada"}, status=status.HTTP_200_OK)
+    
+    
 
 
 # ===================== CARRITO EN SESIÓN =====================
