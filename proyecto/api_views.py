@@ -19,6 +19,8 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend # Filtros para los ViewSets
 from django.db.models import Avg
+from decimal import Decimal
+from datetime import date
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -775,29 +777,46 @@ class LogoutSessionView(APIView):
 
 # ===================== CARRITO EN SESIÓN =====================
 class CarritoViewSet(ViewSet):
+    #http_method_names = ['get', 'post', 'put', 'delete']
     permission_classes = [permissions.IsAuthenticated]
 
-    def _get_carrito(self, request):
-        print(request.user)
+    #Obtiene el carrito actual de la sesión del usuario 
+    # (un diccionario con los IDs de las piezas y sus cantidades).
+    def get_carrito(self, request):
+        #print(request.user)
         return request.session.get('carrito', {})
 
-    def _save_carrito(self, request, carrito):
+    #Guarda el carrito actualizado en la sesión.
+    def save_carrito(self, request, carrito):
         request.session['carrito'] = carrito
         request.session.modified = True # Asegura que Django guarde los cambios en la sesión
 
+    
+    #USE
     def list(self, request):
-        """Obtener el carrito actual con info de piezas"""
-        from .models import Pieza, ImagenPieza
-        carrito = self._get_carrito(request)
+        """Devuelve el contenido actual del carrito, mostrando 
+        información de cada pieza (nombre, imagen, precio, cantidad, 
+        etc.) y el precio total.
+        """
+
+        carrito = self.get_carrito(request)
         resultado = {}
         items = []
         precio_total = 0
         for pieza_id, info in carrito.items():
+            
+            # Validar que pieza_id no sea None o 'None'
+            #TODO: Arreglar esto mejor (si lo quitas salta error: Field 'id' expected a number but got 'None'.)
+            if pieza_id is None or pieza_id == 'None' or pieza_id == '':
+                continue
+
             try:
                 pieza = Pieza.objects.get(id=pieza_id)
+                
                 # Buscar imagen principal: primero ImagenPieza, si no, el campo imagen de Pieza
                 imagen_principal = None
                 imagen_obj = ImagenPieza.objects.filter(pieza=pieza).first()
+                
                 if imagen_obj and imagen_obj.url_imagen:
                     imagen_principal = request.build_absolute_uri(imagen_obj.url_imagen.url)
                 elif pieza.imagen:
@@ -822,91 +841,223 @@ class CarritoViewSet(ViewSet):
         resultado['precio_total'] = precio_total
         return Response(resultado)
 
+    def retrieve(self, request, pk=None):
+            """
+            Devuelve el detalle de una pieza específica del carrito.
+            GET /api/v1/carrito/{pieza_id}/
+            """
+            carrito = self.get_carrito(request)
+            pieza_id = str(pk)
+            info = carrito.get(pieza_id)
+            if not info:
+                return Response({'error': 'Pieza no encontrada en el carrito'}, status=404)
+            try:
+                pieza = Pieza.objects.get(id=pieza_id)
+                imagen_principal = None
+                imagen_obj = ImagenPieza.objects.filter(pieza=pieza).first()
+                
+                if imagen_obj and imagen_obj.url_imagen:
+                    #convertir la URL relativa de la imagen en una URL completa
+                    imagen_principal = request.build_absolute_uri(imagen_obj.url_imagen.url)
+                
+                elif pieza.imagen:
+                    imagen_principal = request.build_absolute_uri(pieza.imagen.url)
+                
+                detalle = {
+                    'id': pieza.id,
+                    'cantidad': info['cantidad'],
+                    'nombre': pieza.nombre,
+                    'imagen': imagen_principal,
+                    'precio': pieza.precio_base,
+                    'precio_total_piezas': pieza.precio_base * info['cantidad'],
+                }
+                return Response(detalle)
+            except Pieza.DoesNotExist:
+                return Response({'error': 'Pieza no encontrada'}, status=404)
+
+
+    #USE
     def create(self, request):
-        """Agregar o actualizar una pieza en el carrito"""
+        """
+        Permite agregar o actualizar una pieza en el carrito. 
+        Espera en el body un JSON con pieza_id y cantidad. 
+        Si la pieza ya está, actualiza la cantidad; si no, la agrega.
+        
+        http://127.0.0.1:8000/api/v1/carrito/
+
+        {
+            "pieza_id": 7,
+            "cantidad": 3
+        }
+ 
+        """
         pieza_id = str(request.data.get('pieza_id'))
         cantidad = int(request.data.get('cantidad', 1))
         
         if cantidad < 1:
             return Response({'error': 'Cantidad debe ser mayor a 0'}, status=400)
         
-        carrito = self._get_carrito(request)
-        # Puedes agregar más info si lo deseas (precio, nombre, etc)
+        carrito = self.get_carrito(request)
+        
         carrito[pieza_id] = {'cantidad': cantidad}
-        self._save_carrito(request, carrito) #guardar en sesión
+        self.save_carrito(request, carrito) #guardar en sesión
         return Response({'message': 'Pieza agregada/actualizada', 'carrito': carrito})
 
+    #USE
     def destroy(self, request, pk=None):
-        """Eliminar una pieza del carrito"""
-        carrito = self._get_carrito(request)
+        """Eliminar una pieza del carrito por su ID.
+        
+        DELETE /api/v1/carrito/{pieza_id}/
+        
+        """
+        carrito = self.get_carrito(request)
         pieza_id = str(pk)
+        
         if pieza_id in carrito:
-            del carrito[pieza_id]
-            self._save_carrito(request, carrito)
+            del carrito[pieza_id] #Elimina la pieza del carrito
+            self.save_carrito(request, carrito)
             return Response({'message': 'Pieza eliminada', 'carrito': carrito})
+        
         return Response({'error': 'Pieza no encontrada en el carrito'}, status=404)
 
-    @action(detail=False, methods=['post'])
-    def vaciar(self, request):
-        """Vaciar el carrito"""
-        self._save_carrito(request, {})
-        return Response({'message': 'Carrito vaciado'})
 
     @action(detail=False, methods=['post'])
     def finalizar(self, request):
-        """Finalizar compra: crea Pedido y LineaPedido, limpia carrito"""
-        from .models import Pedido, LineaPedido, Pieza, Cliente, Tienda, Vendedor
-        from decimal import Decimal
-        carrito = self._get_carrito(request)
+        """
+        POST /api/v1/carrito/finalizar/
         
+        Body:
+        {
+            "direccion_envio": "Calle Ejemplo 123",
+            "metodo_pago_id": 1  // opcional, si no se envía usa el predeterminado
+        }
+        """
+
+        import uuid
+
+        # 1. Obtener carrito
+        carrito = self.get_carrito(request)
         if not carrito:
             return Response({'error': 'El carrito está vacío'}, status=400)
-        user = request.user
-        
-        try:
-            cliente = user.cliente
-        
-        except Exception:
-            return Response({'error': 'El usuario no es cliente'}, status=400)
-        
-        tienda = Tienda.objects.first()
-        vendedor = Vendedor.objects.first()
 
-        if not tienda or not vendedor:
-            return Response({'error': 'No hay tienda o vendedor configurado'}, status=400)
+        # 2. Verificar que es cliente
+        try:
+            cliente = request.user.cliente
+        except Cliente.DoesNotExist:
+            return Response({'error': 'Usuario no es cliente'}, status=400)
+
+        # 3. Verificar que tiene al menos un método de pago
+        metodos_cliente = MetodoPago.objects.filter(cliente=cliente)
+        if not metodos_cliente.exists():
+            return Response({
+                'error': 'Debe registrar al menos un método de pago antes de realizar la compra'
+            }, status=400)
+
+        # 4. Obtener dirección
+        direccion = request.data.get('direccion_envio')
+        if not direccion:
+            return Response({'error': 'Debe proporcionar una dirección de envío'}, status=400)
+
+        # 5. Obtener método de pago (del body o el predeterminado)
+        metodo_pago_id = request.data.get('metodo_pago_id')
         
-        total = Decimal('0.00')
+        if metodo_pago_id:
+            try:
+                metodo_pago = MetodoPago.objects.get(id=metodo_pago_id, cliente=cliente)
+            except MetodoPago.DoesNotExist:
+                return Response({'error': 'Método de pago no válido'}, status=400)
+        else:
+            # Buscar el predeterminado o el primero disponible
+            metodo_pago = metodos_cliente.filter(es_predeterminado=True).first()
+            if not metodo_pago:
+                metodo_pago = metodos_cliente.first()
+
+        # 6. Obtener vendedor
+        vendedor = Vendedor.objects.first()
+        if not vendedor:
+            return Response({'error': 'No hay vendedores disponibles'}, status=500)
+
+        # 7. Preparar líneas y calcular total
         lineas = []
-        
+        total = Decimal('0.00')
+
         for pieza_id, info in carrito.items():
-            pieza = get_object_or_404(Pieza, id=pieza_id)
+            if not pieza_id or pieza_id == 'None':
+                continue
+
+            try:
+                pieza = Pieza.objects.get(id=pieza_id)
+            except Pieza.DoesNotExist:
+                return Response({'error': f'Pieza {pieza_id} no existe'}, status=400)
+
             cantidad = int(info['cantidad'])
-            precio_unitario = pieza.precio_base
-            subtotal = precio_unitario * cantidad
+
+            if pieza.stock < cantidad:
+                return Response({
+                    'error': f'Stock insuficiente para "{pieza.nombre}". Disponible: {pieza.stock}'
+                }, status=400)
+
+            subtotal = pieza.precio_base * cantidad
             total += subtotal
-            lineas.append({'pieza': pieza, 'cantidad': cantidad, 'precio_unitario': precio_unitario, 'subtotal': subtotal})
-        
+
+            lineas.append({
+                'pieza': pieza,
+                'cantidad': cantidad,
+                'precio': pieza.precio_base,
+                'subtotal': subtotal
+            })
+
+        if not lineas:
+            return Response({'error': 'No hay productos válidos en el carrito'}, status=400)
+
+        # 8. Crear pedido
         pedido = Pedido.objects.create(
             estado=Pedido.PENDIENTE,
             cliente=cliente,
-            tienda=tienda,
             vendedor=vendedor,
-            fecha_pedido=None,  # Puedes poner date.today() si quieres 
-            direccion_envio='(por definir)',
+            fecha_pedido=date.today(),
+            direccion_envio=direccion,
             total=total
         )
-        for l in lineas:
+
+        # 9. Crear líneas y descontar stock
+        for linea in lineas:
             LineaPedido.objects.create(
                 pedido=pedido,
-                pieza=l['pieza'],
-                cantidad=l['cantidad'],
-                precio_unitario=l['precio_unitario'],
-                descuento_aplicado=0,
-                subtotal=l['subtotal']
+                pieza=linea['pieza'],
+                cantidad=linea['cantidad'],
+                precio_unitario=linea['precio'],
+                descuento_aplicado=Decimal('0.00'),
+                subtotal=linea['subtotal']
             )
-        self._save_carrito(request, {})
-        return Response({'message': 'Compra finalizada', 'pedido_id': pedido.id})
-    
+            
+            linea['pieza'].stock -= linea['cantidad']
+            linea['pieza'].save()
+
+        # 10. Crear registro de pago
+        Pago.objects.create(
+            pedido=pedido,
+            metodo_pago=metodo_pago,
+            fecha_pago=date.today(),
+            monto=total,
+            estado=Pago.PENDIENTE,
+        
+            #uuid.uuid4() genera un identificador único universal
+            numero_transaccion=str(uuid.uuid4())[:20]
+        )
+
+        # 11. Vaciar carrito
+        self.save_carrito(request, {})
+
+        return Response({
+            'message': 'Compra realizada con éxito',
+            'pedido_id': pedido.id,
+            'total': str(total),
+            'items': len(lineas),
+            'metodo_pago_usado': metodo_pago.id
+        }, status=201)
+
+
 
 
 # ==================== ESTADO DE AUTENTICACIÓN ====================

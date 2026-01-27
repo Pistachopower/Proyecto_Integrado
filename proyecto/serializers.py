@@ -129,7 +129,6 @@ class LineaPedidoSerializer(serializers.HyperlinkedModelSerializer):
     def filtrar_datos_para_cliente_lineaPedido(self, data, instance):
         """Reemplaza los objetos complejos por información que interesa enviar al cliente."""
         
-        # Simplificar Tienda (Solo nombre)
         if instance.pieza:
             data['pieza'] = {
                 "nombre": instance.pieza.nombre,   
@@ -220,6 +219,31 @@ class PedidoSimpleSerializer(serializers.ModelSerializer):
             'total',
             'lineas_pedido'
         ]
+# ============================================================
+# CARRITO EN SESIÓN
+# ============================================================
+class FinalizarCompraSerializer(serializers.Serializer):
+    """Serializador para finalizar la compra del carrito."""
+    direccion_envio = serializers.CharField(
+        max_length=255,
+        required=False,
+        help_text="Dirección donde se enviará el pedido"
+    )
+
+    metodo_pago_id = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+        help_text="ID del método de pago a utilizar (opcional, usa el predeterminado si no se envía)"
+    )
+
+    def validate_direccion_envio(self, valor):
+        """Validar la longitud mínima si se proporciona."""
+        if valor and len(valor.strip()) < 5:
+            raise serializers.ValidationError("La dirección de envío es demasiado corta (mínimo 5 caracteres).")
+        return valor.strip() if valor else valor
+    
+
+
 
 # ============================================================
 # METODOS DE PAGO
