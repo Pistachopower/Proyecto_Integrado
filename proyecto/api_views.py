@@ -423,10 +423,7 @@ class ValoracionViewSet(viewsets.ModelViewSet):
     serializer_class = ValoracionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cliente_id', 'pieza_id']
-<<<<<<< HEAD
     
-=======
->>>>>>> implementacion_loginEmpleado
 
 
     def perform_update(self, serializer):
