@@ -13,3 +13,7 @@ python-dotenv~=1.2.1 #manejo de variables de entorno
 django-oauth-toolkit~=3.0.1 
 
 
+#Para levantar el servidor en produccion
+gunicorn==21.2.0
+
+
