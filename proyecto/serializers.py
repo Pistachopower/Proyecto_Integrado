@@ -94,6 +94,7 @@ class ImagenPiezaSerializer(serializers.HyperlinkedModelSerializer):
 
 class LineaPedidoSerializer(serializers.HyperlinkedModelSerializer):
     pieza = PiezaSerializer(read_only=True)
+    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = LineaPedido
@@ -219,6 +220,12 @@ class PedidoSimpleSerializer(serializers.ModelSerializer):
             'total',
             'lineas_pedido'
         ]
+
+
+class CambiarEstadoPedidoVendedorSerializer(serializers.Serializer):
+    estado = serializers.IntegerField(min_value=1, max_value=5)
+
+    
 # ============================================================
 # CARRITO EN SESIÓN
 # ============================================================

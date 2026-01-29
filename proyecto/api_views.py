@@ -224,6 +224,10 @@ class PiezaViewSet(viewsets.ModelViewSet):
 
 
 class PedidoViewSet(viewsets.ModelViewSet):
+    """
+            PATCH /api/v1/pedido/{id}/cambiar_estado_vendedor/
+            Body: {"estado": 2}
+    """
     queryset = Pedido.objects.all()
     serializer_class = PedidoSerializer
     #permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
@@ -235,6 +239,26 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
     filterset_fields=[
         'cliente_id'   ]
+    
+    @action(detail=True, methods=['patch'])
+    def cambiar_estado_vendedor(self, request, pk=None):
+        pedido = self.get_object()
+        serializer = CambiarEstadoPedidoVendedorSerializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=400)
+
+        estado_anterior = pedido.get_estado_display()
+        pedido.estado = serializer.validated_data['estado']
+        pedido.save()
+
+        return Response({
+            'mensaje': 'Estado actualizado',
+            'pedido_id': pedido.id,
+            'estado_anterior': estado_anterior,
+            'estado_actual': pedido.get_estado_display()
+        })
+
 
 
     
@@ -449,10 +473,46 @@ class DevolucionClienteViewSet(viewsets.ModelViewSet):
 class DevolucionVendedorViewSet(viewsets.ModelViewSet):
     """
     ViewSet para que los vendedores gestionen las devoluciones.
+    
+    GET /api/v1/devoluciones/ - Lista devoluciones de pedidos del vendedor
+    POST /api/v1/devoluciones/{id}/aprobar/ - Aprobar devolución
+    POST /api/v1/devoluciones/{id}/rechazar/ - Rechazar devolución
     """
     queryset = Devolucion.objects.all()
     serializer_class = DevolucionSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Filtra las devoluciones:
+        - Admin/Empleado: ve todas
+        - Vendedor: solo las de sus pedidos
+        """
+        user = self.request.user
+        
+        # Admin o Empleado ven todo
+        if user.rol in [Usuario.ADMINISTRADOR, Usuario.EMPLEADO]:
+            return Devolucion.objects.all()
+        
+        # Vendedor solo ve devoluciones de sus pedidos
+        try:
+            vendedor = user.vendedor
+            return Devolucion.objects.filter(
+                linea_pedido__pedido__vendedor=vendedor
+            )
+        except Vendedor.DoesNotExist:
+            return Devolucion.objects.none()
+
+    def es_vendedor_o_admin(self, request):
+        """Verifica si el usuario es vendedor, admin o empleado."""
+        user = request.user
+        if user.rol in [Usuario.ADMINISTRADOR, Usuario.EMPLEADO]:
+            return True
+        try:
+            vendedor = user.vendedor
+            return vendedor is not None
+        except Vendedor.DoesNotExist:
+            return False
 
     @action(detail=True, methods=['post'])
     def aprobar(self, request, pk=None):
@@ -461,8 +521,12 @@ class DevolucionVendedorViewSet(viewsets.ModelViewSet):
         
         POST /api/v1/devoluciones/{id}/aprobar/
         """
+        # Verificar que es vendedor o admin
+        if not self.es_vendedor_o_admin(request):
+            return Response({'error': 'Solo vendedores pueden aprobar devoluciones'}, status=403)
+
         try:
-            devolucion = Devolucion.objects.get(id=pk)
+            devolucion = self.get_queryset().get(id=pk)
         except Devolucion.DoesNotExist:
             return Response({'error': 'Devolución no encontrada'}, status=404)
 
@@ -508,9 +572,14 @@ class DevolucionVendedorViewSet(viewsets.ModelViewSet):
         Rechazar una devolución.
         
         POST /api/v1/devoluciones/{id}/rechazar/
+        Body opcional: {"motivo_rechazo": "Razón del rechazo"}
         """
+        # Verificar que es vendedor o admin
+        if not self.es_vendedor_o_admin(request):
+            return Response({'error': 'Solo vendedores pueden rechazar devoluciones'}, status=403)
+
         try:
-            devolucion = Devolucion.objects.get(id=pk)
+            devolucion = self.get_queryset().get(id=pk)
         except Devolucion.DoesNotExist:
             return Response({'error': 'Devolución no encontrada'}, status=404)
 
