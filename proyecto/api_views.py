@@ -320,10 +320,213 @@ class PagoViewSet(viewsets.ModelViewSet):
     serializer_class = PagoSerializer
     permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
 
-class DevolucionViewSet(viewsets.ModelViewSet):
+# class DevolucionViewSet(viewsets.ModelViewSet):
+#     queryset = Devolucion.objects.all()
+#     serializer_class = DevolucionSerializer
+#     permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+
+
+
+
+class DevolucionClienteViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para que los clientes gestionen sus devoluciones.
+    
+    POST /api/v1/mis-devoluciones/
+    {
+        "linea_pedido_id": 1,
+        "motivo": "El producto llegó dañado",
+        "cantidad_devuelta": 2
+    }
+    """
+    serializer_class = DevolucionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Solo muestra las devoluciones del cliente autenticado."""
+        try:
+            cliente = self.request.user.cliente
+            return Devolucion.objects.filter(cliente=cliente)
+        
+        except Cliente.DoesNotExist:
+            return Devolucion.objects.none()
+
+    def create(self, request):
+        """
+        Crear una solicitud de devolución.
+        
+        Solo se puede devolver si el pedido está ENTREGADO.
+
+        usuario 15
+        cliente 9
+        Pedido: 52, 44, 79
+        linea pedido: 160 (pieza 2), 161 (pieza 5), 162 (pieza 5), 163 (pieza 10)
+        Estado: enviado
+        """
+        # 1. Verificar que es cliente
+        try:
+            cliente = request.user.cliente
+        except Cliente.DoesNotExist:
+            return Response({'error': 'Usuario no es cliente'}, status=400)
+
+        # 2. Obtener datos del request
+        linea_pedido_id = request.data.get('linea_pedido')
+        motivo = request.data.get('motivo')
+        cantidad_devuelta = request.data.get('cantidad_devuelta')
+
+        # 3. Validar campos requeridos
+        if not linea_pedido_id:
+            return Response({'error': 'Debe indicar la línea de pedido'}, status=400)
+        
+        if not motivo or len(motivo.strip()) < 5:
+            return Response({'error': 'El motivo debe tener al menos 10 caracteres'}, status=400)
+        
+        if not cantidad_devuelta or int(cantidad_devuelta) < 1:
+            return Response({'error': 'La cantidad a devolver debe ser al menos 1'}, status=400)
+
+        cantidad_devuelta = int(cantidad_devuelta)
+
+        # 4. Obtener la línea de pedido
+        try:
+            linea_pedido = LineaPedido.objects.get(id=linea_pedido_id)
+        except LineaPedido.DoesNotExist:
+            return Response({'error': 'Línea de pedido no encontrada'}, status=404)
+
+        # 5. Verificar que el pedido pertenece al cliente
+        if linea_pedido.pedido.cliente != cliente:
+            return Response({'error': 'Este pedido no te pertenece'}, status=403)
+
+        # 6. Verificar que el pedido está ENTREGADO
+        if linea_pedido.pedido.estado != Pedido.ENTREGADO:
+            return Response({
+                'error': 'Solo puedes devolver productos de pedidos entregados',
+                'estado_actual': linea_pedido.pedido.get_estado_display()
+            }, status=400)
+
+        # 7. Verificar que la línea no esté ya devuelta
+        if linea_pedido.estado == LineaPedido.DEVUELTO:
+            return Response({'error': 'Esta línea ya fue devuelta'}, status=400)
+
+        # 8. Verificar cantidad válida
+        # Calcular cuánto ya se devolvió de esta línea
+        ya_devuelto = Devolucion.objects.filter(
+            linea_pedido=linea_pedido,
+            estado__in=[Devolucion.PENDIENTE, Devolucion.APROBADA]
+        ).aggregate(total=models.Sum('cantidad_devuelta'))['total'] or 0
+
+        disponible_devolver = linea_pedido.cantidad - ya_devuelto
+
+        if cantidad_devuelta > disponible_devolver:
+            return Response({
+                'error': f'Solo puedes devolver {disponible_devolver} unidades',
+                'cantidad_en_linea': linea_pedido.cantidad,
+                'ya_devuelto': ya_devuelto
+            }, status=400)
+
+        # 9. Calcular monto de reembolso
+        monto_reembolso = linea_pedido.precio_unitario * cantidad_devuelta
+
+        # 10. Crear la devolución
+        devolucion = Devolucion.objects.create(
+            linea_pedido=linea_pedido,
+            cliente=cliente,
+            fecha_solicitud=date.today(),
+            motivo=motivo,
+            estado=Devolucion.PENDIENTE,
+            cantidad_devuelta=cantidad_devuelta,
+            monto_reembolso=monto_reembolso
+        )
+
+        return Response({
+            'message': 'Solicitud de devolución creada correctamente',
+            'devolucion_id': devolucion.id,
+            'estado': 'Pendiente de aprobación',
+            'cantidad_devuelta': cantidad_devuelta,
+            'monto_reembolso': str(monto_reembolso)
+        }, status=201)
+
+
+class DevolucionVendedorViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para que los vendedores gestionen las devoluciones.
+    """
     queryset = Devolucion.objects.all()
     serializer_class = DevolucionSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=True, methods=['post'])
+    def aprobar(self, request, pk=None):
+        """
+        Aprobar una devolución y restaurar el stock.
+        
+        POST /api/v1/devoluciones/{id}/aprobar/
+        """
+        try:
+            devolucion = Devolucion.objects.get(id=pk)
+        except Devolucion.DoesNotExist:
+            return Response({'error': 'Devolución no encontrada'}, status=404)
+
+        # Verificar que está pendiente
+        if devolucion.estado != Devolucion.PENDIENTE:
+            return Response({
+                'error': 'Solo se pueden aprobar devoluciones pendientes',
+                'estado_actual': devolucion.get_estado_display()
+            }, status=400)
+
+        # Aprobar la devolución
+        devolucion.estado = Devolucion.APROBADA
+        devolucion.fecha_aprobacion = date.today()
+        devolucion.save()
+
+        # Restaurar stock
+        pieza = devolucion.linea_pedido.pieza
+        pieza.stock += devolucion.cantidad_devuelta
+        pieza.save()
+
+        # Marcar línea como devuelta si se devolvió todo
+        linea = devolucion.linea_pedido
+        total_devuelto = Devolucion.objects.filter(
+            linea_pedido=linea,
+            estado=Devolucion.APROBADA
+        ).aggregate(total=models.Sum('cantidad_devuelta'))['total'] or 0
+
+        if total_devuelto >= linea.cantidad:
+            linea.estado = LineaPedido.DEVUELTO
+            linea.save()
+
+        return Response({
+            'message': 'Devolución aprobada correctamente',
+            'devolucion_id': devolucion.id,
+            'stock_restaurado': devolucion.cantidad_devuelta,
+            'stock_actual': pieza.stock,
+            'monto_reembolso': str(devolucion.monto_reembolso)
+        })
+
+    @action(detail=True, methods=['post'])
+    def rechazar(self, request, pk=None):
+        """
+        Rechazar una devolución.
+        
+        POST /api/v1/devoluciones/{id}/rechazar/
+        """
+        try:
+            devolucion = Devolucion.objects.get(id=pk)
+        except Devolucion.DoesNotExist:
+            return Response({'error': 'Devolución no encontrada'}, status=404)
+
+        if devolucion.estado != Devolucion.PENDIENTE:
+            return Response({
+                'error': 'Solo se pueden rechazar devoluciones pendientes'
+            }, status=400)
+
+        devolucion.estado = Devolucion.RECHAZADA
+        devolucion.save()
+
+        return Response({
+            'message': 'Devolución rechazada',
+            'devolucion_id': devolucion.id
+        })
+
 
 
     
@@ -533,14 +736,332 @@ class ValoracionViewSet(viewsets.ModelViewSet):
 
 
 class ListaDeseosViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gestionar la lista de deseos del cliente.
+    
+    Endpoints:
+    - GET /api/v1/lista_deseo/mi_lista/ - Obtener mi lista de deseos
+    - POST /api/v1/lista_deseo/agregar_pieza/ - Agregar pieza a la lista
+    - DELETE /api/v1/lista_deseo/eliminar_pieza/ - Eliminar pieza de la lista
+    - POST /api/v1/lista_deseo/pasar_al_carrito/ - Pasar items al carrito
+    - POST /api/v1/lista_deseo/vaciar/ - Vaciar la lista de deseos
+    """
     queryset = ListaDeseos.objects.all()
     serializer_class = ListaDeseosSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        """Retorna el serializer apropiado según la acción."""
+        if self.action == 'agregar_pieza':
+            return AgregarPiezaListaDeseosSerializer
+        elif self.action == 'eliminar_pieza':
+            return EliminarPiezaListaDeseosSerializer
+        elif self.action == 'pasar_al_carrito':
+            return PasarAlCarritoSerializer
+        return ListaDeseosSerializer
+
+    def get_queryset(self):
+        """Solo muestra la lista de deseos del cliente autenticado."""
+        try:
+            cliente = self.request.user.cliente
+            return ListaDeseos.objects.filter(cliente=cliente)
+        except Cliente.DoesNotExist:
+            return ListaDeseos.objects.none()
+
+    def get_o_crear_lista(self, cliente):
+        """Obtiene o crea la lista de deseos del cliente."""
+        lista, created = ListaDeseos.objects.get_or_create(
+            cliente=cliente,
+            defaults={
+                'nombre': f'Lista de deseos de {cliente.usuario.first_name}',
+                'fecha_creacion': date.today()
+            }
+        )
+        return lista
+
+    @action(detail=False, methods=['get'])
+    def mi_lista(self, request):
+        """
+        Obtiene la lista de deseos del usuario autenticado.
+        
+        GET /api/v1/lista_deseo/mi_lista/
+        """
+        try:
+            cliente = request.user.cliente
+        except Cliente.DoesNotExist:
+            return Response({'error': 'Usuario no es cliente'}, status=400)
+
+        lista = self.get_o_crear_lista(cliente)
+        
+        # Obtener los items con información de las piezas
+        items = []
+        for item in lista.items.all():
+            pieza = item.pieza
+            imagen_principal = None
+            
+            # Buscar imagen principal
+            imagen_obj = ImagenPieza.objects.filter(pieza=pieza).first()
+            if imagen_obj and imagen_obj.url_imagen:
+                imagen_principal = request.build_absolute_uri(imagen_obj.url_imagen.url)
+            elif pieza.imagen:
+                imagen_principal = request.build_absolute_uri(pieza.imagen.url)
+            
+            items.append({
+                'id': item.id,
+                'pieza_id': pieza.id,
+                'nombre': pieza.nombre,
+                'marca': pieza.marca,
+                'precio': str(pieza.precio_base),
+                'imagen': imagen_principal,
+                'stock': pieza.stock,
+                'fecha_agregado': item.fecha_agregado,
+                'disponible': pieza.stock > 0
+            })
+        
+        return Response({
+            'lista_id': lista.id,
+            'nombre': lista.nombre,
+            'fecha_creacion': lista.fecha_creacion,
+            'total_items': len(items),
+            'items': items
+        })
+
+    @action(detail=False, methods=['post'])
+    def agregar_pieza(self, request):
+        """
+        Agrega una pieza a la lista de deseos.
+        
+        POST /api/v1/lista_deseo/agregar_pieza/
+        {
+            "pieza_id": 1
+        }
+        """
+        try:
+            cliente = request.user.cliente
+        except Cliente.DoesNotExist:
+            return Response({'error': 'Usuario no es cliente'}, status=400)
+
+        pieza_id = request.data.get('pieza_id')
+        if not pieza_id:
+            return Response({'error': 'Debe indicar el ID de la pieza'}, status=400)
+
+        try:
+            pieza = Pieza.objects.get(id=pieza_id)
+        except Pieza.DoesNotExist:
+            return Response({'error': 'Pieza no encontrada'}, status=404)
+
+        lista = self.get_o_crear_lista(cliente)
+
+        # Verificar si ya está en la lista
+        if ListaDeseosPieza.objects.filter(lista_deseos=lista, pieza=pieza).exists():
+            return Response({
+                'error': 'Esta pieza ya está en tu lista de deseos',
+                'ya_existe': True
+            }, status=400)
+
+        # Agregar a la lista
+        item = ListaDeseosPieza.objects.create(
+            lista_deseos=lista,
+            pieza=pieza,
+            fecha_agregado=date.today()
+        )
+
+        return Response({
+            'message': 'Pieza agregada a la lista de deseos',
+            'item_id': item.id,
+            'pieza_nombre': pieza.nombre
+        }, status=201)
+
+    @action(detail=False, methods=['delete', 'post'])
+    def eliminar_pieza(self, request):
+        """
+        Elimina una pieza de la lista de deseos.
+        
+        DELETE /api/v1/lista_deseo/eliminar_pieza/
+        {
+            "pieza_id": 1
+        }
+        """
+        try:
+            cliente = request.user.cliente
+        except Cliente.DoesNotExist:
+            return Response({'error': 'Usuario no es cliente'}, status=400)
+
+        pieza_id = request.data.get('pieza_id')
+        if not pieza_id:
+            return Response({'error': 'Debe indicar el ID de la pieza'}, status=400)
+
+        try:
+            lista = ListaDeseos.objects.get(cliente=cliente)
+        except ListaDeseos.DoesNotExist:
+            return Response({'error': 'No tienes una lista de deseos'}, status=404)
+
+        try:
+            item = ListaDeseosPieza.objects.get(lista_deseos=lista, pieza_id=pieza_id)
+            nombre_pieza = item.pieza.nombre
+            item.delete()
+            return Response({
+                'message': f'"{nombre_pieza}" eliminada de la lista de deseos'
+            })
+        except ListaDeseosPieza.DoesNotExist:
+            return Response({'error': 'Esta pieza no está en tu lista de deseos'}, status=404)
+
+    @action(detail=False, methods=['post'])
+    def pasar_al_carrito(self, request):
+        """
+        Pasa los items de la lista de deseos al carrito.
+        Puede pasar todos los items o solo algunos específicos.
+        
+        POST /api/v1/lista_deseo/pasar_al_carrito/
+        
+        Body (opcional):
+        {
+            "piezas_ids": [1, 2, 3],  // Si no se envía, pasa todas las piezas
+            "eliminar_de_lista": true  // Si es true, elimina las piezas pasadas de la lista
+        }
+        """
+        try:
+            cliente = request.user.cliente
+        except Cliente.DoesNotExist:
+            return Response({'error': 'Usuario no es cliente'}, status=400)
+
+        try:
+            lista = ListaDeseos.objects.get(cliente=cliente)
+        except ListaDeseos.DoesNotExist:
+            return Response({'error': 'No tienes una lista de deseos'}, status=404)
+
+        # Obtener parámetros
+        piezas_ids = request.data.get('piezas_ids', None)
+        eliminar_de_lista = request.data.get('eliminar_de_lista', False)
+
+        # Obtener items a pasar
+        if piezas_ids:
+            items = ListaDeseosPieza.objects.filter(
+                lista_deseos=lista,
+                pieza_id__in=piezas_ids
+            )
+        else:
+            items = lista.items.all()
+
+        if not items.exists():
+            return Response({'error': 'No hay piezas para agregar al carrito'}, status=400)
+
+        # Obtener carrito actual de la sesión
+        carrito = request.session.get('carrito', {})
+        
+        piezas_agregadas = []
+        piezas_sin_stock = []
+        piezas_ya_en_carrito = []
+
+        for item in items:
+            pieza = item.pieza
+            pieza_id = str(pieza.id)
+
+            # Verificar stock
+            if pieza.stock <= 0:
+                piezas_sin_stock.append(pieza.nombre)
+                continue
+
+            # Verificar si ya está en el carrito
+            if pieza_id in carrito:
+                # Incrementar cantidad si hay stock
+                cantidad_actual = carrito[pieza_id]['cantidad']
+                if cantidad_actual < pieza.stock:
+                    carrito[pieza_id]['cantidad'] += 1
+                    piezas_agregadas.append(pieza.nombre)
+                else:
+                    piezas_ya_en_carrito.append(pieza.nombre)
+            else:
+                # Agregar al carrito con cantidad 1
+                carrito[pieza_id] = {'cantidad': 1}
+                piezas_agregadas.append(pieza.nombre)
+
+        # Guardar carrito en sesión
+        request.session['carrito'] = carrito
+        request.session.modified = True
+
+        # Eliminar de la lista si se solicitó
+        items_eliminados = []
+        if eliminar_de_lista and piezas_agregadas:
+            for item in items:
+                if item.pieza.nombre in piezas_agregadas:
+                    items_eliminados.append(item.pieza.nombre)
+                    item.delete()
+
+        return Response({
+            'message': 'Items procesados correctamente',
+            'agregadas_al_carrito': piezas_agregadas,
+            'sin_stock': piezas_sin_stock,
+            'ya_en_carrito_max_stock': piezas_ya_en_carrito,
+            'eliminadas_de_lista': items_eliminados,
+            'total_en_carrito': len(carrito)
+        })
+
+    @action(detail=False, methods=['post'])
+    def vaciar(self, request):
+        """
+        Vacía completamente la lista de deseos.
+        
+        POST /api/v1/lista_deseo/vaciar/
+        """
+        try:
+            cliente = request.user.cliente
+        except Cliente.DoesNotExist:
+            return Response({'error': 'Usuario no es cliente'}, status=400)
+
+        try:
+            lista = ListaDeseos.objects.get(cliente=cliente)
+            cantidad = lista.items.count()
+            lista.items.all().delete()
+            return Response({
+                'message': f'Lista de deseos vaciada ({cantidad} items eliminados)'
+            })
+        except ListaDeseos.DoesNotExist:
+            return Response({'error': 'No tienes una lista de deseos'}, status=404)
+
+    @action(detail=False, methods=['get'])
+    def verificar_pieza(self, request):
+        """
+        Verifica si una pieza está en la lista de deseos.
+        
+        GET /api/v1/lista_deseo/verificar_pieza/?pieza_id=1
+        """
+        try:
+            cliente = request.user.cliente
+        except Cliente.DoesNotExist:
+            return Response({'en_lista': False})
+
+        pieza_id = request.query_params.get('pieza_id')
+        if not pieza_id:
+            return Response({'error': 'Debe indicar el ID de la pieza'}, status=400)
+
+        try:
+            lista = ListaDeseos.objects.get(cliente=cliente)
+            en_lista = ListaDeseosPieza.objects.filter(
+                lista_deseos=lista,
+                pieza_id=pieza_id
+            ).exists()
+            return Response({'en_lista': en_lista, 'pieza_id': int(pieza_id)})
+        except ListaDeseos.DoesNotExist:
+            return Response({'en_lista': False, 'pieza_id': int(pieza_id)})
+
 
 class ListaDeseosPiezaViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gestionar items individuales de la lista de deseos.
+    Principalmente para operaciones CRUD básicas.
+    """
     queryset = ListaDeseosPieza.objects.all()
     serializer_class = ListaDeseosPiezaSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Solo muestra los items de la lista del cliente autenticado."""
+        try:
+            cliente = self.request.user.cliente
+            return ListaDeseosPieza.objects.filter(lista_deseos__cliente=cliente)
+        except Cliente.DoesNotExist:
+            return ListaDeseosPieza.objects.none()
 
 class DescuentoViewSet(viewsets.ModelViewSet):
     queryset = Descuento.objects.all()
@@ -752,11 +1273,30 @@ class LoginSessionView(APIView):
             # 3. Crear la sesión
             login(request, user)
             
-            #Si la autenticación es correcta, devolvemos is_authenticated=True y un status 200
-            return Response({
+            # 4. Verificar si tiene lista de deseos con items
+            lista_deseos_info = None
+            try:
+                cliente = user.cliente
+                lista = ListaDeseos.objects.filter(cliente=cliente).first()
+                if lista and lista.items.exists():
+                    lista_deseos_info = {
+                        'tiene_items': True,
+                        'total_items': lista.items.count(),
+                        'mensaje': f'Tienes {lista.items.count()} artículo(s) en tu lista de deseos'
+                    }
+            except Cliente.DoesNotExist:
+                pass
+            
+            response_data = {
                 "message": "Sesión iniciada correctamente",
-               "is_authenticated": True,
-            }, status=status.HTTP_200_OK)
+                "is_authenticated": True,
+            }
+            
+            # Agregar info de lista de deseos si existe
+            if lista_deseos_info:
+                response_data['lista_deseos'] = lista_deseos_info
+            
+            return Response(response_data, status=status.HTTP_200_OK)
         else:
             return Response(
                 {"error": "Credenciales inválidas"}, 
@@ -791,12 +1331,19 @@ class CarritoViewSet(ViewSet):
         request.session['carrito'] = carrito
         request.session.modified = True # Asegura que Django guarde los cambios en la sesión
 
-    
-    #USE
+
     def list(self, request):
         """Devuelve el contenido actual del carrito, mostrando 
         información de cada pieza (nombre, imagen, precio, cantidad, 
         etc.) y el precio total.
+
+        Agregar pieza al carrito:
+        {
+            "pieza_id": 7,
+            "cantidad": 3
+        }
+
+
         """
 
         carrito = self.get_carrito(request)
@@ -924,6 +1471,8 @@ class CarritoViewSet(ViewSet):
     @action(detail=False, methods=['post'])
     def finalizar(self, request):
         """
+        Método para finalizar la compra del carrito actual.
+
         POST /api/v1/carrito/finalizar/
         
         Body:
@@ -948,6 +1497,7 @@ class CarritoViewSet(ViewSet):
 
         # 3. Verificar que tiene al menos un método de pago
         metodos_cliente = MetodoPago.objects.filter(cliente=cliente)
+        
         if not metodos_cliente.exists():
             return Response({
                 'error': 'Debe registrar al menos un método de pago antes de realizar la compra'
@@ -964,6 +1514,7 @@ class CarritoViewSet(ViewSet):
         if metodo_pago_id:
             try:
                 metodo_pago = MetodoPago.objects.get(id=metodo_pago_id, cliente=cliente)
+            
             except MetodoPago.DoesNotExist:
                 return Response({'error': 'Método de pago no válido'}, status=400)
         else:

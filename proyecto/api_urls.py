@@ -19,7 +19,7 @@ router.register(r'tarjeta', TarjetaViewSet, basename='tarjeta')
 router.register(r'cuenta_bancaria', CuentaBancariaViewSet, basename='cuentabancaria')
 router.register(r'billetera_digital', BilleteraDigitalViewSet, basename='billeteradigital')
 router.register(r'pago', PagoViewSet, basename='pago')
-router.register(r'devolucion', DevolucionViewSet, basename='devolucion')
+#router.register(r'devolucion', DevolucionViewSet, basename='devolucion')
 router.register(r'valoracion', ValoracionViewSet, basename='valoracion')
 router.register(r'lista_deseo', ListaDeseosViewSet, basename='listadeseos')
 router.register(r'lista_deseos_pieza', ListaDeseosPiezaViewSet, basename='listadeseospieza')
@@ -32,6 +32,10 @@ router.register(r'metodo_pago_cliente', MetodoPagoClienteViewSet, basename='meto
 
 # Carrito en sesión
 router.register(r'carrito', CarritoViewSet, basename='carrito')
+
+#Devoluciones cliente y vendedor
+router.register(r'mis-devoluciones', DevolucionClienteViewSet, basename='mis-devoluciones')
+router.register(r'devoluciones', DevolucionVendedorViewSet, basename='devoluciones')
 
 urlpatterns = [
     path('', include(router.urls)),

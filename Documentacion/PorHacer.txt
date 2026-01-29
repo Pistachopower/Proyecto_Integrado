@@ -32,5 +32,5 @@ Necesito saber qué es lo que necesita
 
 
 HOY
-#TODO: REVISAR Y PROBAR FUNCIONAMIENTO
-@action(detail=False, methods=['get'], permission_classes=[AllowAny])
+Metodo de pago actualizar 
+Predeterminado
