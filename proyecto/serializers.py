@@ -94,6 +94,7 @@ class ImagenPiezaSerializer(serializers.HyperlinkedModelSerializer):
 
 class LineaPedidoSerializer(serializers.HyperlinkedModelSerializer):
     pieza = PiezaSerializer(read_only=True)
+    id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = LineaPedido
@@ -129,7 +130,6 @@ class LineaPedidoSerializer(serializers.HyperlinkedModelSerializer):
     def filtrar_datos_para_cliente_lineaPedido(self, data, instance):
         """Reemplaza los objetos complejos por información que interesa enviar al cliente."""
         
-        # Simplificar Tienda (Solo nombre)
         if instance.pieza:
             data['pieza'] = {
                 "nombre": instance.pieza.nombre,   
@@ -220,6 +220,37 @@ class PedidoSimpleSerializer(serializers.ModelSerializer):
             'total',
             'lineas_pedido'
         ]
+
+
+class CambiarEstadoPedidoVendedorSerializer(serializers.Serializer):
+    estado = serializers.IntegerField(min_value=1, max_value=5)
+
+    
+# ============================================================
+# CARRITO EN SESIÓN
+# ============================================================
+class FinalizarCompraSerializer(serializers.Serializer):
+    """Serializador para finalizar la compra del carrito."""
+    direccion_envio = serializers.CharField(
+        max_length=255,
+        required=False,
+        help_text="Dirección donde se enviará el pedido"
+    )
+
+    metodo_pago_id = serializers.IntegerField(
+        required=False,
+        allow_null=True,
+        help_text="ID del método de pago a utilizar (opcional, usa el predeterminado si no se envía)"
+    )
+
+    def validate_direccion_envio(self, valor):
+        """Validar la longitud mínima si se proporciona."""
+        if valor and len(valor.strip()) < 5:
+            raise serializers.ValidationError("La dirección de envío es demasiado corta (mínimo 5 caracteres).")
+        return valor.strip() if valor else valor
+    
+
+
 
 # ============================================================
 # METODOS DE PAGO
@@ -427,8 +458,8 @@ class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
     def destroy(self):
         instance = self.instance
         # 1. Validación: No permitir borrar si tiene pagos asociados (historial financiero)
-        if instance.pagos.exists():
-            raise serializers.ValidationError({"detail": "No se puede eliminar este método de pago porque tiene historial de pagos asociados."})
+        # if instance.pagos.exists():
+        #     raise serializers.ValidationError({"detail": "No se puede eliminar este método de pago porque tiene historial de pagos asociados."})
 
         era_predeterminado = instance.es_predeterminado
         cliente = instance.cliente
@@ -463,13 +494,45 @@ class PagoSerializer(serializers.HyperlinkedModelSerializer):
 # POST-VENTA
 # ============================================================
 
-class DevolucionSerializer(serializers.HyperlinkedModelSerializer):
-    linea_pedido = LineaPedidoSerializer(read_only=True)
-    cliente = ClienteSerializer(read_only=True)
+# class DevolucionSerializer(serializers.HyperlinkedModelSerializer):
+#     linea_pedido = LineaPedidoSerializer(read_only=True)
+#     cliente = ClienteSerializer(read_only=True)
+
+#     class Meta:
+#         model = Devolucion
+#         fields = "__all__"
+
+
+
+class DevolucionSerializer(serializers.ModelSerializer):
+    """Serializer para devoluciones."""
+    
+    # Campos de solo lectura para mostrar info útil
+    pieza_nombre = serializers.CharField(source='linea_pedido.pieza.nombre', read_only=True)
+    pedido_id = serializers.IntegerField(source='linea_pedido.pedido.id', read_only=True)
+    cliente_nombre = serializers.CharField(source='cliente.usuario.username', read_only=True)
+    estado_display = serializers.CharField(source='get_estado_display', read_only=True)
 
     class Meta:
         model = Devolucion
-        fields = "__all__"
+        fields = [
+            'id',
+            'linea_pedido',
+            'cliente',
+            'fecha_solicitud',
+            'fecha_aprobacion',
+            'motivo',
+            'estado',
+            'estado_display',
+            'cantidad_devuelta',
+            'monto_reembolso',
+            # Campos extra
+            'pieza_nombre',
+            'pedido_id',
+            'cliente_nombre',
+        ]
+        read_only_fields = ['id', 'fecha_solicitud', 'fecha_aprobacion', 'monto_reembolso']
+
 
 
 
@@ -570,6 +633,38 @@ class ListaDeseosSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ListaDeseos
         fields = "__all__"
+
+
+# Serializers de entrada para acciones de ListaDeseos
+class AgregarPiezaListaDeseosSerializer(serializers.Serializer):
+    """Serializer para agregar una pieza a la lista de deseos."""
+    pieza_id = serializers.IntegerField(
+        required=True,
+        help_text="ID de la pieza a agregar a la lista de deseos"
+    )
+
+
+class EliminarPiezaListaDeseosSerializer(serializers.Serializer):
+    """Serializer para eliminar una pieza de la lista de deseos."""
+    pieza_id = serializers.IntegerField(
+        required=True,
+        help_text="ID de la pieza a eliminar de la lista de deseos"
+    )
+
+
+class PasarAlCarritoSerializer(serializers.Serializer):
+    """Serializer para pasar items de la lista de deseos al carrito."""
+    piezas_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        allow_empty=True,
+        help_text="IDs de las piezas a pasar al carrito (si no se envía, pasa todas)"
+    )
+    eliminar_de_lista = serializers.BooleanField(
+        required=False,
+        default=False,
+        help_text="Si es true, elimina las piezas pasadas de la lista de deseos"
+    )
 
 
 # ============================================================
@@ -712,6 +807,6 @@ class RegistroClienteSerializer(serializers.Serializer):
         Cliente.objects.create(usuario=user, **cliente_data)
 
         return {
-            "user_data": user,
-            "cliente_data": cliente_data 
-        }
+             "user_data": user,
+             "cliente_data": cliente_data 
+     }
