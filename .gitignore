@@ -83,6 +83,7 @@ $RECYCLE.BIN/
 #Python
 __pycache__/
 
+pycache/
 
 #
 media/
