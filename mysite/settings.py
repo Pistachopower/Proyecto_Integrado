@@ -71,8 +71,8 @@ MIDDLEWARE = [
 
 # CAMBIO 1: Configuración de CORS y CSRF (Los permisos para Vue)
 CORS_ALLOWED_ORIGINS = [
-    'http://23.23.32.46',  # Frontend
-    'http://34.238.73.57', # Backend (por si accedes desde navegador a la API)
+    'https://23.23.32.46',  # Frontend
+    'https://34.238.73.57', # Backend (por si accedes desde navegador a la API)
 ]
 
 # ¡ESTO ES VITAL! Permite que las cookies viajen entre el puertos
@@ -81,8 +81,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # Le decimos a Django que confíe en Vue para enviar formularios
 CSRF_TRUSTED_ORIGINS = [
-    'http://23.23.32.46',
-    'http://34.238.73.57',
+    'https://23.23.32.46',
+    'https://34.238.73.57',
 ]
 
 # CAMBIO 2: Relajar la seguridad para trabajar en LOCAL
