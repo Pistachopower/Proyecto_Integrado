@@ -414,6 +414,13 @@ class ListaDeseosPieza(models.Model):
     )
     fecha_agregado = models.DateField()
 
+    class Meta:
+        # Esta restricción garantiza que una misma pieza no pueda estar más de una vez en la misma lista de deseos.
+        # Así, se evita que un cliente agregue la misma pieza varias veces a su lista.
+        constraints = [
+            models.UniqueConstraint(fields=['lista_deseos', 'pieza'], name='unique_pieza_por_lista')
+        ]
+
 
 # ============================================================
 # NIVEL 5: MARKETING
@@ -444,16 +451,17 @@ class Descuento(models.Model):
         choices=ESTADO
     )
 
-    
-
     codigo = models.CharField(max_length=50, unique=True)
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
     valor = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
-    usos_maximos = models.IntegerField()
-    usos_actuales = models.IntegerField()
+    usos_maximos = models.IntegerField() # Es el número máximo de veces que ese descuento puede ser utilizado en total (por todos los clientes). Por ejemplo, si pones 100, solo se podrá usar 100 veces entre todos los clientes.
+    usos_actuales = models.IntegerField() #Es el contador de cuántas veces se ha usado ese descuento hasta ahora. Cada vez que un cliente usa el descuento, este valor aumenta en 1.
+
+    def __str__(self):
+        return f"{self.nombre} ({self.get_tipo_display()} - {self.valor})"
 
 
 class ClienteDescuento(models.Model):
@@ -469,3 +477,6 @@ class ClienteDescuento(models.Model):
     )
     fecha_asignado = models.DateField()
     veces_usado = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.cliente} - {self.descuento} (Asignado: {self.fecha_asignado})"

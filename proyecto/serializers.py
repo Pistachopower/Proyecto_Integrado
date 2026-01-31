@@ -807,6 +807,6 @@ class RegistroClienteSerializer(serializers.Serializer):
         Cliente.objects.create(usuario=user, **cliente_data)
 
         return {
-            "user_data": user,
-            "cliente_data": cliente_data 
-        }
+             "user_data": user,
+             "cliente_data": cliente_data 
+     }

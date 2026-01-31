@@ -4,7 +4,7 @@ from .serializers import *
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
-from django.db.models import Avg
+from django.db.models import Sum, Count, Avg
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.viewsets import ViewSet
@@ -20,7 +20,12 @@ from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend # Filtros para los ViewSets
 from django.db.models import Avg
 from decimal import Decimal
-from datetime import date
+from datetime import date, timedelta
+from .utils import asignar_descuento_fidelidad
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+
+
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -259,9 +264,12 @@ class PedidoViewSet(viewsets.ModelViewSet):
             'estado_actual': pedido.get_estado_display()
         })
 
+    def perform_create(self, serializer):
+        pedido = serializer.save()
+        cliente = pedido.cliente
+        # Intentar asignar el descuento de fidelidad si corresponde
+        asignar_descuento_fidelidad(cliente)
 
-
-    
 
 class LineaPedidoViewSet(viewsets.ModelViewSet):
     queryset = LineaPedido.objects.all()
@@ -380,12 +388,7 @@ class DevolucionClienteViewSet(viewsets.ModelViewSet):
         Crear una solicitud de devolución.
         
         Solo se puede devolver si el pedido está ENTREGADO.
-
-        usuario 15
-        cliente 9
-        Pedido: 52, 44, 79
-        linea pedido: 160 (pieza 2), 161 (pieza 5), 162 (pieza 5), 163 (pieza 10)
-        Estado: enviado
+        POST /api/v1/mis-devoluciones/
         """
         # 1. Verificar que es cliente
         try:
@@ -403,7 +406,7 @@ class DevolucionClienteViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Debe indicar la línea de pedido'}, status=400)
         
         if not motivo or len(motivo.strip()) < 5:
-            return Response({'error': 'El motivo debe tener al menos 10 caracteres'}, status=400)
+            return Response({'error': 'El motivo debe tener al menos 5 caracteres'}, status=400)
         
         if not cantidad_devuelta or int(cantidad_devuelta) < 1:
             return Response({'error': 'La cantidad a devolver debe ser al menos 1'}, status=400)
@@ -433,6 +436,8 @@ class DevolucionClienteViewSet(viewsets.ModelViewSet):
 
         # 8. Verificar cantidad válida
         # Calcular cuánto ya se devolvió de esta línea
+        #Sirve para saber cuántas unidades de esa línea de pedido ya han sido devueltas (o están en proceso de devolución), 
+        # y así evitar que el cliente devuelva más unidades de las que compró.
         ya_devuelto = Devolucion.objects.filter(
             linea_pedido=linea_pedido,
             estado__in=[Devolucion.PENDIENTE, Devolucion.APROBADA]
@@ -647,16 +652,22 @@ class DevolucionVendedorViewSet(viewsets.ModelViewSet):
 #                status=status.HTTP_404_NOT_FOUND
 #            )
 #
-#        # Obtener todas las valoraciones de la pieza
-#        #Las ordena por fecha DESCENDENTE (más recientes primero con -fecha_valoracion)
-#        valoraciones = Valoracion.objects.filter(pieza=pieza).order_by('-fecha_valoracion')
+#        # Obtener todas las valoraciones de la pieza de mayor a menor fecha
+#        valoraciones = Valoracion.objects.filter(
+#            pieza=pieza
+#        ).order_by('-fecha_valoracion')
 #
 #        # Calcular promedio de puntuación
-#        from django.db.models import Avg
-#        promedio = valoraciones.aggregate(Avg('puntuacion'))['puntuacion__avg']
+#        promedio = valoraciones.aggregate(
+#            Avg('puntuacion')
+#        )['puntuacion__avg']
 #
-#        # Serializar las valoraciones
-#        serializer = ValoracionSerializer(valoraciones, many=True, context={'request': request})
+#        # Serializar datos
+#        serializer = ValoracionSerializer(
+#            valoraciones,
+#            many=True,
+#            context={'request': request}
+#        )
 #
 #        # Variable 1: Promedio redondeado a 2 decimales (si hay valoraciones, sino 0)
 #        promedio_puntuacion = round(promedio, 2) if promedio else 0
@@ -941,6 +952,7 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
             'pieza_nombre': pieza.nombre
         }, status=201)
 
+
     @action(detail=False, methods=['delete', 'post'])
     def eliminar_pieza(self, request):
         """
@@ -950,6 +962,7 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
         {
             "pieza_id": 1
         }
+        Esta implementación elimina todos los registros coincidentes, por si acaso hay duplicados.
         """
         try:
             cliente = request.user.cliente
@@ -965,14 +978,14 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
         except ListaDeseos.DoesNotExist:
             return Response({'error': 'No tienes una lista de deseos'}, status=404)
 
-        try:
-            item = ListaDeseosPieza.objects.get(lista_deseos=lista, pieza_id=pieza_id)
-            nombre_pieza = item.pieza.nombre
-            item.delete()
+        items = ListaDeseosPieza.objects.filter(lista_deseos=lista, pieza_id=pieza_id)
+        if items.exists():
+            nombre_pieza = items.first().pieza.nombre
+            items.delete()
             return Response({
                 'message': f'"{nombre_pieza}" eliminada de la lista de deseos'
             })
-        except ListaDeseosPieza.DoesNotExist:
+        else:
             return Response({'error': 'Esta pieza no está en tu lista de deseos'}, status=404)
 
     @action(detail=False, methods=['post'])
@@ -1153,6 +1166,19 @@ class RegistroClienteViewSet(CreateAPIView):
 
     permission_classes = [AllowAny]  # Permite el acceso sin autenticación
 
+
+    # def perform_create(self, serializer):
+    #     cliente = serializer.save()
+    #     try:
+    #         descuento = Descuento.objects.get(codigo="A524844", estado=Descuento.ACTIVO)
+    #         ClienteDescuento.objects.create(
+    #             cliente=cliente,
+    #             descuento=descuento,
+    #             fecha_asignado=date.today(),
+    #             veces_usado=0
+    #         )
+    #     except Descuento.DoesNotExist:
+    #         pass
 
 
 
@@ -1434,7 +1460,9 @@ class CarritoViewSet(ViewSet):
                 imagen_obj = ImagenPieza.objects.filter(pieza=pieza).first()
                 
                 if imagen_obj and imagen_obj.url_imagen:
+                    #convertir la URL relativa de la imagen en una URL completa
                     imagen_principal = request.build_absolute_uri(imagen_obj.url_imagen.url)
+                
                 elif pieza.imagen:
                     imagen_principal = request.build_absolute_uri(pieza.imagen.url)
                 
@@ -1681,9 +1709,6 @@ class CarritoViewSet(ViewSet):
 
 
 # ==================== ESTADO DE AUTENTICACIÓN ====================
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-
 #Para comprobar si el usuario ha iniciado sesión basado en las cookies de sesión
 @require_http_methods(["GET"])
 def auth_status(request):
@@ -1693,3 +1718,174 @@ def auth_status(request):
             'is_authenticated': request.user.is_authenticated})
     
     return JsonResponse({'is_authenticated': False}, status=403)
+
+
+# ================= DASHBOARD VENDEDOR =====================
+class DashboardVendedorView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        try:
+            vendedor = Vendedor.objects.get(usuario=user)
+        except Vendedor.DoesNotExist:
+            return Response({"error": "No eres un vendedor válido."}, status=403)
+
+        hoy = date.today()
+        ayer = hoy - timedelta(days=1)
+        inicio_semana = hoy - timedelta(days=hoy.weekday())
+        inicio_semana_pasada = inicio_semana - timedelta(days=7)
+        fin_semana_pasada = inicio_semana - timedelta(days=1)
+
+        # Ventas hoy y ayer
+        #Busca los pedidos del vendedor, que sea fecha hoy y que estén en estado PAGADO, ENVIADO o ENTREGADO
+        #Luego suma el total de esos pedidos y guarda en diccionario con la clave 'total'
+        #Sino hay ventas, devuelve NONE, por eso el "or 0" al final
+        ventas_hoy = Pedido.objects.filter(vendedor=vendedor, fecha_pedido=hoy, estado__in=
+                                           [Pedido.PAGADO, Pedido.ENVIADO, Pedido.ENTREGADO]
+                                           ).aggregate(total=Sum('total'))['total'] or 0
+        
+        #Misma lógica pero para ayer
+        ventas_ayer = Pedido.objects.filter(vendedor=vendedor, fecha_pedido=ayer, estado__in=
+                                            [Pedido.PAGADO, Pedido.ENVIADO, Pedido.ENTREGADO]
+                                            ).aggregate(total=Sum('total'))['total'] or 0
+        
+        porcentaje_vs_ayer = 0
+        
+        #para evitar división por cero
+        if ventas_ayer > 0:
+            #ventas_hoy - ventas_ayer: diferencia de ventas entre hoy y ayer.
+            #/ ventas_ayer: lo divide entre las ventas de ayer para saber cuánto ha cambiado en proporción.
+            #* 100: lo convierte a porcentaje.
+            #round(..., 2): redondea el resultado a 2 decimales.
+            porcentaje_vs_ayer = round(((ventas_hoy - ventas_ayer) / ventas_ayer) * 100, 2)
+
+        # Pedidos pendientes
+        pedidos_pendientes = Pedido.objects.filter(vendedor=vendedor, estado=Pedido.PENDIENTE).count()
+
+        # Producto más vendido (activo)
+        #Consulta en la base de datos todas las líneas de pedido (LineaPedido) que pertenecen a pedidos de ese vendedor específico.
+        #Agrupa los resultados por el ID y el nombre de la pieza (pieza__id, pieza__nombre).
+        #Para cada grupo (cada pieza), suma la cantidad total vendida de esa pieza usando .annotate(total_vendido=Sum('cantidad')).
+        #Ordena los resultados de mayor a menor según la cantidad total vendida (order_by('-total_vendido')).
+        #Toma el primer resultado con .first(), que será la pieza más vendida.
+        producto_mas_vendido = (
+            LineaPedido.objects.filter(pedido__vendedor=vendedor)
+            .values('pieza__id', 'pieza__nombre')
+            .annotate(total_vendido=Sum('cantidad'))
+            .order_by('-total_vendido')
+            .first()
+        )
+
+        #Si existe algún resultado, extrae el nombre de la pieza más vendida (producto_activo) 
+        # y la cantidad total vendida (producto_activo_cantidad). Si no hay resultados, ambos serán None o 0.
+        producto_activo = producto_mas_vendido['pieza__nombre'] if producto_mas_vendido else None #Nombre del pieza más vendido
+        producto_activo_cantidad = producto_mas_vendido['total_vendido'] if producto_mas_vendido else 0 #Cantidad vendida
+
+        # Valoración promedio de productos del vendedor
+        #Busca los IDs de todas las piezas que han sido vendidas por el vendedor (es decir, piezas que aparecen en alguna línea de pedido de un pedido de ese vendedor). El resultado es una lista de IDs únicos de piezas.
+        #Con esa lista de IDs, busca todas las valoraciones (comentarios/puntuaciones) que existen para esas piezas.
+        piezas_ids = Pieza.objects.filter(lineas_pedido__pedido__vendedor=vendedor).values_list('id', flat=True).distinct()
+
+        #Calcula el promedio de la puntuación de todas esas valoraciones usando Avg('puntuacion').
+        valoracion_promedio = Valoracion.objects.filter(pieza_id__in=piezas_ids).aggregate(avg=Avg('puntuacion'))['avg']
+        
+        #Si hay valoraciones, redondea el promedio a 2 decimales.
+        if valoracion_promedio is not None:
+            valoracion_promedio = round(valoracion_promedio, 2)
+
+        # Ventas esta semana y semana anterior
+        #Filtra los pedidos de ese vendedor cuya fecha está entre el inicio de la semana (lunes) y hoy, y cuyo estado es PAGADO, ENVIADO o ENTREGADO.
+        #Suma el campo total de esos pedidos con aggregate(total=Sum('total')).
+        #Si no hay ventas, devuelve 0.
+        ventas_semana = Pedido.objects.filter(vendedor=vendedor, 
+                                              fecha_pedido__gte=inicio_semana, fecha_pedido__lte=hoy, estado__in=[
+                                                  Pedido.PAGADO, Pedido.ENVIADO, Pedido.ENTREGADO]).aggregate(total=Sum('total'))['total'] or 0
+        
+        #Filtra los pedidos del vendedor cuya fecha está entre el inicio y el fin de la semana pasada (de lunes a domingo de la semana anterior).
+        #misma lógica pero para la semana pasada
+        ventas_semana_pasada = Pedido.objects.filter(vendedor=vendedor, fecha_pedido__gte=inicio_semana_pasada, fecha_pedido__lte=fin_semana_pasada, 
+                                                     estado__in=[Pedido.PAGADO, Pedido.ENVIADO, Pedido.ENTREGADO]).aggregate(total=Sum('total'))['total'] or 0
+        
+        porcentaje_vs_semana_pasada = 0
+        
+        #Indicador rápido para saber si vendiste más, menos o igual que la semana anterior.
+        if ventas_semana_pasada > 0:
+            porcentaje_vs_semana_pasada = round(((ventas_semana - ventas_semana_pasada) / ventas_semana_pasada) * 100, 2)
+
+        # Cliente más frecuente
+        #Filtra todos los pedidos de ese vendedor.
+        #Agrupa los pedidos por cliente (usando el ID y el nombre del cliente).
+        #Cuenta cuántos pedidos ha hecho cada cliente con annotate(num_pedidos=Count('id')).
+        #Ordena los resultados de mayor a menor según el número de pedidos realizados.
+        #Toma el primer resultado con .first(), que será el cliente que ha hecho más
+        cliente_frecuente = (
+            Pedido.objects.filter(vendedor=vendedor)
+            .values('cliente__id', 'cliente__usuario__first_name', 'cliente__usuario__last_name')
+            .annotate(num_pedidos=Count('id'))
+            .order_by('-num_pedidos')
+            .first()
+        )
+
+        cliente_frecuente_nombre = None #Almacena en un diccionario
+        cliente_frecuente_pedidos = 0
+
+        if cliente_frecuente:
+            #Obtiene nombre y apellido del cliente más frecuente 
+            cliente_frecuente_nombre = f"{cliente_frecuente['cliente__usuario__first_name']} {cliente_frecuente['cliente__usuario__last_name']}"
+            
+            #Obtiene número de pedidos realizados por el cliente más frecuente
+            cliente_frecuente_pedidos = cliente_frecuente['num_pedidos']
+
+        
+        # Últimas transacciones (últimos 5 pedidos)
+        #Busca todos los pedidos hechos al vendedor actual.
+        # trae junto con cada pedido, los datos del cliente y del usuario (nombre, apellido) en una sola consulta a la base de datos
+        #Ordena los pedidos por fecha de pedido en orden descendente (los más recientes primero).
+        #Limita los resultados a los 5 pedidos más recientes.
+        ultimos_pedidos = (
+            Pedido.objects.filter(vendedor=vendedor)
+            .select_related('cliente__usuario')
+            .order_by('-fecha_pedido')[:5]
+        )
+
+        #
+        ultimas_transacciones = []
+
+        for pedido in ultimos_pedidos:
+            # Obtener nombre completo del cliente
+            nombre_cliente = pedido.cliente.usuario.first_name
+            apellido_cliente = pedido.cliente.usuario.last_name
+            nombre_completo = f"{nombre_cliente} {apellido_cliente}"
+
+            # Obtener monto total del pedido
+            monto = float(pedido.total)
+
+            # Obtener estado legible del pedido
+            estado = pedido.get_estado_display()
+
+            # Obtener fecha del pedido
+            fecha = pedido.fecha_pedido
+
+            # Crear diccionario resumen
+            resumen = {
+                'cliente': nombre_completo,
+                'monto': monto,
+                'estado': estado,
+                'fecha': fecha
+            }
+            ultimas_transacciones.append(resumen)
+
+        return Response({
+            'ventas_hoy': float(ventas_hoy),
+            'porcentaje_vs_ayer': porcentaje_vs_ayer,
+            'pedidos_pendientes': pedidos_pendientes,
+            'producto_activo': producto_activo,
+            'producto_activo_cantidad': producto_activo_cantidad,
+            'valoracion_promedio': valoracion_promedio,
+            'ventas_semana': float(ventas_semana),
+            'porcentaje_vs_semana_pasada': porcentaje_vs_semana_pasada,
+            'cliente_frecuente': cliente_frecuente_nombre,
+            'cliente_frecuente_pedidos': cliente_frecuente_pedidos,
+            'ultimas_transacciones': ultimas_transacciones
+        })

@@ -51,4 +51,7 @@ urlpatterns = [
     # En tu urls.py
     path('auth/status/', auth_status),
 
+    # Dashboard vendedor
+    path('dashboard-vendedor/', DashboardVendedorView.as_view(), name='dashboard-vendedor'),
+
 ]
