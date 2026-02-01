@@ -512,6 +512,7 @@ class DevolucionSerializer(serializers.ModelSerializer):
     pedido_id = serializers.IntegerField(source='linea_pedido.pedido.id', read_only=True)
     cliente_nombre = serializers.CharField(source='cliente.usuario.username', read_only=True)
     estado_display = serializers.CharField(source='get_estado_display', read_only=True)
+    linea_pedido_estado= serializers.IntegerField(source='linea_pedido.estado', read_only=True)
 
     class Meta:
         model = Devolucion
@@ -530,6 +531,7 @@ class DevolucionSerializer(serializers.ModelSerializer):
             'pieza_nombre',
             'pedido_id',
             'cliente_nombre',
+            'linea_pedido_estado',
         ]
         read_only_fields = ['id', 'fecha_solicitud', 'fecha_aprobacion', 'monto_reembolso']
 

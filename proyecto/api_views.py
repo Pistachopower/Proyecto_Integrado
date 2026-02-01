@@ -21,7 +21,6 @@ from django_filters.rest_framework import DjangoFilterBackend # Filtros para los
 from django.db.models import Avg
 from decimal import Decimal
 from datetime import date, timedelta
-from .utils import asignar_descuento_fidelidad
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 
@@ -554,6 +553,10 @@ class DevolucionVendedorViewSet(viewsets.ModelViewSet):
 
         # Marcar línea como devuelta si se devolvió todo
         linea = devolucion.linea_pedido
+        linea.estado = LineaPedido.DEVUELTO
+        linea.save()
+
+
         total_devuelto = Devolucion.objects.filter(
             linea_pedido=linea,
             estado=Devolucion.APROBADA
