@@ -22,6 +22,7 @@ RUN pip install --upgrade pip && \
 # Copy project files
 COPY . /app/
 
+
 # Collect static files (uncomment if needed)
 # RUN python manage.py collectstatic --noinput
 
