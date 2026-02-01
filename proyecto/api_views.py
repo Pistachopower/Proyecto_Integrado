@@ -700,6 +700,7 @@ class ValoracionViewSet(viewsets.ModelViewSet):
     
     - GET /api/v1/valoracion/ -> Lista todas las valoraciones (público)
     - GET /api/v1/valoracion/{id}/ -> Detalle de una valoración (público)
+      GET /api/v1/valoracion/por_pieza/?pieza_id=1
     - PUT /api/v1/valoracion/{id}/ -> Editar valoración (solo si es dueño)
     - DELETE /api/v1/valoracion/{id}/ -> Eliminar valoración (solo si es dueño)
     """
@@ -723,6 +724,59 @@ class ValoracionViewSet(viewsets.ModelViewSet):
         Elimina una valoración.
         """
         instance.delete()
+
+
+    def create(self, request, *args, **kwargs):
+        """
+        Permite crear una valoración solo si el cliente ha comprado la pieza.
+        POST /api/v1/valoracion/
+
+        {
+          "pieza": 1,
+          "puntuacion": 5,
+          "titulo": "Muy buena",
+          "comentario": "Me gustó mucho"
+        }
+        """
+        # Paso 1: Verificar que el usuario es un cliente
+        try:
+            cliente = request.user.cliente
+        except Exception:
+            return Response({'error': 'Solo los clientes pueden valorar piezas.'}, status=403)
+
+        # Paso 2: Obtener el ID de la pieza desde el request
+        pieza_id = request.data.get('pieza')
+        if not pieza_id:
+            return Response({'error': 'Debes indicar la pieza a valorar.'}, status=400)
+
+        # Paso 3: Verificar que la pieza existe
+        try:
+            pieza = Pieza.objects.get(id=pieza_id)
+        except Pieza.DoesNotExist:
+            return Response({'error': 'La pieza no existe.'}, status=404)
+
+        # Paso 4: Verificar que el cliente ha comprado esa pieza
+        la_ha_comprado = LineaPedido.objects.filter(pedido__cliente=cliente, pieza=pieza).exists()
+        if not la_ha_comprado:
+            return Response({'error': 'Solo puedes valorar piezas que has comprado.'}, status=403)
+
+        # Paso 5: Verificar si ya ha comentado esta pieza
+        ya_comento = Valoracion.objects.filter(cliente=cliente, pieza=pieza).exists()
+        if ya_comento:
+            return Response({'error': 'Ya has comentado esta pieza.'}, status=400)
+
+        # Paso 6: Validar los datos enviados por el usuario
+        datos = request.data  # Datos del comentario enviados por el frontend
+        serializer = self.get_serializer(data=datos)
+        if not serializer.is_valid():
+            # Si hay errores de validación, los devolvemos
+            return Response(serializer.errors, status=400)
+
+        # Guardar la valoración, asignando el cliente, la fecha y la pieza de forma segura
+        nueva_valoracion = serializer.save(cliente=cliente, pieza=pieza, fecha_valoracion=date.today())
+        # Paso 7: Devolver la valoración creada como respuesta
+        return Response(self.get_serializer(nueva_valoracion).data, status=201)
+    
 
     #Obtiene las valoraciones de una pieza específica componente frontend C_Valoraciones
     @action(detail=False, methods=['get'], permission_classes=[permissions.AllowAny])
