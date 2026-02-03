@@ -1,7 +1,8 @@
 from django.urls import path, include
 from .api_views import *
 from rest_framework.routers import DefaultRouter #
-from .api_views import LoginSessionView, LogoutSessionView, ValoracionViewSet
+from .api_views import LoginSessionView, LogoutSessionView, ValoracionViewSet, AuthStatusView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 
@@ -39,6 +40,15 @@ router.register(r'devoluciones', DevolucionVendedorViewSet, basename='devolucion
 
 urlpatterns = [
     path('', include(router.urls)),
+
+    #/token/: El usuario envía su username y password, y recibe un par de tokens (access y refresh). 
+    # El access token se usa para autenticar peticiones, el refresh para obtener nuevos access tokens cuando el anterior expira.
+    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), 
+
+    #/token/refresh/: El usuario envía su refresh token y recibe un nuevo access token sin tener que volver a iniciar sesión.
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')), #inicio de sesion API ROOT
     path('registro_cliente/', RegistroClienteViewSet.as_view(), name='registro_cliente'),
     path('mi-perfil/', VerMiPerfilView.as_view()),
@@ -48,8 +58,8 @@ urlpatterns = [
     path('logout/', LogoutSessionView.as_view(), name='logout_session'),
 
 
-    # En tu urls.py
-    path('auth/status/', auth_status),
+    # Estado de autenticación JWT
+    path('auth/status/', AuthStatusView.as_view(), name='auth_status'),
 
     # Dashboard vendedor
     path('dashboard-vendedor/', DashboardVendedorView.as_view(), name='dashboard-vendedor'),

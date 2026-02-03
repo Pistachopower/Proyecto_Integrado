@@ -17,7 +17,6 @@ gunicorn==21.2.0
 
 
 
-#Para levantar el servidor en produccion
-gunicorn==21.2.0
+
 
 

@@ -49,8 +49,8 @@ INSTALLED_APPS = [
     'django_filters',
 
     #Para la lógica del logout con JWT
-    #'rest_framework_simplejwt', 
-    #'rest_framework_simplejwt.token_blacklist',
+    'rest_framework_simplejwt', 
+    'rest_framework_simplejwt.token_blacklist',
 
 ]
 
@@ -200,8 +200,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # Quitamos JWT y ponemos SessionAuthentication
-        'rest_framework.authentication.SessionAuthentication',
+  
+        #'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+
     ),
 }
 

@@ -141,6 +141,7 @@ class Pedido(models.Model):
     ENVIADO = 3
     ENTREGADO = 4
     CANCELADO = 5
+    CARRITO = 6
 
     ESTADO = [
         (PENDIENTE, "Pendiente"),
@@ -148,6 +149,8 @@ class Pedido(models.Model):
         (ENVIADO, "Enviado"),
         (ENTREGADO, "Entregado"),
         (CANCELADO, "Cancelado"),
+        (CARRITO, "Carrito"),
+
     ]
 
     estado  = models.PositiveSmallIntegerField(
