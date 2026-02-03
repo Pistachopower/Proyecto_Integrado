@@ -263,11 +263,11 @@ class PedidoViewSet(viewsets.ModelViewSet):
             'estado_actual': pedido.get_estado_display()
         })
 
-    def perform_create(self, serializer):
-        pedido = serializer.save()
-        cliente = pedido.cliente
-        # Intentar asignar el descuento de fidelidad si corresponde
-        asignar_descuento_fidelidad(cliente)
+    # def perform_create(self, serializer):
+    #     pedido = serializer.save()
+    #     cliente = pedido.cliente
+    #     # Intentar asignar el descuento de fidelidad si corresponde
+    #     asignar_descuento_fidelidad(cliente)
 
 
 class LineaPedidoViewSet(viewsets.ModelViewSet):
