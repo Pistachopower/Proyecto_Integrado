@@ -1428,10 +1428,12 @@ class LoginSessionView(APIView):
         password = request.data.get('password')
 
         # 2. Django verifica si existen
+        #Busca user en bd, compara password hasheada, retorna objeto user o None
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
             # 3. Generar tokens JWT
+            #Se renueva el token cada vez que se loguea
             refresh = RefreshToken.for_user(user)
             
             # 4. Verificar si tiene lista de deseos con items
@@ -1450,7 +1452,7 @@ class LoginSessionView(APIView):
                 pass
             
             response_data = {
-                "message": "Sesión iniciada correctamente",
+                "message": "Sesión iniciada correctamente HOLA ",
                 "is_authenticated": True,
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),

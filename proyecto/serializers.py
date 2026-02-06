@@ -695,105 +695,105 @@ class RegistroClienteSerializer(serializers.Serializer):
     #Creamos primero el usuario
     user_data = UsuarioSerializer()
 
-    #Luego Creamos el cliente con los datos de usuario
-    #cliente_data = ClienteSerializer()
+    # #Luego Creamos el cliente con los datos de usuario
+    # cliente_data = ClienteSerializer()
 
-    # def validate(self, data):
+    def validate(self, data):
     #     """
     #     Validación general de los datos de registro
     #     """
-    #     user_data = data.get('user_data', {})
+         user_data = data.get('user_data', {})
         
     #     # Validar email
-    #     self.validate_email(user_data.get('email'))
+         self.validate_email(user_data.get('email'))
         
     #     # Validar teléfono
-    #     self.validate_telefono(user_data.get('telefono'))
+         self.validate_telefono(user_data.get('telefono'))
         
     #     # Validar fecha de nacimiento
-    #     self.validate_fecha_nacimiento(user_data.get('fecha_nacimiento'))
+         self.validate_fecha_nacimiento(user_data.get('fecha_nacimiento'))
         
-    #     return data
+         return data
 
-    # def validate_email(self, email):
+    def validate_email(self, email):
     #     """
     #     Valida que el email tenga un formato válido
     #     """
-    #     if not email: #email vacío
-    #         raise serializers.ValidationError({
-    #             "user_data": {
-    #                 "email": "El email es obligatorio."
-    #             }
-    #         })
+        if not email: #email vacío
+             raise serializers.ValidationError({
+                 "user_data": {
+                     "email": "El email es obligatorio."
+                 }
+             })
         
     #     # Crea una instancia para validar formato de email
-    #     email_validator = EmailValidator()
-    #     try:
-    #         email_validator(email)
-    #     except Exception:
-    #         raise serializers.ValidationError({
-    #             "user_data": {
-    #                 "email": "El formato del email no es válido."
-    #             }
-    #         })
+        email_validator = EmailValidator()
+        try:
+             email_validator(email)
+        except Exception:
+             raise serializers.ValidationError({
+                 "user_data": {
+                     "email": "El formato del email no es válido."
+                 }
+             })
         
     #     # Verificar que el email no esté ya registrado
-    #     if Usuario.objects.filter(email=email).exists():
-    #         raise serializers.ValidationError({
-    #             "user_data": {
-    #                 "email": "Este email ya está registrado."
-    #             }
-    #         })
+        if Usuario.objects.filter(email=email).exists():
+             raise serializers.ValidationError({
+                 "user_data": {
+                     "email": "Este email ya está registrado."
+                 }
+             })
 
-    # def validate_telefono(self, telefono):
-    #     """
-    #     Valida que el teléfono tenga entre 9 y 15 dígitos
-    #     """
-    #     if not telefono:
-    #         raise serializers.ValidationError({
-    #             "user_data": {
-    #                 "telefono": "El teléfono es obligatorio."
-    #             }
-    #         })
+    def validate_telefono(self, telefono):
+        """
+        Valida que el teléfono tenga entre 9 y 15 dígitos
+        """
+        if not telefono:
+            raise serializers.ValidationError({
+                "user_data": {
+                    "telefono": "El teléfono es obligatorio."
+                }
+            })
         
-    #     # Eliminar espacios y caracteres especiales para contar solo dígitos
-    #     digitos = ''.join(filter(str.isdigit, str(telefono)))
+        # Eliminar espacios y caracteres especiales para contar solo dígitos
+        digitos = ''.join(filter(str.isdigit, str(telefono)))
         
-    #     if len(digitos) < 9 or len(digitos) > 15:
-    #         raise serializers.ValidationError({
-    #             "user_data": {
-    #                 "telefono": "El teléfono debe tener entre 9 y 15 dígitos."
-    #             }
-    #         })
+        if len(digitos) < 9 or len(digitos) > 15:
+            raise serializers.ValidationError({
+                "user_data": {
+                    "telefono": "El teléfono debe tener entre 9 y 15 dígitos."
+                }
+            })
 
-    # def validate_fecha_nacimiento(self, fecha_nacimiento):
-    #     """
-    #     Valida que la fecha de nacimiento sea válida y en el pasado
-    #     """
-    #     if not fecha_nacimiento:
-    #         raise serializers.ValidationError({
-    #             "user_data": {
-    #                 "fecha_nacimiento": "La fecha de nacimiento es obligatoria."
-    #             }
-    #         })
+    def validate_fecha_nacimiento(self, fecha_nacimiento):
+        """
+        Valida que la fecha de nacimiento sea válida y en el pasado
+        """
+        if not fecha_nacimiento:
+            raise serializers.ValidationError({
+                "user_data": {
+                    "fecha_nacimiento": "La fecha de nacimiento es obligatoria."
+                }
+            })
         
-    #     # Verificar que la fecha no sea en el futuro
-    #     hoy = timezone.now().date()
-    #     if fecha_nacimiento > hoy:
-    #         raise serializers.ValidationError({
-    #             "user_data": {
-    #                 "fecha_nacimiento": "La fecha de nacimiento no puede ser en el futuro."
-    #             }
-    #         })
+        # Verificar que la fecha no sea en el futuro
+        hoy = timezone.now().date()
+        if fecha_nacimiento > hoy:
+            raise serializers.ValidationError({
+                "user_data": {
+                    "fecha_nacimiento": "La fecha de nacimiento no puede ser en el futuro."
+                }
+            })
         
-    #     # Verificar que sea mayor de 18 años (opcional, ajusta según tu lógica de negocio)
-    #     edad_minima_fecha = date(hoy.year - 18, hoy.month, hoy.day)
-    #     if fecha_nacimiento > edad_minima_fecha:
-    #         raise serializers.ValidationError({
-    #             "user_data": {
-    #                 "fecha_nacimiento": "Debes ser mayor de 18 años para registrarte."
-    #             }
-    #         })
+        # Verificar que sea mayor de 18 años (opcional, ajusta según tu lógica de negocio)
+        edad_minima_fecha = date(hoy.year - 18, hoy.month, hoy.day)
+        if fecha_nacimiento > edad_minima_fecha:
+            raise serializers.ValidationError({
+                "user_data": {
+                    "fecha_nacimiento": "Debes ser mayor de 18 años para registrarte."
+                }
+            })
 
     def create(self, validated_data):
         #Separamos los datos de usuario y cliente
@@ -808,11 +808,6 @@ class RegistroClienteSerializer(serializers.Serializer):
 
         #Cliente.objects.create(usuario=user, **cliente_data)
         Cliente.objects.create(usuario=user)
-
-        # return {
-        #      "user_data": user,
-        #      "cliente_data": cliente_data 
-        # }
     
         return {
              "user_data": user,
