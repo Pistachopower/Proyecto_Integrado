@@ -807,7 +807,14 @@ class RegistroClienteSerializer(serializers.Serializer):
         user.save()
 
         #Cliente.objects.create(usuario=user, **cliente_data)
-        Cliente.objects.create(usuario=user)
+        cliente = Cliente.objects.create(usuario=user)
+        
+        # Crear lista de deseos automáticamente para el nuevo cliente
+        ListaDeseos.objects.create(
+            cliente=cliente,
+            nombre=f'Lista de deseos de {user.first_name}',
+            fecha_creacion=date.today()
+        )
     
         return {
              "user_data": user,

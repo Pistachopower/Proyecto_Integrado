@@ -1409,10 +1409,9 @@ class ImagenPiezaViewSet(viewsets.ModelViewSet):
 #                status=status.HTTP_401_UNAUTHORIZED
 #            )
 
-
 class LoginSessionView(APIView):
     """
-    Endpoint de login personalizado que devuelve tokens JWT + info de lista de deseos.
+    Endpoint de login personalizado que devuelve tokens JWT.
     
     POST /api/v1/login/
     {
@@ -1436,23 +1435,8 @@ class LoginSessionView(APIView):
             #Se renueva el token cada vez que se loguea
             refresh = RefreshToken.for_user(user)
             
-            # 4. Verificar si tiene lista de deseos con items
-            lista_deseos_info = None
-            try:
-                cliente = user.cliente
-                lista = ListaDeseos.objects.filter(cliente=cliente).first()
-                
-                if lista and lista.items.exists():
-                    lista_deseos_info = {
-                        'tiene_items': True,
-                        'total_items': lista.items.count(),
-                        'mensaje': f'Tienes {lista.items.count()} artículo(s) en tu lista de deseos'
-                    }
-            except Cliente.DoesNotExist:
-                pass
-            
             response_data = {
-                "message": "Sesión iniciada correctamente HOLA ",
+                "message": "Sesión iniciada correctamente",
                 "is_authenticated": True,
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
@@ -1463,10 +1447,6 @@ class LoginSessionView(APIView):
                     "rol": user.rol,
                 }
             }
-            
-            # Agregar info de lista de deseos si existe
-            if lista_deseos_info:
-                response_data['lista_deseos'] = lista_deseos_info
             
             return Response(response_data, status=status.HTTP_200_OK)
         else:
