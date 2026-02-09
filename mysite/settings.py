@@ -192,12 +192,24 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-  
-        #'rest_framework.authentication.SessionAuthentication',
+   
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
 
     ),
 }
+
+
+# ============================================================
+# CONFIGURACIÓN DE PAYPAL
+# ============================================================
+PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
+PAYPAL_CLIENT_SECRET = os.getenv('PAYPAL_CLIENT_SECRET')
+PAYPAL_MODE = os.getenv('PAYPAL_MODE', 'sandbox')  # 'sandbox' 
+
+# URLs de retorno después del pago (Para VUE)
+PAYPAL_RETURN_URL = os.getenv('PAYPAL_RETURN_URL', 'http://localhost:8080/pago/exito')
+PAYPAL_CANCEL_URL = os.getenv('PAYPAL_CANCEL_URL', 'http://localhost:8080/pago/cancelado')
 
 
 

@@ -331,12 +331,57 @@ class Pago(models.Model):
     metodo_pago = models.ForeignKey(
         MetodoPago,
         on_delete=models.CASCADE,
-        related_name="pagos"
+        related_name="pagos",
+        null=True,
+        blank=True
     )
     fecha_pago = models.DateField()
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     #estado = models.CharField(max_length=20, choices=ESTADO)
     numero_transaccion = models.CharField(max_length=100)
+
+
+class PagoPayPal(models.Model):
+    """
+    Modelo para guardar los detalles específicos de transacciones PayPal.
+    """
+    CREADO = 1
+    APROBADO = 2
+    CAPTURADO = 3
+    FALLIDO = 4
+    CANCELADO = 5
+
+    ESTADO = [
+        (CREADO, "Creado"),
+        (APROBADO, "Aprobado"),
+        (CAPTURADO, "Capturado"),
+        (FALLIDO, "Fallido"),
+        (CANCELADO, "Cancelado"),
+    ]
+
+    pedido = models.ForeignKey(
+        Pedido,
+        on_delete=models.CASCADE,
+        related_name="pagos_paypal"
+    )
+    pago = models.OneToOneField(
+        Pago,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="pago_paypal"
+    )
+    paypal_order_id = models.CharField(max_length=100, unique=True)
+    paypal_capture_id = models.CharField(max_length=100, null=True, blank=True)
+    estado = models.PositiveSmallIntegerField(choices=ESTADO, default=CREADO)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    moneda = models.CharField(max_length=3, default="EUR")
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    respuesta_paypal = models.JSONField(null=True, blank=True)  # Guarda la respuesta completa de PayPal
+
+    def __str__(self):
+        return f"PayPal Order {self.paypal_order_id} - Pedido {self.pedido.id}"
 
 
 # ============================================================

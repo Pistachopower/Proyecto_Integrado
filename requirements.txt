@@ -8,6 +8,8 @@ psycopg2-binary~=2.9.9 #conexion con postgresql
 Faker~=18.9.0 #poblar base de datos con datos falsos
 python-dotenv~=1.2.1 #manejo de variables de entorno
 
+#PayPal SDK para pagos. Comando de instalación con todo: pip install -r requirements.txt
+paypalrestsdk~=1.13.3
 
 #autenticacion con OAuth2
 django-oauth-toolkit~=3.0.1 

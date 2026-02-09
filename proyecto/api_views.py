@@ -23,6 +23,8 @@ from decimal import Decimal
 from datetime import date, timedelta
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
+import paypalrestsdk
 
 
 
@@ -1816,6 +1818,7 @@ class CarritoViewSet(ViewSet):
         if not direccion:
             return Response({'error': 'Debe proporcionar una dirección de envío'}, status=400)
 
+        
         # 4. Obtener método de pago
         metodo_pago_id = request.data.get('metodo_pago_id')
         if metodo_pago_id:
@@ -1823,10 +1826,8 @@ class CarritoViewSet(ViewSet):
                 metodo_pago = MetodoPago.objects.get(id=metodo_pago_id, cliente=cliente)
             except MetodoPago.DoesNotExist:
                 return Response({'error': 'Método de pago no válido'}, status=400)
-        else:
-            metodo_pago = metodos_cliente.filter(es_predeterminado=True).first()
-            if not metodo_pago:
-                metodo_pago = metodos_cliente.first()
+
+
 
         # 5. Verificar stock de todas las piezas
         for linea in pedido.lineas_pedido.all():
@@ -2062,3 +2063,388 @@ class DashboardVendedorView(APIView):
             'cliente_frecuente_pedidos': cliente_frecuente_pedidos,
             'ultimas_transacciones': ultimas_transacciones
         })
+
+
+# ============================================================
+# PAYPAL - INTEGRACIÓN DE PAGOS
+# ============================================================
+
+def configurar_paypal():
+    """Configura el SDK de PayPal con las credenciales. Este método
+    funciona para conectarme a PayPal Sandbox.  
+    
+    """
+    paypalrestsdk.configure({
+        "mode": settings.PAYPAL_MODE,  #Defino que uso el entorno de prueba sandbox
+        "client_id": settings.PAYPAL_CLIENT_ID, #Identificador público de tu aplicación en PayPal
+        "client_secret": settings.PAYPAL_CLIENT_SECRET #Clave secreta de tu aplicación en PayPal
+    })
+
+
+class CrearOrdenPayPalView(APIView):
+    """
+    Crea una orden de pago en PayPal.
+    
+    POST /api/v1/paypal/crear-orden/
+    {
+        "pedido_id": 123
+    }
+    
+    Respuesta exitosa:
+    {
+        "success": true,
+        "order_id": "PAYID-...",
+        "approval_url": "https://www.sandbox.paypal.com/..."
+    }
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        pedido_id = request.data.get('pedido_id')
+        
+        if not pedido_id:
+            return Response(
+                {'error': 'El campo pedido_id es requerido'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Verificar que el usuario es cliente
+        try:
+            cliente = request.user.cliente
+        except Cliente.DoesNotExist:
+            return Response(
+                {'error': 'El usuario no tiene perfil de cliente'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Obtener el pedido
+        try:
+            pedido = Pedido.objects.get(id=pedido_id, cliente=cliente)
+        except Pedido.DoesNotExist:
+            return Response(
+                {'error': 'Pedido no encontrado o no pertenece al cliente'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Verificar estado válido para pagar
+        if pedido.estado not in [Pedido.PENDIENTE, Pedido.CARRITO]:
+            return Response(
+                {'error': f'El pedido no está en estado válido para pagar. Estado actual: {pedido.get_estado_display()}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Verificar si ya existe un pago PayPal pendiente
+        pago_existente = PagoPayPal.objects.filter(
+            pedido=pedido,
+            estado__in=[PagoPayPal.CREADO, PagoPayPal.APROBADO]
+        ).first()
+
+        if pago_existente:
+            # Construir la URL de aprobación de PayPal Sandbox
+            url_aprobacion = f"https://www.sandbox.paypal.com/checkoutnow?token={pago_existente.paypal_order_id}"
+            
+            return Response({
+                'success': True,
+                'order_id': pago_existente.paypal_order_id,
+                'approval_url': url_aprobacion,
+                'message': 'Ya existe una orden de pago pendiente'
+            })
+
+        # Configurar PayPal (iniciarlo con las credenciales)
+        configurar_paypal()
+
+        # Crear la orden en PayPal
+        monto_total = str(pedido.total)
+        
+        #Crea un objeto de pago de PayPal (orde de pago) usando la librería paypalrestsdk
+        payment = paypalrestsdk.Payment({
+            "intent": "sale", #Se define el pago como una venta ("intent": "sale").
+            "payer": {
+                "payment_method": "paypal" #Se indica que el método de pago será PayPal ("payment_method": "paypal").
+            },
+            #Se configuran las URLs a las que PayPal redirigirá al usuario tras aprobar o cancelar el pago
+            "redirect_urls": {
+                "return_url": settings.PAYPAL_RETURN_URL,
+                "cancel_url": settings.PAYPAL_CANCEL_URL
+            },
+
+            #Se especifica la transacción
+            "transactions": [{
+                "item_list": {
+                    "items": [{
+                        "name": f"Pedido #{pedido.id}",
+                        "sku": f"PED-{pedido.id}",
+                        "price": monto_total,
+                        "currency": "EUR",
+                        "quantity": 1
+                    }]
+                },
+                "amount": {
+                    "total": monto_total,
+                    "currency": "EUR"
+                },
+                "description": f"Pago del pedido #{pedido.id}"
+            }]
+        })
+
+        if payment.create():
+            # Obtener la URL de aprobación
+            approval_url = None
+
+            for link in payment.links: #Itera sobre los enlaces que PayPal devuelve en la respuesta de creación del pago
+                #Busca el enlace que tiene la relación "approval_url", que es la URL
+                #  a la que el usuario debe ser redirigido para aprobar el pago
+                if link.rel == "approval_url": 
+                    approval_url = link.href 
+                    break
+
+            # Guardar el registro de PagoPayPal
+            pago_paypal = PagoPayPal.objects.create(
+                pedido=pedido,
+                paypal_order_id=payment.id,
+                estado=PagoPayPal.CREADO,
+                monto=Decimal(monto_total),
+                moneda="EUR",
+                respuesta_paypal=payment.to_dict()
+            )
+
+            return Response({
+                'success': True,
+                'order_id': payment.id,
+                'approval_url': approval_url,
+                'pago_paypal_id': pago_paypal.id
+            })
+        else:
+            return Response({
+                'success': False,
+                'error': 'Error al crear la orden en PayPal',
+                'details': payment.error
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CapturarPagoPayPalView(APIView):
+    """
+    Captura el pago después de que el usuario lo aprobó en PayPal.
+    
+    POST /api/v1/paypal/capturar-pago/
+    {
+        "payment_id": "PAYID-...",
+        "payer_id": "ABCD1234..."
+    }
+    
+    El payer_id viene en la URL de retorno de PayPal como query param.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        payment_id = request.data.get('payment_id') #identifica la orden
+        payer_id = request.data.get('payer_id') # identifica al pagador, viene en la URL de retorno de PayPal como query param
+
+        if not payment_id or not payer_id:
+            return Response(
+                {'error': 'payment_id y payer_id son requeridos'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Buscar el registro de PagoPayPal
+        try:
+            pago_paypal = PagoPayPal.objects.get(paypal_order_id=payment_id)
+        except PagoPayPal.DoesNotExist:
+            return Response(
+                {'error': 'No se encontró el registro de pago'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Verificar que pertenece al cliente
+        try:
+            cliente = request.user.cliente
+            if pago_paypal.pedido.cliente != cliente:
+                return Response(
+                    {'error': 'Este pago no pertenece al cliente'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+        except Cliente.DoesNotExist:
+            return Response(
+                {'error': 'El usuario no tiene perfil de cliente'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Verificar si ya fue capturado
+        if pago_paypal.estado == PagoPayPal.CAPTURADO:
+            return Response({
+                'success': True,
+                'message': 'Este pago ya fue capturado anteriormente',
+                'pedido_id': pago_paypal.pedido.id
+            })
+
+        if pago_paypal.estado not in [PagoPayPal.CREADO, PagoPayPal.APROBADO]:
+            return Response(
+                {'error': f'El pago no está en estado válido. Estado: {pago_paypal.get_estado_display()}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        #Volvemos a iniciar Paypal con nuestras credenciales 
+        configurar_paypal()
+
+        #Recuperamos la orden de pago de PayPal usando el payment_id (paypal_order_id) que guardamos en nuestro modelo PagoPayPal
+        payment = paypalrestsdk.Payment.find(payment_id)
+
+        #Intentamos ejecutar (capturar) el pago usando el payer_id que PayPal nos devuelve cuando el usuario aprueba el pago.
+        if payment.execute({"payer_id": payer_id}):
+            # Pago exitoso
+            pago_paypal.estado = PagoPayPal.CAPTURADO
+            pago_paypal.respuesta_paypal = payment.to_dict() #
+            
+            # Obtener el capture_id
+            try:
+
+                #Accede a la lista de recursos relacionados (related_resources) de la primera transacción del pago.
+                related_resources = payment.transactions[0].related_resources
+                
+                #Verifica que la lista no esté vacía (es decir, que PayPal devolvió información de la venta).
+                if related_resources:
+                    pago_paypal.paypal_capture_id = related_resources[0].sale.id
+            
+            except (IndexError, AttributeError):
+                pass
+
+            pago_paypal.save()
+
+            # Actualizar el pedido a PAGADO
+            pedido = pago_paypal.pedido
+            pedido.estado = Pedido.PAGADO
+            pedido.save()
+
+            # Crear registro en modelo Pago
+            pago = Pago.objects.create(
+                pedido=pedido,
+                metodo_pago=None, #TODO: podríamos crear un método de pago específico para PayPal o dejarlo como None
+                fecha_pago=date.today(),
+                monto=pago_paypal.monto,
+                estado=Pago.COMPLETADO,
+                numero_transaccion=payment_id
+            )
+
+            pago_paypal.pago = pago
+            pago_paypal.save()
+
+            return Response({
+                'success': True,
+                'message': 'Pago completado exitosamente',
+                'pedido_id': pedido.id,
+                'estado_pedido': pedido.get_estado_display(),
+                'monto': str(pago_paypal.monto),
+                'transaction_id': pago_paypal.paypal_capture_id or payment_id
+            })
+        else:
+            pago_paypal.estado = PagoPayPal.FALLIDO
+            pago_paypal.respuesta_paypal = payment.error
+            pago_paypal.save()
+
+            return Response({
+                'success': False,
+                'error': 'Error al procesar el pago',
+                'details': payment.error
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CancelarPagoPayPalView(APIView):
+    """
+    Maneja cuando el usuario cancela el pago en PayPal.
+    
+    POST /api/v1/paypal/cancelar-pago/
+    {
+        "payment_id": "PAYID-..."
+    }
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        payment_id = request.data.get('payment_id')
+
+        if not payment_id:
+            return Response(
+                {'error': 'payment_id es requerido'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            pago_paypal = PagoPayPal.objects.get(paypal_order_id=payment_id)
+            
+            cliente = request.user.cliente
+            if pago_paypal.pedido.cliente != cliente:
+                return Response(
+                    {'error': 'Este pago no pertenece al cliente'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            pago_paypal.estado = PagoPayPal.CANCELADO
+            pago_paypal.save()
+
+            return Response({
+                'success': True,
+                'message': 'Pago cancelado',
+                'pedido_id': pago_paypal.pedido.id
+            })
+
+        except PagoPayPal.DoesNotExist:
+            return Response(
+                {'error': 'No se encontró el registro de pago'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Cliente.DoesNotExist:
+            return Response(
+                {'error': 'El usuario no tiene perfil de cliente'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class VerificarPagoPayPalView(APIView):
+    """
+    Verifica el estado de un pago PayPal.
+    
+    GET /api/v1/paypal/verificar-pago/?payment_id=PAYID-...
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        payment_id = request.query_params.get('payment_id')
+
+        if not payment_id:
+            return Response(
+                {'error': 'payment_id es requerido'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            pago_paypal = PagoPayPal.objects.get(paypal_order_id=payment_id)
+            
+            cliente = request.user.cliente
+            if pago_paypal.pedido.cliente != cliente:
+                return Response(
+                    {'error': 'Este pago no pertenece al cliente'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            return Response({
+                'success': True,
+                'payment_id': payment_id,
+                'estado': pago_paypal.get_estado_display(),
+                'estado_codigo': pago_paypal.estado,
+                'pedido_id': pago_paypal.pedido.id,
+                'monto': str(pago_paypal.monto),
+                'moneda': pago_paypal.moneda,
+                'fecha_creacion': pago_paypal.fecha_creacion,
+                'capturado': pago_paypal.estado == PagoPayPal.CAPTURADO
+            })
+
+        except PagoPayPal.DoesNotExist:
+            return Response(
+                {'error': 'No se encontró el registro de pago'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Cliente.DoesNotExist:
+            return Response(
+                {'error': 'El usuario no tiene perfil de cliente'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
