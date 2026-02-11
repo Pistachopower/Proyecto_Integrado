@@ -371,13 +371,25 @@ class PagoPayPal(models.Model):
         blank=True,
         related_name="pago_paypal"
     )
+
+    #paypal_order_id: Es el identificador único de la orden de pago generada por 
+    # PayPal cuando creas la orden. Permite relacionar tu registro local con la 
+    # transacción en PayPal.
     paypal_order_id = models.CharField(max_length=100, unique=True)
+    
+
+    #paypal_capture_id: Es el identificador de la captura de pago en PayPal, 
+    # que se genera cuando el usuario autoriza y se captura el pago 
+    # (es decir, cuando el dinero realmente se transfiere). 
+    # Es útil para hacer consultas o reembolsos en PayPal.
     paypal_capture_id = models.CharField(max_length=100, null=True, blank=True)
     estado = models.PositiveSmallIntegerField(choices=ESTADO, default=CREADO)
     monto = models.DecimalField(max_digits=10, decimal_places=2)
     moneda = models.CharField(max_length=3, default="EUR")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    
     respuesta_paypal = models.JSONField(null=True, blank=True)  # Guarda la respuesta completa de PayPal
 
     def __str__(self):

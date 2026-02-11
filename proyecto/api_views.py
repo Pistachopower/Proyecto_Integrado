@@ -2237,7 +2237,7 @@ class CapturarPagoPayPalView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        payment_id = request.data.get('payment_id') #identifica la orden
+        payment_id = request.data.get('payment_id') #identifica la orden pago creada en PayPal, viene en la URL de retorno de PayPal como query param
         payer_id = request.data.get('payer_id') # identifica al pagador, viene en la URL de retorno de PayPal como query param
 
         if not payment_id or not payer_id:
@@ -2293,7 +2293,7 @@ class CapturarPagoPayPalView(APIView):
         if payment.execute({"payer_id": payer_id}):
             # Pago exitoso
             pago_paypal.estado = PagoPayPal.CAPTURADO
-            pago_paypal.respuesta_paypal = payment.to_dict() #
+            pago_paypal.respuesta_paypal = payment.to_dict() # Guardamos la respuesta completa de PayPal
             
             # Obtener el capture_id
             try:
@@ -2308,17 +2308,22 @@ class CapturarPagoPayPalView(APIView):
             except (IndexError, AttributeError):
                 pass
 
-            pago_paypal.save()
+            pago_paypal.save() # Guardamos el estado actualizado del pago PayPal en nuestra base de datos
 
             # Actualizar el pedido a PAGADO
             pedido = pago_paypal.pedido
             pedido.estado = Pedido.PAGADO
             pedido.save()
 
+            # Buscar el método de pago tipo BILLETERA del cliente para asociarlo al pago
+            metodo_paypal = MetodoPago.objects.filter(
+                            cliente=pedido.cliente,
+                            tipo_metodo=MetodoPago.BILLETERA).first()
+
             # Crear registro en modelo Pago
             pago = Pago.objects.create(
                 pedido=pedido,
-                metodo_pago=None, #TODO: podríamos crear un método de pago específico para PayPal o dejarlo como None
+                metodo_pago= metodo_paypal,
                 fecha_pago=date.today(),
                 monto=pago_paypal.monto,
                 estado=Pago.COMPLETADO,

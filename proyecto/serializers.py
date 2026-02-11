@@ -146,7 +146,7 @@ class LineaPedidoSerializer(serializers.HyperlinkedModelSerializer):
         return data
 
 
-class PedidoSerializer(serializers.HyperlinkedModelSerializer):
+class PedidoSerializer(serializers.ModelSerializer):
     cliente = ClienteSerializer(read_only=True)
     vendedor = VendedorSerializer(read_only=True)
     lineas_pedido = LineaPedidoSerializer(many=True, read_only=True)
