@@ -820,3 +820,8 @@ class RegistroClienteSerializer(serializers.Serializer):
              "user_data": user,
     
         }
+
+class PasswordResetSerializer(serializers.Serializer): 
+    email = serializers.EmailField(required=True)
+
+    

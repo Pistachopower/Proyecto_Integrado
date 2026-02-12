@@ -2404,3 +2404,63 @@ class CancelarPagoPayPalView(APIView):
             )
 
 
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.conf import settings
+from .serializers import PasswordResetSerializer
+
+class PasswordResetRequestView(APIView): 
+    """
+    Maneja las solicitudes de reseteo de contraseña. Recibe un email, verifica 
+    si existe un usuario con ese email y envía un enlace de reseteo si es así. 
+
+    POST /api/v1/auth/password-reset/ { "email": "usuario@tienda.com" }
+
+    Documentación de Django sobre tokens de reseteo de contraseña:
+    https://docs.djangoproject.com/en/4.2/topics/auth/default/#django.contrib.auth.tokens.PasswordResetTokenGenerator
+
+    """
+    def post(self, request):
+        serializer = PasswordResetSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            try:
+                user = Usuario.objects.get(email=email)
+            
+            except Usuario.DoesNotExist:
+                # Por seguridad, respondemos igual aunque el usuario no exista
+                return Response({"detail": "Si el email existe, se enviará un enlace de reseteo."}, status=status.HTTP_200_OK)
+
+            #generamos el token
+            token = PasswordResetTokenGenerator().make_token(user)
+
+            #Codificamos el ID del usuario en base64 para incluirlo en la URL de reseteo
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            
+            #URL de reseteo a la app de vue, donde el frontend tendrá una ruta que reciba 
+            # el uid y el token para mostrar el formulario de nueva contraseña
+            reset_url = f"http://localhost:8080/recuperar-contrasena?uid={uid}&token={token}"
+
+
+            #Este método viene de django.core.mail 
+            send_mail(
+                subject="Recupera tu contraseña",
+                message=f"Para restablecer tu contraseña, haz clic en el siguiente enlace: {reset_url}",
+                
+                #from_email: El correo del remitente, tomado de settings.DEFAULT_FROM_EMAIL (debes definirlo en tu settings.py).
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                
+                #recipient_list: Una lista con el email del destinatario (el usuario que pidió el reseteo).
+                recipient_list=[email],
+                
+                #fail_silently=False: Si ocurre un error al enviar el correo, lanzará una excepción (útil para detectar problemas en desarrollo).
+                fail_silently=False,
+            )
+
+            return Response({"detail": "Si el email existe, se enviará un enlace de reseteo."}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
