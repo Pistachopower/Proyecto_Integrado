@@ -1,8 +1,6 @@
 from django.urls import path, include
 from .api_views import *
-from rest_framework.routers import DefaultRouter #
-from .api_views import LoginSessionView, LogoutSessionView, ValoracionViewSet, AuthStatusView
-from .api_views import CrearOrdenPayPalView, CapturarPagoPayPalView, CancelarPagoPayPalView, VerificarPagoPayPalView
+from rest_framework.routers import DefaultRouter 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -69,6 +67,5 @@ urlpatterns = [
     path('paypal/crear-orden/', CrearOrdenPayPalView.as_view(), name='paypal-crear-orden'),
     path('paypal/capturar-pago/', CapturarPagoPayPalView.as_view(), name='paypal-capturar-pago'),
     path('paypal/cancelar-pago/', CancelarPagoPayPalView.as_view(), name='paypal-cancelar-pago'),
-    path('paypal/verificar-pago/', VerificarPagoPayPalView.as_view(), name='paypal-verificar-pago'),
 
 ]

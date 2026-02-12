@@ -1,5 +1,4 @@
-Cliente
-Agregar comentario y valoraciones (agregar la media de todas las valoraciones sobre un producto) (consultar todas las valoraciones sobre x producto)
+
 
 Permisos
 
@@ -9,28 +8,12 @@ Devolucion (cambiar el estado)
 
 Cuando termine la compra crear un pdf con la factura
 
-Lista de deseo
 
 Vendedor 
 Permisos
 Agregar productos con un csv
 
 
-Por hacer 
-De los metodos de pago cliente:
-Agregar el método update y controlar que solo haya un método predeterminado (sobreescribir el predeterminado anterior)
-
-Peticion carrito
-Post (Agregar)
-{
-  "pieza_id": 1,
-  "cantidad": 3
-}
-
-Antes
-Necesito saber qué es lo que necesita
-
 
 HOY
-Metodo de pago actualizar 
-Predeterminado
+Necesito definir bien cuándo voy a descontar el stock, si es en finalizar (con pago Tarjeta, Cuenta Bancaria) paypal 
