@@ -217,7 +217,8 @@ PAYPAL_CANCEL_URL = os.getenv('PAYPAL_CANCEL_URL', 'http://localhost:8080/pago/c
 # ============================================================
 DEFAULT_FROM_EMAIL = 'no-reply@motorpartexpress.com'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' #Para produccion
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' #Prueba email desde consola para prueba 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')

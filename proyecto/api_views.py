@@ -2422,6 +2422,9 @@ class PasswordResetRequestView(APIView):
     https://docs.djangoproject.com/en/4.2/topics/auth/default/#django.contrib.auth.tokens.PasswordResetTokenGenerator
 
     """
+
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = PasswordResetSerializer(data=request.data)
         
@@ -2442,7 +2445,7 @@ class PasswordResetRequestView(APIView):
             
             #URL de reseteo a la app de vue, donde el frontend tendrá una ruta que reciba 
             # el uid y el token para mostrar el formulario de nueva contraseña
-            reset_url = f"http://localhost:8080/recuperar-contrasena?uid={uid}&token={token}"
+            reset_url = f"http://localhost:8080/restablecer-contrasena?uid={uid}&token={token}"
 
 
             #Este método viene de django.core.mail 
@@ -2463,4 +2466,49 @@ class PasswordResetRequestView(APIView):
             return Response({"detail": "Si el email existe, se enviará un enlace de reseteo."}, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
+from django.contrib.auth import get_user_model
+from django.utils.http import urlsafe_base64_decode
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        if serializer.is_valid():
+            #Obtiene el uid, token y nueva contraseña del cuerpo de la solicitud
+            uid = serializer.validated_data['uid']
+            token = serializer.validated_data['token']
+            new_password = serializer.validated_data['new_password']
+
+            #Obtenemos el modelo de usuario activo en el proyecto (el modelo Usuario personalizado)
+            User = get_user_model()
+            try:
+                #Decodifica el uid que viene en base64 para obtener el ID del usuario
+                uid_decoded = urlsafe_base64_decode(uid).decode()
+
+                #Busca el usuario en la base de datos usando el ID decodificado
+                user = User.objects.get(pk=uid_decoded)
+
+             #ValueError, TypeError, OverflowError: Si el uid está malformado, vacío, o no puede convertirse correctamente (por ejemplo, si alguien manipula el enlace).   
+            except (User.DoesNotExist, ValueError, TypeError, OverflowError):
+                return Response({"error": "Enlace no válido o usuario no encontrado."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+            #Utiliza el PasswordResetTokenGenerator de Django para verificar que el token es válido para ese usuario. 
+            # El token se genera usando información del usuario (como su ID, fecha de última modificación de contraseña, etc.) 
+            # y tiene una validez limitada (por defecto, unas horas). Si el token no es válido o ha expirado, se devuelve un error.
+            token_generator = PasswordResetTokenGenerator()
+
+            if not token_generator.check_token(user, token): 
+                return Response({"error": "El enlace de reseteo no es válido o ha expirado."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Actualiza la contraseña del usuario
+            user.set_password(new_password)
+            user.save()
+            return Response({"detail": "Contraseña actualizada con éxito."}, status=status.HTTP_200_OK)
+            
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

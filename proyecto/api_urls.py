@@ -72,5 +72,8 @@ urlpatterns = [
 
     # Recuperación de contraseña
     path('password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),
+    path('auth/password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+
+
 
 ]
