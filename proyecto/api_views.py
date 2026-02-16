@@ -1529,13 +1529,47 @@ class CarritoViewSet(ViewSet):
         return pedido
 
     def calcular_total(self, pedido):
-        """Recalcula el total del pedido sumando las líneas."""
-        total = pedido.lineas_pedido.aggregate(
-            total=Sum('subtotal')
-        )['total'] or Decimal('0.00')
+        """Recalcula el total del pedido sumando las líneas y aplica 
+        descuento de bienvenida si corresponde."""
+
+        # total = pedido.lineas_pedido.aggregate(
+        #     total=Sum('subtotal')
+        # )['total'] or Decimal('0.00')
+        # pedido.total = total
+        # pedido.save()
+        # return total
+
+        # Suma todos los subtotales de las líneas de pedido
+        subtotales = pedido.lineas_pedido.aggregate(total=Sum('subtotal')) #
+        suma_subtotales = subtotales['total']
+        
+        if suma_subtotales is None:
+            total = Decimal('0.00')
+        else:
+            total = suma_subtotales
+
+        cliente = pedido.cliente
+        pedidos_previos = cliente.pedidos_cliente.exclude(id=pedido.id).exclude(estado=pedido.CARRITO)
+        es_primer_pedido = not pedidos_previos.exists()
+    
+        descuento = Decimal('0.00')
+        if es_primer_pedido:
+            # Buscar el descuento de bienvenida activo
+            descuento_obj = Descuento.objects.filter(nombre__icontains="Bienvenida", estado=Descuento.ACTIVO).first()
+            if descuento_obj:
+                if descuento_obj.tipo == Descuento.PORCENTAJE:
+                    descuento = total * (descuento_obj.valor / Decimal('100'))
+                
+                elif descuento_obj.tipo == Descuento.FIJO:
+                    descuento = descuento_obj.valor
+                # Controla que el descuento no sea mayor al total
+                descuento = min(descuento, total)
+                total -= descuento
+
         pedido.total = total
         pedido.save()
         return total
+
 
     def list(self, request):
         """
@@ -1654,7 +1688,7 @@ class CarritoViewSet(ViewSet):
 
         pedido = self.get_carrito(cliente)
         
-        # Buscar si ya existe la línea
+        # Busca si ya existe la línea
         linea, created = LineaPedido.objects.get_or_create(
             pedido=pedido,
             pieza=pieza,
@@ -1675,6 +1709,12 @@ class CarritoViewSet(ViewSet):
         # Recalcular total del pedido
         self.calcular_total(pedido)
 
+        if created:
+            status_code = 201  # Se creó una nueva línea en el carrito
+        else:
+            status_code = 200  # Se actualizó una línea existente
+
+
         return Response({
             'message': 'Pieza agregada/actualizada en el carrito',
             'pieza_id': pieza.id,
@@ -1682,7 +1722,7 @@ class CarritoViewSet(ViewSet):
             'cantidad': linea.cantidad,
             'subtotal': str(linea.subtotal),
             'total_carrito': str(pedido.total)
-        }, status=201 if created else 200)
+        }, status=status_code)
 
     def partial_update(self, request, pk=None):
         """

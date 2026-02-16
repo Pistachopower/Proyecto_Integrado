@@ -2,7 +2,7 @@
 
 Permisos
 
-Descuento 
+Descuento: descuento de bienvenida 5% aplicado pero puedes hacer más cosas (indicar al cliente que tiene descuento bienvenida)
 
 Devolucion (cambiar el estado)
 
