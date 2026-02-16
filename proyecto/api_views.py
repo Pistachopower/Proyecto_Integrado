@@ -228,15 +228,18 @@ class PiezaViewSet(viewsets.ModelViewSet):
         serializer = PiezaSerializer(piezas, many=True, context={'request': request})
         return Response(serializer.data)
 
-
+#Factura cliente
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
 class PedidoViewSet(viewsets.ModelViewSet):
     """
             PATCH /api/v1/pedido/{id}/cambiar_estado_vendedor/
+            GET /api/v1/pedido/{id}/factura_cliente/
             Body: {"estado": 2}
     """
     queryset = Pedido.objects.all()
     serializer_class = PedidoSerializer
-    #permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    permission_classes = [IsAuthenticated]
 
     #Permite filtrar los pedidos por cliente_id
     filter_backends=[
@@ -270,6 +273,118 @@ class PedidoViewSet(viewsets.ModelViewSet):
     #     cliente = pedido.cliente
     #     # Intentar asignar el descuento de fidelidad si corresponde
     #     asignar_descuento_fidelidad(cliente)
+
+    @action(detail=True, methods=['get'])
+    def factura_cliente(self, request, pk=None):
+        """
+        Genera y descarga una factura PDF profesional para el pedido.
+        """
+        import os
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib import colors
+        from reportlab.lib.units import mm
+        from reportlab.platypus import Table, TableStyle
+        from reportlab.lib.utils import ImageReader
+
+        pedido = self.get_object()
+        if pedido.estado not in [Pedido.PAGADO, Pedido.ENVIADO, Pedido.ENTREGADO]:
+            return Response({'error': 'La factura solo está disponible para pedidos pagados.'}, status=403)
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="factura_pedido_{pedido.id}.pdf"'
+        
+        p = canvas.Canvas(response, pagesize=A4)
+        width, height = A4
+        margen_izq = 30 * mm
+        margen_sup = height - 30 * mm
+        y = margen_sup
+
+        # --- Cabecera: Logo y datos empresa ---
+        logo_path = os.path.join(settings.BASE_DIR, 'media/logo.png')
+        try:
+            logo = ImageReader(logo_path)
+            p.drawImage(logo, margen_izq, y-10*mm, width=40*mm, height=20*mm, mask='auto')
+        except Exception:
+            pass
+        # Datos empresa (ajusta a tus datos reales)
+        empresa_x = margen_izq + 50*mm
+        p.setFont("Helvetica-Bold", 12)
+        p.drawString(empresa_x, y, "Mi Empresa S.L.")
+        p.setFont("Helvetica", 9)
+        p.drawString(empresa_x, y-12, "CIF: B12345678")
+        p.drawString(empresa_x, y-24, "Calle Ejemplo 123, 41000 Sevilla")
+        p.drawString(empresa_x, y-36, "Tel: 954 000 000 | info@miempresa.com")
+
+        y -= 45
+        # Línea separadora
+        p.setStrokeColor(colors.grey)
+        p.setLineWidth(0.5)
+        p.line(margen_izq, y, width-margen_izq, y)
+        y -= 15
+
+        # --- Datos de la factura y cliente ---
+        p.setFont("Helvetica-Bold", 14)
+        p.drawString(margen_izq, y, f"Factura N.º {pedido.id}")
+        p.setFont("Helvetica", 10)
+        p.drawRightString(width - margen_izq, y, f"Fecha: {pedido.fecha_pedido}")
+        y -= 18
+        p.drawString(margen_izq, y, f"Cliente: {pedido.cliente.usuario.first_name} {pedido.cliente.usuario.last_name}")
+        y -= 15
+        p.drawString(margen_izq, y, f"Email: {pedido.cliente.usuario.email}")
+        y -= 15
+        p.drawString(margen_izq, y, f"Dirección: {pedido.direccion_envio}")
+        y -= 32
+
+        # --- Tabla de líneas de pedido ---
+        data = [["Producto", "Cantidad", "Precio Unitario", "Subtotal"]]
+        for linea in pedido.lineas_pedido.all():
+            data.append([
+                str(linea.pieza.nombre),
+                str(linea.cantidad),
+                f"{linea.precio_unitario:.2f} €",
+                f"{linea.subtotal:.2f} €"
+            ])
+        # Añadir total
+        data.append(["", "", "TOTAL:", f"{pedido.total:.2f} €"])
+
+        table = Table(data, colWidths=[70*mm, 30*mm, 35*mm, 35*mm])
+        style = TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.black),
+            ('ALIGN', (1,1), (-1,-1), 'CENTER'),
+            ('ALIGN', (2,1), (3,-2), 'RIGHT'),
+            ('ALIGN', (2,-1), (3,-1), 'RIGHT'),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0,0), (-1,0), 10),
+            ('BOTTOMPADDING', (0,0), (-1,0), 8),
+            ('GRID', (0,0), (-1,-2), 0.5, colors.grey),
+            ('BOX', (0,0), (-1,-1), 1, colors.black),
+            ('BACKGROUND', (0,-1), (-1,-1), colors.whitesmoke),
+            ('FONTNAME', (2,-1), (2,-1), 'Helvetica-Bold'),
+            ('FONTNAME', (3,-1), (3,-1), 'Helvetica-Bold'),
+            ('FONTSIZE', (2,-1), (3,-1), 11),
+        ])
+        table.setStyle(style)
+        table.wrapOn(p, width, height)
+        table.drawOn(p, margen_izq, y-15*len(data))
+        y -= 15*len(data) + 40
+
+        # --- Pie de página ---
+        p.setFont("Helvetica-Oblique", 9)
+        p.setFillColor(colors.grey)
+        p.drawString(margen_izq, 30, "Gracias por su compra. Para cualquier consulta, contacte con nosotros.")
+        p.setFillColor(colors.black)
+
+        p.showPage()
+        p.save()
+        return response
+
+
+
+
+
+
+
 
 
 class LineaPedidoViewSet(viewsets.ModelViewSet):
