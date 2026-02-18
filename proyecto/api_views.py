@@ -189,7 +189,7 @@ class PiezaViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
   
     #TODO: REVISAR Y PROBAR FUNCIONAMIENTO
-    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    @action(detail=False, methods=['get'])
     def otros_filtros(self, request):
         """
         Filtra piezas por estado.
@@ -281,6 +281,26 @@ class PedidoViewSet(viewsets.ModelViewSet):
     #     cliente = pedido.cliente
     #     # Intentar asignar el descuento de fidelidad si corresponde
     #     asignar_descuento_fidelidad(cliente)
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def filtrar_pedidosCliente(self, request):
+        """
+        Filtra pedidos por id, estado, fecha.
+        GET /api/v1/pedido/filtrar_pedidosCliente/?id=1
+        """
+        pedidos = Pedido.objects.all()
+        pedido_id = request.query_params.get('id')
+
+        if pedido_id:
+            pedidos = pedidos.filter(id=pedido_id)
+
+        serializer = PedidoSerializer(pedidos, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
+
+
+
 
     @action(detail=True, methods=['get'])
     def factura_cliente(self, request, pk=None):
