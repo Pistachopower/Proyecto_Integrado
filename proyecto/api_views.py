@@ -231,11 +231,19 @@ class PiezaViewSet(viewsets.ModelViewSet):
 #Factura cliente
 from django.http import HttpResponse
 from reportlab.pdfgen import canvas
+import os
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.lib.units import mm
+from reportlab.platypus import Table, TableStyle
+from reportlab.lib.utils import ImageReader
+
 class PedidoViewSet(viewsets.ModelViewSet):
     """
-            PATCH /api/v1/pedido/{id}/cambiar_estado_vendedor/
-            GET /api/v1/pedido/{id}/factura_cliente/
-            Body: {"estado": 2}
+    PATCH /api/v1/pedido/{id}/cambiar_estado_vendedor/
+    Body: {"estado": 2}
+    
+    GET /api/v1/pedido/{id}/factura_cliente/
     """
     queryset = Pedido.objects.all()
     serializer_class = PedidoSerializer
@@ -278,55 +286,90 @@ class PedidoViewSet(viewsets.ModelViewSet):
     def factura_cliente(self, request, pk=None):
         """
         Genera y descarga una factura PDF profesional para el pedido.
-        """
-        import os
-        from reportlab.lib.pagesizes import A4
-        from reportlab.lib import colors
-        from reportlab.lib.units import mm
-        from reportlab.platypus import Table, TableStyle
-        from reportlab.lib.utils import ImageReader
 
+        GET /api/v1/pedido/{id}/factura_cliente/
+        """
+        #Obtenemos el id del pedido. Obtiene el objeto pedido
         pedido = self.get_object()
+
         if pedido.estado not in [Pedido.PAGADO, Pedido.ENVIADO, Pedido.ENTREGADO]:
             return Response({'error': 'La factura solo está disponible para pedidos pagados.'}, status=403)
 
+        #Crea objeto HttpResponse con el tipo de contenido PDF y el nombre del archivo
         response = HttpResponse(content_type='application/pdf')
+
+        # configura la cabecera HTTP Content-Disposition de la respuesta para indicar al navegador que el contenido debe descargarse como un archivo adjunto
         response['Content-Disposition'] = f'attachment; filename="factura_pedido_{pedido.id}.pdf"'
         
+        #Aquí se crea un objeto canvas de ReportLab, que permite dibujar y generar el contenido del PDF. 
+        # Se le indica que el PDF se escribirá directamente en la respuesta HTTP (response) y que el 
+        # tamaño de la página será A4
         p = canvas.Canvas(response, pagesize=A4)
+        
+        #Definimos el tamaño de la página en formato A4
         width, height = A4
+
+        #Hacemos el cálculo con la constante mm 
+        #30 × 2.83465= 85.04 puntos: definir el margen a la izquierda
         margen_izq = 30 * mm
+
+        #30 × 2.83465= 85.04 puntos: definir el margen superior
         margen_sup = height - 30 * mm
+
+        #establece la posición vertical inicial (coordenada Y) desde donde se empezará a dibujar 
+        # el contenido en el PDF.
         y = margen_sup
 
         # --- Cabecera: Logo y datos empresa ---
+
+        #Obtenemos la ruta absoluta del logo de la empresa. /home/nelson/Documentos/Proyecto_Integrado/media/logo.png
         logo_path = os.path.join(settings.BASE_DIR, 'media/logo.png')
-        try:
-            logo = ImageReader(logo_path)
-            p.drawImage(logo, margen_izq, y-10*mm, width=40*mm, height=20*mm, mask='auto')
-        except Exception:
-            pass
-        # Datos empresa (ajusta a tus datos reales)
+        
+        #ImageReader abre el archivo de imagen directamente desde el disco y lo convierte en un objeto que ReportLab puede usar para dibujar la imagen en el PDF
+        logo = ImageReader(logo_path)
+        
+        #logo: es el objeto de imagen cargado previamente (con ImageReader).
+        #margen_izq: posición X (horizontal) donde empieza la imagen (margen izquierdo).
+        #y-10*mm: posición Y (vertical) desde arriba, bajando 10 mm desde la coordenada y.
+        #width=40*mm: ancho de la imagen (40 milímetros).
+        #height=20*mm: alto de la imagen (20 milímetros).
+        #mask='auto': hace transparente el fondo blanco de la imagen si es posible.
+        p.drawImage(logo, margen_izq, y-10*mm, width=40*mm, height=20*mm, mask='auto')
+        
+
+        # Datos empresa
+        #Esto posiciona el texto de la empresa (nombre, dirección, etc.) a la derecha del logo, 
+        # dejando un espacio de 50 mm desde el margen izquierdo. Así, el texto no se superpone 
+        # con el logo y queda alineado de forma profesional en la cabecera del PDF.
         empresa_x = margen_izq + 50*mm
+
+        #Configuracion de tipo de letra y tamaño 
         p.setFont("Helvetica-Bold", 12)
-        p.drawString(empresa_x, y, "Mi Empresa S.L.")
+
+        #Pinta nombre empresa con las medidas definidas en empresa_x y y.
+        p.drawString(empresa_x, y, "Motor Part Express S.L.")
+        
+        #Cambiamos el tamaño y tipo de letra para los datos adicionales de la empresa
         p.setFont("Helvetica", 9)
         p.drawString(empresa_x, y-12, "CIF: B12345678")
         p.drawString(empresa_x, y-24, "Calle Ejemplo 123, 41000 Sevilla")
         p.drawString(empresa_x, y-36, "Tel: 954 000 000 | info@miempresa.com")
 
+        #Bajamos la coordenada Y para dejar espacio entre la cabecera y el resto del contenido
         y -= 45
+        
         # Línea separadora
+        #Dibuja linea en gris debajo de la cabecera para separar visualmente la información de la empresa del resto del contenido.
         p.setStrokeColor(colors.grey)
-        p.setLineWidth(0.5)
+        p.setLineWidth(0.9)
         p.line(margen_izq, y, width-margen_izq, y)
         y -= 15
 
-        # --- Datos de la factura y cliente ---
+        # # --- Datos de la factura y cliente ---
         p.setFont("Helvetica-Bold", 14)
-        p.drawString(margen_izq, y, f"Factura N.º {pedido.id}")
+        p.drawString(margen_izq, y, f"Número de Pedido: {pedido.id}")
         p.setFont("Helvetica", 10)
-        p.drawRightString(width - margen_izq, y, f"Fecha: {pedido.fecha_pedido}")
+        p.drawRightString(width - margen_izq, y, f"Fecha del pedido: {pedido.fecha_pedido}")
         y -= 18
         p.drawString(margen_izq, y, f"Cliente: {pedido.cliente.usuario.first_name} {pedido.cliente.usuario.last_name}")
         y -= 15
@@ -335,18 +378,22 @@ class PedidoViewSet(viewsets.ModelViewSet):
         p.drawString(margen_izq, y, f"Dirección: {pedido.direccion_envio}")
         y -= 32
 
-        # --- Tabla de líneas de pedido ---
+        # # --- Tabla de líneas de pedido ---
+        #Definimos la cabecera de la tabla de productos para la factura PDF.
         data = [["Producto", "Cantidad", "Precio Unitario", "Subtotal"]]
+
+        #Con la relacion inversa de lineas_pedido a pedido, obtenemos todas las líneas de pedido asociadas al pedido actual y las recorremos para añadirlas a la tabla.
         for linea in pedido.lineas_pedido.all():
             data.append([
                 str(linea.pieza.nombre),
                 str(linea.cantidad),
-                f"{linea.precio_unitario:.2f} €",
+                f"{linea.precio_unitario:.2f} €", #Formateamos el precio unitario con dos decimales y el símbolo de euro
                 f"{linea.subtotal:.2f} €"
             ])
-        # Añadir total
+        # # Añadir total
         data.append(["", "", "TOTAL:", f"{pedido.total:.2f} €"])
 
+        #Estilo de la tabla para la factura PDF. Define colores, alineación, fuentes, bordes, etc. para que la tabla tenga un aspecto profesional y sea fácil de leer.
         table = Table(data, colWidths=[70*mm, 30*mm, 35*mm, 35*mm])
         style = TableStyle([
             ('BACKGROUND', (0,0), (-1,0), colors.lightgrey),
@@ -366,16 +413,23 @@ class PedidoViewSet(viewsets.ModelViewSet):
         ])
         table.setStyle(style)
         table.wrapOn(p, width, height)
+
+        #Pintamos los datos de la tabla en el PDF, comenzando desde la posición definida por
+        #  margen_izq y y-15*len(data) para dejar espacio entre las filas. Luego actualizamos 
+        # la coordenada Y para dejar espacio debajo de la tabla.
         table.drawOn(p, margen_izq, y-15*len(data))
         y -= 15*len(data) + 40
 
-        # --- Pie de página ---
+        # # --- Pie de página ---
         p.setFont("Helvetica-Oblique", 9)
-        p.setFillColor(colors.grey)
+        p.setFillColor(colors.black)
         p.drawString(margen_izq, 30, "Gracias por su compra. Para cualquier consulta, contacte con nosotros.")
         p.setFillColor(colors.black)
 
+        #Finalizamos el PDF
         p.showPage()
+        
+        #Guarda el PDF para que se pueda descargar o enviar en la respuesta HTTP
         p.save()
         return response
 
