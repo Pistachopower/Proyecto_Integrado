@@ -317,18 +317,16 @@ class PedidoViewSet(viewsets.ModelViewSet):
         GET /api/v1/pedido/filtrar_pedidosVendedor/?vendedor_id=1&id=1&nombre_cliente=Juan&monto=100.00&fecha=2026-02-19
         """
         pedidos = Pedido.objects.all()
-        vendedor_id = request.query_params.get('vendedor_id')
         pedido_id = request.query_params.get('id')
         nombre_cliente = request.query_params.get('nombre_cliente')
         monto = request.query_params.get('monto')
         fecha = request.query_params.get('fecha')
 
-        if vendedor_id:
-            pedidos = pedidos.filter(vendedor_id=vendedor_id)
         if pedido_id:
             pedidos = pedidos.filter(id=pedido_id)
         if nombre_cliente:
             pedidos = pedidos.filter(cliente__usuario__first_name__icontains=nombre_cliente)
+            #piezas = piezas.filter(nombre__icontains=busqueda)
         if monto:
             pedidos = pedidos.filter(total=monto)
         if fecha:
@@ -336,7 +334,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
         pedidos = pedidos.order_by('id')
         
-        serializer = PedidoSerializer(pedidos, many=True, context={'request': request})
+        serializer = PedidoSimpleSerializer(pedidos, many=True, context={'request': request})
         return Response(serializer.data)
 
 
