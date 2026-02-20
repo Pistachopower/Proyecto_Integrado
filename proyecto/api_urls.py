@@ -1,5 +1,6 @@
 from django.urls import path, include
 from .api_views import *
+from .api_views import ContactoVendedorAPIView
 from rest_framework.routers import DefaultRouter 
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .api_views import PasswordResetRequestView
@@ -74,6 +75,7 @@ urlpatterns = [
     path('password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),
     path('auth/password-reset/confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 
-
+    # Endpoint para contacto vendedor
+    path('contacto-vendedor/', ContactoVendedorAPIView.as_view(), name='contacto-vendedor'),
 
 ]

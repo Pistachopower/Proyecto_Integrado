@@ -2778,3 +2778,50 @@ class PasswordResetConfirmView(APIView):
             
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+#######################################################################
+# ==================== Contacto con vendedor ====================
+#######################################################################
+from django.core.mail import send_mail
+class ContactoVendedorAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        """
+        Endpoint para que los clientes puedan enviar un mensaje de contacto al vendedor.
+        Post /api/v1/contacto-vendedor/
+        {
+            "nombre": "Juan Pérez",
+            "email": "juan.perez@example.com",
+            "numero_telefono": "123456789",
+            "mensaje": "Estoy interesado en uno de tus productos, ¿podrías darme más información?"
+        }   
+
+        """
+        serializer = ContactoVendedorSerializer(data=request.data)
+        
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        datos = serializer.validated_data
+        nombre = datos['nombre']
+        email = datos['email']
+        numero_telefono = datos['numero_telefono']
+        asunto = f"Nuevo mensaje de contacto de {nombre}"
+        mensaje = f"Nombre: {nombre}\nEmail: {email}\nNúmero de teléfono: {numero_telefono}\n\nMensaje:\n{datos['mensaje']}"
+
+        try:
+            #send_mail es una función de Django que envía un correo electrónico. 
+            send_mail(
+                asunto,
+                mensaje,
+                None,  # Usa DEFAULT_FROM_EMAIL
+                [settings.EMAIL_HOST_USER],  # Envía el correo al email del vendedor (definido en settings.EMAIL_HOST_USER)
+                fail_silently=False, #Si ocurre un error al enviar el correo, lanzará una excepción (útil para detectar problemas en desarrollo).
+            )
+            return Response({'mensaje': 'Mensaje enviado correctamente.'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(e)
+            return Response({'error': f'Error al enviar el correo: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

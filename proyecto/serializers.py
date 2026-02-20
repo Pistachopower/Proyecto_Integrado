@@ -835,3 +835,14 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     uid = serializers.CharField()
     token = serializers.CharField()
     new_password = serializers.CharField(min_length=8)
+
+
+# ============================================================
+# CONTACTO VENDEDOR
+# ============================================================
+class ContactoVendedorSerializer(serializers.Serializer):
+    nombre = serializers.CharField(max_length=100)
+    email = serializers.EmailField(validators=[EmailValidator()])
+    numero_telefono = serializers.CharField(max_length=20, required=True, allow_blank=False)
+    asunto = serializers.CharField(max_length=200)
+    mensaje = serializers.CharField(max_length=2000)
