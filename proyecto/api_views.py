@@ -758,6 +758,7 @@ class DevolucionVendedorViewSet(viewsets.ModelViewSet):
             return Response({'error': 'Solo vendedores pueden aprobar devoluciones'}, status=403)
 
         try:
+            #Obtenemos la devolución por su ID (pk) para aprobarla. Si no existe, se devuelve un error 404.
             devolucion = self.get_queryset().get(id=pk)
         except Devolucion.DoesNotExist:
             return Response({'error': 'Devolución no encontrada'}, status=404)
@@ -988,17 +989,21 @@ class ValoracionViewSet(viewsets.ModelViewSet):
 
         # Paso 4: Verificar que el cliente ha comprado esa pieza
         la_ha_comprado = LineaPedido.objects.filter(pedido__cliente=cliente, pieza=pieza).exists()
+        
         if not la_ha_comprado:
             return Response({'error': 'Solo puedes valorar piezas que has comprado.'}, status=403)
 
         # Paso 5: Verificar si ya ha comentado esta pieza
         ya_comento = Valoracion.objects.filter(cliente=cliente, pieza=pieza).exists()
+        
         if ya_comento:
             return Response({'error': 'Ya has comentado esta pieza.'}, status=400)
 
         # Paso 6: Validar los datos enviados por el usuario
         datos = request.data  # Datos del comentario enviados por el frontend
-        serializer = self.get_serializer(data=datos)
+        
+        serializer = self.get_serializer(data=datos) #self.get_serializer() devuelve una instancia de ValoracionSerialize
+        
         if not serializer.is_valid():
             # Si hay errores de validación, los devolvemos
             return Response(serializer.errors, status=400)
@@ -1064,6 +1069,108 @@ class ValoracionViewSet(viewsets.ModelViewSet):
             'total_valoraciones': valoraciones.count(),
             'valoraciones': serializer.data
         })
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
+    def pendientes(self, request):
+        """
+        Lista todas las valoraciones pendientes de aprobación (aprobado=False).
+        Solo accesible para empleados o administradores.
+
+        GET /api/v1/valoracion/pendientes/
+        """
+        #Obtenemos el usuario autenticado
+        usuario = request.user
+
+        #Definimos los roles permitidos para acceder a este endpoint
+        roles_permitidos = [Usuario.EMPLEADO, Usuario.ADMINISTRADOR]
+
+        #Verificamos si el usuario tiene un rol permitido
+        # Usamos getattr para evitar errores si el atributo no existe
+        if not getattr(usuario, 'rol', None) in roles_permitidos:
+            return Response({'error': 'No tienes permisos para ver valoraciones pendientes.'}, status=403)
+
+        #Obtenemos todas las valoraciones pendientes de aprobación, ordenadas por fecha descendente
+        valoraciones = Valoracion.objects.filter(aprobado=False).order_by('-fecha_valoracion')
+
+        valoraciones_data = []  # Lista donde guardaremos cada valoración con su imagen
+
+        #Recorremos cada valoración pendiente
+        for valoracion in valoraciones:
+            pieza = valoracion.pieza  # Obtener la pieza asociada a la valoración
+
+            # 6. Buscar la imagen principal de la pieza
+            imagen_principal = None
+            imagen_obj = ImagenPieza.objects.filter(pieza=pieza).first()  # Buscar imagen en ImagenPieza
+            
+            # Simplificado: Si imagen_obj existe y tiene url_imagen, usarla
+            if imagen_obj and getattr(imagen_obj, 'url_imagen', None):
+                # Si existe una imagen en ImagenPieza, uso esa
+                imagen_principal = request.build_absolute_uri(imagen_obj.url_imagen.url)
+            
+
+
+            #Serializar la valoración y agregar la URL de la imagen
+            valoracion_serializada = ValoracionSerializer(valoracion, context={'request': request}).data
+            
+            valoracion_serializada['imagen_pieza'] = imagen_principal  # Añado campo imagen_pieza
+            
+            valoraciones_data.append(valoracion_serializada)
+
+        #Calculamos el total de valoraciones pendientes
+        total_pendientes = valoraciones.count()
+
+        #Construimos la respuesta final
+        respuesta = {
+            'total_pendientes': total_pendientes,
+            'valoraciones': valoraciones_data
+        }
+
+        #Devolvemos la respuesta al frontend
+        return Response(respuesta)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def aprobar(self, request, pk=None):
+        """
+        Aprueba una valoración (aprobado=True).
+        Solo accesible para empleados o administradores.
+
+        POST /api/v1/valoracion/{id}/aprobar/
+        """
+        usuario = request.user
+        roles_permitidos = [Usuario.EMPLEADO, Usuario.ADMINISTRADOR]
+        # Usar getattr para obtener el rol de forma segura
+        if not getattr(usuario, 'rol', None) in roles_permitidos:
+            return Response({'error': 'No tienes permisos para aprobar valoraciones.'}, status=403)
+
+        valoracion = self.get_object()
+        valoracion.aprobado = True
+        valoracion.save()
+
+        mensaje = 'Valoración aprobada correctamente.'
+        respuesta = {'mensaje': mensaje, 'valoracion_id': valoracion.id, 'aprobado': valoracion.aprobado}
+        return Response(respuesta)
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def rechazar(self, request, pk=None):
+        """
+        Rechaza (elimina) una valoración pendiente.
+        Solo accesible para empleados o administradores.
+
+        POST /api/v1/valoracion/{id}/rechazar/
+        """
+        usuario = request.user
+        roles_permitidos = [Usuario.EMPLEADO, Usuario.ADMINISTRADOR]
+        
+        if not getattr(usuario, 'rol', None) in roles_permitidos:
+            return Response({'error': 'No tienes permisos para rechazar valoraciones.'}, status=403)
+
+        valoracion = self.get_object()
+        valoracion_id = valoracion.id
+        valoracion.delete()
+
+        mensaje = 'Valoración rechazada y eliminada correctamente.'
+        respuesta = {'mensaje': mensaje, 'valoracion_id': valoracion_id}
+        return Response(respuesta)
 
     #FUNCIONA
     # @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])

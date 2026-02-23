@@ -449,6 +449,7 @@ class Valoracion(models.Model):
     titulo = models.CharField(max_length=100)
     comentario = models.TextField()
     fecha_valoracion = models.DateField()
+    aprobado = models.BooleanField(default=False) #Para aprobar o rechazar valoraciones desde el dashboard del vendedor
 
 
 class ListaDeseos(models.Model):
