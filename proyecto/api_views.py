@@ -25,8 +25,14 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
 import paypalrestsdk
+from dotenv import load_dotenv
+import os
+import requests
 
-
+# Cargar variables de entorno
+load_dotenv()
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+GEMINI_API_URL = f'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}'
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -2932,3 +2938,71 @@ class ContactoVendedorAPIView(APIView):
         except Exception as e:
             print(e)
             return Response({'error': f'Error al enviar el correo: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+#######################################################################
+# ==================== Chatbot ==================== 
+#######################################################################
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+import os
+
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def chatbot_view(request):
+    """
+    Endpoint para el chatbot.
+    1. Recibe una pregunta del usuario (POST, campo 'pregunta').
+    2. Lee el documento FAQ (Markdown) con la información de referencia.
+    3. Arma el prompt para el LLM (aquí solo lo mostramos, luego se enviará a Gemini).
+    4. (Futuro) Llama a Gemini y devuelve la respuesta real.
+    """
+    # 1. Obtener la pregunta del usuario
+    pregunta = request.data.get('pregunta', '').strip()
+    if not pregunta:
+        return Response({'error': 'No se recibió ninguna pregunta.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # 2. Leer el documento FAQ
+    faq_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'faq_motorpartexpress.md')
+    try:
+        with open(faq_path, 'r', encoding='utf-8') as f:
+            faq_contenido = f.read()
+    except Exception as e:
+        return Response({'error': f'No se pudo leer el documento FAQ: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # 3. Armar el prompt
+    prompt = (
+        'Eres el asistente de Motor Part Express. Usa solo la información del siguiente documento para responder. '
+        'Si no encuentras la respuesta, indica que el usuario debe contactar a un vendedor o usar el formulario de contacto.\n\n'
+        f'DOCUMENTO DE REFERENCIA:\n{faq_contenido}\n\n'
+        f'PREGUNTA DEL USUARIO: {pregunta}\n\n'
+        'RESPUESTA:'
+    )
+
+    # 4. Enviar el prompt a Gemini
+    headers = {'Content-Type': 'application/json'}
+    data = {
+        "contents": [
+            {"parts": [{"text": prompt}]}
+        ]
+    }
+    try:
+        response = requests.post(GEMINI_API_URL, headers=headers, json=data, timeout=20)
+        response.raise_for_status()
+        gemini_data = response.json()
+        # Extraer respuesta de forma robusta
+        respuesta_llm = ""
+        try:
+            respuesta_llm = gemini_data['candidates'][0]['content']['parts'][0].get('text', '')
+            print("Respuesta Gemini:", respuesta_llm)
+        except Exception:
+            respuesta_llm = str(gemini_data)
+    except Exception as e:
+        return Response({'error': f'Error al consultar Gemini: {str(e)}'}, status=500)
+
+    # 5. Devolver la respuesta al usuario
+    return Response({'respuesta': respuesta_llm})

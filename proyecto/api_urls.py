@@ -78,4 +78,7 @@ urlpatterns = [
     # Endpoint para contacto vendedor
     path('contacto-vendedor/', ContactoVendedorAPIView.as_view(), name='contacto-vendedor'),
 
+
+    # Endpoint para el chatbot
+    path('chatbot/', chatbot_view, name='chatbot'),
 ]
