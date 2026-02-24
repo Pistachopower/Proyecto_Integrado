@@ -80,5 +80,6 @@ urlpatterns = [
 
 
     # Endpoint para el chatbot
-    path('chatbot/', chatbot_view, name='chatbot'),
+    #path('chatbot/', chatbot_view, name='chatbot'),
+    path('chatbot/', ChatbotView.as_view(), name='chatbot'),
 ]

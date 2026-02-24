@@ -29,10 +29,7 @@ from dotenv import load_dotenv
 import os
 import requests
 
-# Cargar variables de entorno
-load_dotenv()
-GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
-GEMINI_API_URL = f'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY}'
+
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
@@ -2946,63 +2943,209 @@ class ContactoVendedorAPIView(APIView):
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-import os
+#import os
 
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import permission_classes
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def chatbot_view(request):
-    """
-    Endpoint para el chatbot.
-    1. Recibe una pregunta del usuario (POST, campo 'pregunta').
-    2. Lee el documento FAQ (Markdown) con la información de referencia.
-    3. Arma el prompt para el LLM (aquí solo lo mostramos, luego se enviará a Gemini).
-    4. (Futuro) Llama a Gemini y devuelve la respuesta real.
-    """
-    # 1. Obtener la pregunta del usuario
-    pregunta = request.data.get('pregunta', '').strip()
-    if not pregunta:
-        return Response({'error': 'No se recibió ninguna pregunta.'}, status=status.HTTP_400_BAD_REQUEST)
+# Cargar variables de entorno
+load_dotenv()
+#GEMINI_API_KEY_1 = os.getenv('GEMINI_API_KEY_1')
+#GEMINI_API_KEY_2 = os.getenv('GEMINI_API_KEY_2')
+#
+#GEMINI_API_URL_1 = f'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY_1}'
+#GEMINI_API_URL_2 = f'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent?key={GEMINI_API_KEY_2}'
 
-    # 2. Leer el documento FAQ
-    faq_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'faq_motorpartexpress.md')
-    try:
-        with open(faq_path, 'r', encoding='utf-8') as f:
-            faq_contenido = f.read()
-    except Exception as e:
-        return Response({'error': f'No se pudo leer el documento FAQ: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+# @api_view(['POST'])
+# @permission_classes([AllowAny])
+# def chatbot_view(request):
+#     """
+#     Endpoint para el chatbot.
+#     1. Recibe una pregunta del usuario (POST, campo 'pregunta').
+#     2. Lee el documento FAQ (Markdown) con la información de referencia.
+#     3. Arma el prompt para el LLM (aquí solo lo mostramos, luego se enviará a Gemini).
+#     4. Llama a Gemini y devuelve la respuesta real.
 
-    # 3. Armar el prompt
-    prompt = (
-        'Eres el asistente de Motor Part Express. Usa solo la información del siguiente documento para responder. '
-        'Si no encuentras la respuesta, indica que el usuario debe contactar a un vendedor o usar el formulario de contacto.\n\n'
-        f'DOCUMENTO DE REFERENCIA:\n{faq_contenido}\n\n'
-        f'PREGUNTA DEL USUARIO: {pregunta}\n\n'
-        'RESPUESTA:'
-    )
+#     POST /api/v1/chatbot/
+#     {
+#         "pregunta": "¿Cuál es el horario de atención?"
+#     }
 
-    # 4. Enviar el prompt a Gemini
-    headers = {'Content-Type': 'application/json'}
-    data = {
-        "contents": [
-            {"parts": [{"text": prompt}]}
-        ]
-    }
-    try:
-        response = requests.post(GEMINI_API_URL, headers=headers, json=data, timeout=20)
-        response.raise_for_status()
-        gemini_data = response.json()
-        # Extraer respuesta de forma robusta
-        respuesta_llm = ""
+#     Respuesta:
+#     {
+#         "respuesta": "Nuestro horario de atención es de lunes a viernes de 9:00
+#         a 18:00 y sábados de 10:00 a 14:00."
+#     }
+#     """
+#     #Busca la clave pregunta, en caso contrario muestra cadena vacia
+#     #.strip() para eliminar espacios al inicio y al final de la pregunta
+#     pregunta = request.data.get('pregunta', '').strip()
+    
+#     if not pregunta:
+#         return Response({'error': 'No se recibió ninguna pregunta.'}, status=status.HTTP_400_BAD_REQUEST)
+
+#     # 2. Leer el documento FAQ
+#     #faq_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'faq_motorpartexpress.md')
+    
+#     # Obtiene la ruta absoluta de la carpeta actual (donde está este archivo)
+#     base_dir = os.path.dirname(__file__)
+
+#     # Une la ruta base con la carpeta 'chatbot' y el nombre del archivo FAQ
+#     faq_path = os.path.join(base_dir, 'chatbot', 'faq_motorpartexpress.md')
+
+
+#     try:
+#         #Abrimos el archivo FAQ en modo lectura ('r') y con codificación UTF-8 para asegurarnos de que se lean correctamente los caracteres especiales.
+#         with open(faq_path, 'r', encoding='utf-8') as f: #f es una variable que representa el archivo abierto, y se utiliza para leer su contenido.
+#             faq_contenido = f.read() #Lee contenido, convierte a string y guarda contenido en variable faq_contenido
+#     except Exception as e:
+#         return Response({'error': f'No se pudo leer el documento FAQ: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+#     # 3. Armar el prompt
+#     instruccion_extra = (
+#         'Si ya saludaste antes, no repitas el saludo en las siguientes respuestas. '
+#         'Responde directamente a la pregunta si ya hubo interacción previa.'
+#     )
+#     prompt = (
+#         'Eres el asistente de Motor Part Express. Debes ser amigable. Recuerda que eres un experto en piezas de coches.'
+#         ' Usa solo la información del siguiente documento para responder. '
+#         'Si no encuentras la respuesta, indica que el usuario debe contactar a un vendedor o usar el formulario de contacto.\n\n'
+#         f'{instruccion_extra}\n'
+#         f'DOCUMENTO DE REFERENCIA:\n{faq_contenido}\n\n'
+#         f'PREGUNTA DEL USUARIO: {pregunta}\n\n'
+#         'RESPUESTA:'
+#     )
+
+#     # 4. Enviar el prompt a Gemini
+#     headers = {'Content-Type': 'application/json'} #Encabezados HTTP para indicar que el cuerpo de la solicitud es JSON
+    
+#     #Cuerpo o payload tipo post para enviar a Gemini, con el prompt dentro de la estructura que Gemini espera (en contents -> parts -> text)
+#     data = {
+#         "contents": [
+#             {"parts": [{"text": prompt}]}
+#         ]
+#     }
+
+#     try:
+#         #GEMINI_API_URL_1: Es la URL del endpoint de la API de Gemini a la que se envía la solicitud.
+#         response = requests.post(GEMINI_API_URL_1, headers=headers, json=data, timeout=20)
+        
+#         response.raise_for_status() #verifica si la respuesta HTTP de la API de Gemini fue exitosa
+        
+#         gemini_data = response.json() #Convierte la respuesta de Gemini de formato JSON a un diccionario de Python para poder trabajar con los datos devueltos por Gemini.
+        
+#         # Extraer respuesta de forma robusta
+#         respuesta_llm = ""
+
+#         try:
+#         #gemini_data es un diccionario con la respuesta completa de Gemini (la API de Google).
+#         #['candidates'][0] accede al primer candidato de respuesta que devuelve Gemini (puede haber varios, pero normalmente solo usas el primero).
+#         #['content']['parts'][0] entra al contenido de ese candidato y toma la primera parte de la respuesta.
+#         #.get('text', '') busca el texto de la respuesta generada por Gemini. Si no lo encuentra, devuelve una cadena vacía.
+#             respuesta_llm = gemini_data['candidates'][0]['content']['parts'][0].get('text', '')
+#             print("Respuesta Gemini:", respuesta_llm)
+#         except Exception:
+#             respuesta_llm = str(gemini_data)
+    
+#     except Exception as e:
+#         return Response({'error': f'Error al consultar Gemini: {str(e)}'}, status=500)
+
+#     # 5. Devolver la respuesta al usuario
+#     return Response({'respuesta': respuesta_llm})
+
+
+import json
+
+class ChatbotView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        # Obtener el mensaje del usuario y el historial de la conversación
+        user_message = request.data.get('message', '')
+        conversation_history = request.data.get('history', [])
+
+        # Construir la ruta absoluta al archivo FAQ
+        # Ajustar la ruta para buscar en /proyecto/chatbot/
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        faq_path = os.path.join(base_dir, 'chatbot', 'faq_motorpartexpress.md')
+        
+        # Leer el contenido del archivo FAQ
         try:
-            respuesta_llm = gemini_data['candidates'][0]['content']['parts'][0].get('text', '')
-            print("Respuesta Gemini:", respuesta_llm)
-        except Exception:
-            respuesta_llm = str(gemini_data)
-    except Exception as e:
-        return Response({'error': f'Error al consultar Gemini: {str(e)}'}, status=500)
+            with open(faq_path, 'r', encoding='utf-8') as f:
+                faq_content = f.read()
+        except Exception as e:
+            return Response({'error': f'Error al leer el archivo FAQ: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # 5. Devolver la respuesta al usuario
-    return Response({'respuesta': respuesta_llm})
+        # Construir el prompt para Gemini
+        prompt = (
+            "Eres un chatbot experto en atención al cliente de MotorPartExpress. "
+            "Responde de forma profesional, útil y sin repetir saludos como 'Hola' o 'Bienvenido' en cada respuesta. "
+            "Utiliza la siguiente información de la FAQ para ayudar al usuario.\n\n"
+            f"FAQ:\n{faq_content}\n\n"
+            "Historial de la conversación:\n" +
+            "\n".join([f"Usuario: {msg['user']}\nBot: {msg['bot']}" for msg in conversation_history]) +
+            f"\n\nUsuario: {user_message}\nBot:"
+        )
+
+        # Obtener las claves de API de Gemini desde variables de entorno
+        api_key_1 = os.getenv('GEMINI_API_KEY_1')
+        api_key_2 = os.getenv('GEMINI_API_KEY_2')
+        url = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash-lite:generateContent'
+
+        headers = {'Content-Type': 'application/json'}
+        payload = {
+            "contents": [
+                {"parts": [{"text": prompt}]}
+            ]
+        }
+
+        def llamada_gemini(api_key):
+            """
+            Realiza una petición a la API de Gemini con la clave proporcionada.
+            Imprime el status code y el texto de la respuesta para depuración.
+            """
+            response = requests.post(f"{url}?key={api_key}", headers=headers, data=json.dumps(payload))
+            #print(f"[Gemini] Status: {response.status_code}")
+            #print(f"[Gemini] Body: {response.text}")
+            return response
+
+        # --- Fallback automático entre dos claves API ---
+        response = None
+        error_messages = []
+
+        # Intentar con la primera clave
+        if api_key_1:
+            response = llamada_gemini(api_key_1)
+            
+            # Si hay error de cuota o rate limit, guardar el error y probar la segunda clave
+            if response.status_code == 429 or (response.status_code == 400 and 'quota' in response.text.lower()):
+                error_messages.append(f"Clave 1: {response.status_code} {response.text}")
+                
+                if api_key_2:
+                    response = llamada_gemini(api_key_2)
+            # Si no hay error, continuar
+        
+        elif api_key_2:
+            # Si no hay clave 1, probar directamente con la clave 2
+            response = llamada_gemini(api_key_2)
+
+        # Procesar la respuesta
+        if response and response.status_code == 200:
+            data = response.json()
+            try:
+                mensaje_bot = data['candidates'][0]['content']['parts'][0]['text']
+            
+            except Exception:
+                mensaje_bot = "Lo siento, no pude procesar la respuesta de Gemini."
+            
+            return Response({'response': mensaje_bot})
+        
+        else:
+            # Si ambas claves fallan, mostrar los errores acumulados
+            if error_messages:
+                error_detail = " | ".join(error_messages)
+            elif response:
+                error_detail = f"Error de Gemini: {response.status_code} {response.text}"
+            else:
+                error_detail = "No se pudo conectar a Gemini."
+            return Response({'error': error_detail}, status=status.HTTP_502_BAD_GATEWAY)

@@ -1,7 +1,7 @@
 # Preguntas Frecuentes Motor Part Express
 
 ## ¿Qué piezas venden?
-Vendemos piezas originales y genéricas para coches de todas las marcas.
+Vendemos piezas originales, de segunda mano y reconstruidas para coches de todas las marcas.
 
 ## ¿Cómo puedo hacer un pedido?
 Puedes hacer un pedido desde nuestra web creado una cuenta o escribiendo en el formulario de contacto.
