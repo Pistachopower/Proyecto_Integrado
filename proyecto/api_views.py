@@ -3061,11 +3061,9 @@ class ChatbotView(APIView):
 
     def post(self, request):
         # Obtener el mensaje del usuario y el historial de la conversación
-        user_message = request.data.get('message', '')
-        conversation_history = request.data.get('history', [])
+        mensajeUsuario = request.data.get('mensaje', '')
+        historialConversacion = request.data.get('historial', [])
 
-        # Construir la ruta absoluta al archivo FAQ
-        # Ajustar la ruta para buscar en /proyecto/chatbot/
         base_dir = os.path.dirname(os.path.abspath(__file__))
         faq_path = os.path.join(base_dir, 'chatbot', 'faq_motorpartexpress.md')
         
@@ -3073,18 +3071,25 @@ class ChatbotView(APIView):
         try:
             with open(faq_path, 'r', encoding='utf-8') as f:
                 faq_content = f.read()
+        
         except Exception as e:
             return Response({'error': f'Error al leer el archivo FAQ: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # Construir el prompt para Gemini
+     
+        historial_formateado = [] #variable para enviar contexto de conversación al modelo
+        for msj in historialConversacion:
+            usuario = msj.get('user', '')
+            bot = msj.get('bot', '')
+            historial_formateado.append(f"Usuario: {usuario}\nBot: {bot}")
+
         prompt = (
             "Eres un chatbot experto en atención al cliente de MotorPartExpress. "
             "Responde de forma profesional, útil y sin repetir saludos como 'Hola' o 'Bienvenido' en cada respuesta. "
             "Utiliza la siguiente información de la FAQ para ayudar al usuario.\n\n"
             f"FAQ:\n{faq_content}\n\n"
             "Historial de la conversación:\n" +
-            "\n".join([f"Usuario: {msg['user']}\nBot: {msg['bot']}" for msg in conversation_history]) +
-            f"\n\nUsuario: {user_message}\nBot:"
+            "\n".join(historial_formateado) +
+            f"\n\nUsuario: {mensajeUsuario}\nBot:"
         )
 
         # Obtener las claves de API de Gemini desde variables de entorno
@@ -3113,7 +3118,8 @@ class ChatbotView(APIView):
         response = None
         error_messages = []
 
-        # Intentar con la primera clave
+        # Intentar con la primera clave llamando a la funcion llamada_gemini
+        #si falla una prueba con la otra y guarda el error
         if api_key_1:
             response = llamada_gemini(api_key_1)
             
