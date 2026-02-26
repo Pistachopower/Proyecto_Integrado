@@ -260,9 +260,13 @@ class PiezaViewSet(viewsets.ModelViewSet):
             try:
                 # Buscar o crear la categoría
                 categoria_nombre = row['categoria'].strip()
+               
+                # get_or_create devuelve una tupla: (objeto_categoria, creado)
+                categoria_tuple = CategoriaPieza.objects.get_or_create(nombre=categoria_nombre)[0]
                 
-                categoria= CategoriaPieza.objects.get_or_create(nombre=categoria_nombre)
+                categoria_obj = categoria_tuple  # El objeto de categoría
                 
+                # Usamos solo el objeto de categoría
                 pieza = Pieza.objects.create(
                     nombre=row['nombre'].strip(),
                     marca=row['marca'].strip(),
@@ -273,16 +277,17 @@ class PiezaViewSet(viewsets.ModelViewSet):
                     referencia=row['referencia'].strip(),
                     version=row['version'].strip(),
                     stock=int(row['stock']),
-                    categoria=categoria
+                    categoria=categoria_obj
                 )
                 piezas_creadas.append(pieza.id)
+                
             except Exception as e:
                 errores_creacion.append(f'Fila {idx+2}: {str(e)}')
 
         if errores_creacion:
-            return Response({'detail': 'Error al crear algunas piezas.', 'errores': errores_creacion}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detalle': 'Error al crear algunas piezas.', 'errores': errores_creacion}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'detail': f'{len(piezas_creadas)} piezas creadas exitosamente.', 'ids': piezas_creadas}, status=status.HTTP_201_CREATED)
+        return Response({'detalle': f'{len(piezas_creadas)} piezas creadas exitosamente.', 'ids': piezas_creadas}, status=status.HTTP_201_CREATED)
 
 
 
