@@ -846,3 +846,148 @@ class ContactoVendedorSerializer(serializers.Serializer):
     numero_telefono = serializers.CharField(max_length=20, required=True, allow_blank=False)
     asunto = serializers.CharField(max_length=200)
     mensaje = serializers.CharField(max_length=2000)
+
+
+
+
+# ============================================================
+# SERIALIZER PARA CARGA MASIVA DE PIEZAS
+# ============================================================
+
+class BulkPiezaUploadSerializer(serializers.Serializer): #Bulk: Se pone "Bulk (en lote)" en el nombre para indicar que es para carga masiva por convención
+    file = serializers.FileField()
+
+    def validate(self, data):
+        """
+        Valida que el archivo tenga columnas correctas y tipos válidos.
+        """
+        import pandas as pd
+        import pyexcel_ods
+        import os
+
+        #Obtiene el archivo subido por el usuario desde el diccionario data
+        file = data.get('file')
+
+        #Obtenemos el nombre del archivo y lo convertimos a minúsculas para facilitar la comparación de extensiones
+        filename = file.name.lower()
+
+        #Obtenemos la extensión del archivo usando os.path.splitext, que devuelve una tupla (nombre_sin_extension, extension)
+        ext = os.path.splitext(filename)[1]
+
+        # Soportar csv, xlsx, ods
+        if ext == '.csv':
+            df = pd.read_csv(file)
+        elif ext == '.xlsx':
+            df = pd.read_excel(file)
+        elif ext == '.ods':
+            try:
+                df = pd.read_excel(file, engine='odf')
+            
+            except ImportError:
+                raise serializers.ValidationError('Para archivos .ods necesitas instalar pyexcel-ods y odfpy.')
+        else:
+            raise serializers.ValidationError('Formato de archivo no soportado. Usa .csv, .xlsx o .ods')
+
+        # --- Normalización de columnas ---
+        # Convertimos todos los nombres de columna a minúsculas para evitar errores por diferencias de mayúsculas/minúsculas.
+        # Así, "Estado", "ESTADO" o "estado" serán tratados igual.
+        columnas_normalizadas = []
+        for nombre_columna in df.columns:
+            nombre_normalizado = nombre_columna.strip().lower()
+            columnas_normalizadas.append(nombre_normalizado)
+        df.columns = columnas_normalizadas
+        
+
+        # Campos requeridos (excepto imagen)
+        required_fields = [
+            'nombre', 'referencia', 'version', 'marca', 'anio',
+            'precio_base', 'descripcion', 'stock', 'estado', 'categoria'
+        ]
+
+        # Revisar columnas faltantes de forma explícita
+        missing_columns = []
+
+        for field in required_fields:
+            # Si la columna no existe en el DataFrame, la agregamos a la lista de faltantes
+            if field not in df.columns:
+                missing_columns.append(field)
+
+        if missing_columns:
+            # Si hay columnas faltantes, lanzamos un error indicando cuáles son
+            columnas = ", ".join(missing_columns)
+            raise serializers.ValidationError(f'Faltan columnas requeridas: {columnas}')
+
+        # Validar tipos y valores
+        errores = []
+        
+        #idx es el número de la fila (empezando desde 0).
+        #row es un objeto que representa los datos de esa fila (como un diccionario: row['nombre'], row['marca'], etc.).
+        for idx, fila in df.iterrows(): #Recorremos cada fila del DataFrame con iterrows(), obteniendo el índice (idx) y los datos de la fila (row)
+            
+            num_fila = idx + 2  #Para mostrar el número de fila real (considerando que la fila 1 es el encabezado)
+            
+            # nombre
+            #isinstance(fila['nombre'], str) verifica que el valor en la columna 'nombre' sea una cadena de texto.
+            #fila['nombre'].strip() elimina los espacios en blanco al inicio y al final del valor. Si después de eliminar los espacios el valor queda vacío, entonces no es válido.
+            if not isinstance(fila['nombre'], str) or not fila['nombre'].strip():
+                errores.append(f'Fila {num_fila}: nombre inválido')
+            
+            # marca
+            if not isinstance(fila['marca'], str) or not fila['marca'].strip():
+                errores.append(f'Fila {num_fila}: marca inválida')
+            # anio
+            try:
+                anio = int(fila['anio'])
+                if anio < 1900 or anio > 2100:
+                    errores.append(f'Fila {num_fila}: año fuera de rango')
+            except Exception:
+                #Errores que captura: string, float, caracteres vacio
+                errores.append(f'Fila {num_fila}: año inválido')
+            
+            # precio_base
+            try:
+                precio = float(fila['precio_base'])
+                if precio < 0:
+                    errores.append(f'Fila {num_fila}: precio_base negativo')
+            except Exception:
+                errores.append(f'Fila {num_fila}: precio_base inválido')
+            
+            # descripcion
+            if not isinstance(fila['descripcion'], str) or not fila['descripcion'].strip():
+                errores.append(f'Fila {num_fila}: descripcion inválida')
+            
+            # estado
+            try:
+                estado = int(fila['estado'])
+                if estado not in [1, 2, 3]:
+                    errores.append(f'Fila {num_fila}: estado debe ser 1, 2 o 3')
+            except Exception:
+                errores.append(f'Fila {num_fila}: estado inválido')
+            
+            # referencia
+            if not isinstance(fila['referencia'], str) or not fila['referencia'].strip():
+                errores.append(f'Fila {num_fila}: referencia inválida')
+            
+            # version
+            if not isinstance(fila['version'], str) or not fila['version'].strip():
+                errores.append(f'Fila {num_fila}: version inválida')
+            
+            # stock
+            try:
+                stock = int(fila['stock'])
+                if stock < 0:
+                    errores.append(f'Fila {num_fila}: stock negativo')
+            except Exception:
+                errores.append(f'Fila {num_fila}: stock inválido')
+            
+            # categoria
+            if not isinstance(fila['categoria'], str) or not fila['categoria'].strip():
+                errores.append(f'Fila {num_fila}: categoria inválida')
+
+        if errores:
+            raise serializers.ValidationError({'errores': errores})
+
+        #guarda el DataFrame (df) que contiene todos los datos del archivo subido (ya validados) dentro del diccionario data, que es lo que retorna el método validate del serializer
+        data['dataframe'] = df
+        
+        return data

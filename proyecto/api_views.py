@@ -190,6 +190,7 @@ class PiezaViewSet(viewsets.ModelViewSet):
         
         serializer = PiezaSerializer(piezas, many=True, context={'request': request})
         return Response(serializer.data)
+    
   
     #TODO: REVISAR Y PROBAR FUNCIONAMIENTO
     @action(detail=False, methods=['get'])
@@ -230,6 +231,61 @@ class PiezaViewSet(viewsets.ModelViewSet):
 
         serializer = PiezaSerializer(piezas, many=True, context={'request': request})
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'], url_path='bulk_upload', permission_classes=[IsAuthenticated])
+    def bulk_upload(self, request):
+        """
+        Carga masiva de piezas desde archivo (csv, xlsx, ods).
+        Solo empleados y vendedores pueden realizar esta acción.
+
+        POST /api/v1/pieza/bulk_upload/
+        """
+        user = request.user
+        # Solo empleados y vendedores
+        if not hasattr(user, 'rol') or user.rol not in [Usuario.EMPLEADO, Usuario.ADMINISTRADOR]:
+            return Response({'detail': 'Solo empleados y vendedores pueden realizar esta acción.'}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = BulkPiezaUploadSerializer(data=request.data)
+        
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        df = serializer.validated_data['dataframe']
+        
+        errores_creacion = []
+        
+        piezas_creadas = []
+        
+        for idx, row in df.iterrows():
+            try:
+                # Buscar o crear la categoría
+                categoria_nombre = row['categoria'].strip()
+                
+                categoria= CategoriaPieza.objects.get_or_create(nombre=categoria_nombre)
+                
+                pieza = Pieza.objects.create(
+                    nombre=row['nombre'].strip(),
+                    marca=row['marca'].strip(),
+                    anio=int(row['anio']),
+                    precio_base=row['precio_base'],
+                    descripcion=row['descripcion'].strip(),
+                    estado=int(row['estado']),
+                    referencia=row['referencia'].strip(),
+                    version=row['version'].strip(),
+                    stock=int(row['stock']),
+                    categoria=categoria
+                )
+                piezas_creadas.append(pieza.id)
+            except Exception as e:
+                errores_creacion.append(f'Fila {idx+2}: {str(e)}')
+
+        if errores_creacion:
+            return Response({'detail': 'Error al crear algunas piezas.', 'errores': errores_creacion}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'detail': f'{len(piezas_creadas)} piezas creadas exitosamente.', 'ids': piezas_creadas}, status=status.HTTP_201_CREATED)
+
+
+
 
 #Factura cliente
 from django.http import HttpResponse

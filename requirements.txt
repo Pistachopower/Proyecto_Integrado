@@ -21,7 +21,14 @@ gunicorn==21.2.0
 reportlab~=4.2.0
 
 
+# Soporte para carga masiva de piezas (csv, xlsx, ods)
+pandas~=2.2.1
 
+pyexcel-ods~=0.2.2
+
+openpyxl~=3.1.2
+
+odfpy~=1.4.1
 
 
 
