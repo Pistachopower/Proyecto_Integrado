@@ -17,3 +17,6 @@ Agregar productos con un csv
 
 HOY
 Necesito definir bien cuándo voy a descontar el stock, si es en finalizar (con pago Tarjeta, Cuenta Bancaria) paypal 
+
+
+Mirar bien el error del carrito cuando se pasa de favoritos al carrito

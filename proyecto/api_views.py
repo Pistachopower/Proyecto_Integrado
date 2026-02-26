@@ -239,6 +239,11 @@ class PiezaViewSet(viewsets.ModelViewSet):
         Solo empleados y vendedores pueden realizar esta acción.
 
         POST /api/v1/pieza/bulk_upload/
+
+        Body (form-data):
+
+        - file: Archivo CSV, XLSX o ODS con las piezas a cargar. Debe tener las siguientes columnas:        
+        nombre, marca, anio, precio_base, descripcion, estado, referencia, version, stock, categoria
         """
         user = request.user
         # Solo empleados y vendedores
