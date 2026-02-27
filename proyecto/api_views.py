@@ -1309,6 +1309,7 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
         except Cliente.DoesNotExist:
             return ListaDeseos.objects.none()
 
+    # Método auxiliar para obtener o crear la lista de deseos del cliente
     def get_o_crear_lista(self, cliente):
         """Obtiene o crea la lista de deseos del cliente."""
         lista, created = ListaDeseos.objects.get_or_create(
@@ -1452,11 +1453,9 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def pasar_al_carrito(self, request):
         """
-        Pasa los items de la lista de deseos al carrito.
+        Pasa los items de la lista de deseos al carrito persistente (Pedido con estado CARRITO).
         Puede pasar todos los items o solo algunos específicos.
-        
         POST /api/v1/lista_deseo/pasar_al_carrito/
-        
         Body (opcional):
         {
             "piezas_ids": [1, 2, 3],  // Si no se envía, pasa todas las piezas
@@ -1473,11 +1472,13 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
         except ListaDeseos.DoesNotExist:
             return Response({'error': 'No tienes una lista de deseos'}, status=404)
 
-        # Obtener parámetros
         piezas_ids = request.data.get('piezas_ids', None)
+        
+        #Se activa cuando el cliente quiere pasar al carrito solo algunas piezas específicas de su lista de deseos. 
+        # Si no se envía este campo, se pasan todas las piezas.
         eliminar_de_lista = request.data.get('eliminar_de_lista', False)
 
-        # Obtener items a pasar
+        # Seleccionar items a pasar
         if piezas_ids:
             items = ListaDeseosPieza.objects.filter(
                 lista_deseos=lista,
@@ -1489,47 +1490,72 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
         if not items.exists():
             return Response({'error': 'No hay piezas para agregar al carrito'}, status=400)
 
-        # Obtener carrito actual de la sesión
-        carrito = request.session.get('carrito', {})
+        # Buscar el carrito persistente (Pedido con estado CARRITO) del cliente
+        pedido = Pedido.objects.filter(cliente=cliente, estado=Pedido.CARRITO).first()
         
-        piezas_agregadas = []
-        piezas_sin_stock = []
-        piezas_ya_en_carrito = []
+        if not pedido:
+            # Si no existe, lo creamos
+            pedido = Pedido.objects.create(
+                cliente=cliente,
+                estado=Pedido.CARRITO,
+                vendedor=None,  # TO DO: Queda pendiente por pensar
+                fecha_pedido=date.today(),
+                direccion_envio=cliente.usuario.direccion,
+                total=0,
+            )
 
+        piezas_agregadas = [] 
+        piezas_sin_stock = [] #TO DO: Revisar el uso del codigo 
+        piezas_ya_en_carrito = []
+        items_eliminados = []
+
+
+        # Procesar cada pieza de la lista de deseos
         for item in items:
             pieza = item.pieza
-            pieza_id = str(pieza.id)
-
-            # Verificar stock
+            
+            # Si la pieza no tiene stock disponible, terminamos la ejecución y devolvemos un error
             if pieza.stock <= 0:
-                piezas_sin_stock.append(pieza.nombre)
-                continue
+                return Response({
+                    'error': f'La pieza "{pieza.nombre}" no tiene stock disponible.',
+                    'pieza_id': pieza.id,
+                    'pieza_nombre': pieza.nombre
+                }, status=400)
 
-            # Verificar si ya está en el carrito
-            if pieza_id in carrito:
-                # Incrementar cantidad si hay stock
-                cantidad_actual = carrito[pieza_id]['cantidad']
-                if cantidad_actual < pieza.stock:
-                    carrito[pieza_id]['cantidad'] += 1
+            # Buscar si ya existe una línea de pedido para esta pieza en el carrito
+            linea = pedido.lineas_pedido.filter(pieza=pieza).first()
+
+            if linea:
+                # Si ya está en el carrito, verifica si se puede sumar una unidad más
+                if linea.cantidad < pieza.stock:
+                    # Hay stock suficiente, suma una unidad
+                    linea.cantidad += 1
+                    linea.save()
+
+                    #Agregamos el nombre de la pieza a la lista de piezas agregadas al carrito, para informar al cliente en la respuesta.
                     piezas_agregadas.append(pieza.nombre)
                 else:
+                    # Ya está en el carrito con el máximo permitido por el stock
                     piezas_ya_en_carrito.append(pieza.nombre)
             else:
-                # Agregar al carrito con cantidad 1
-                carrito[pieza_id] = {'cantidad': 1}
-                piezas_agregadas.append(pieza.nombre)
+                # Si no está en el carrito, crea una nueva línea de pedido con cantidad 1
+                pedido.lineas_pedido.create(
+                    pieza=pieza,
+                    cantidad=1,
+                    precio_unitario=pieza.precio_base,
+                    descuento_aplicado=0,
+                    subtotal=pieza.precio_base
+                )
+                piezas_agregadas.append(pieza.nombre) #Revisar porque no se envia al frontend
 
-        # Guardar carrito en sesión
-        request.session['carrito'] = carrito
-        request.session.modified = True
+            # Eliminar de la lista de deseos si corresponde
+            if eliminar_de_lista and pieza.nombre in piezas_agregadas:
+                items_eliminados.append(pieza.nombre)
+                item.delete()
 
-        # Eliminar de la lista si se solicitó
-        items_eliminados = []
-        if eliminar_de_lista and piezas_agregadas:
-            for item in items:
-                if item.pieza.nombre in piezas_agregadas:
-                    items_eliminados.append(item.pieza.nombre)
-                    item.delete()
+        # Actualizar el total del pedido (carrito) MIRAR BIEN ESTE CÓDIGO
+        pedido.total = sum(l.cantidad * l.precio_unitario for l in pedido.lineas_pedido.all())
+        pedido.save()
 
         return Response({
             'message': 'Items procesados correctamente',
@@ -1537,7 +1563,7 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
             'sin_stock': piezas_sin_stock,
             'ya_en_carrito_max_stock': piezas_ya_en_carrito,
             'eliminadas_de_lista': items_eliminados,
-            'total_en_carrito': len(carrito)
+            'total_en_carrito': pedido.lineas_pedido.count()
         })
 
     @action(detail=False, methods=['post'])
