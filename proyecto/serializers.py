@@ -638,35 +638,35 @@ class ListaDeseosSerializer(serializers.HyperlinkedModelSerializer):
 
 
 # Serializers de entrada para acciones de ListaDeseos
-class AgregarPiezaListaDeseosSerializer(serializers.Serializer):
-    """Serializer para agregar una pieza a la lista de deseos."""
-    pieza_id = serializers.IntegerField(
-        required=True,
-        help_text="ID de la pieza a agregar a la lista de deseos"
-    )
+# class AgregarPiezaListaDeseosSerializer(serializers.Serializer):
+#     """Serializer para agregar una pieza a la lista de deseos."""
+#     pieza_id = serializers.IntegerField(
+#         required=True,
+#         help_text="ID de la pieza a agregar a la lista de deseos"
+#     )
 
 
-class EliminarPiezaListaDeseosSerializer(serializers.Serializer):
-    """Serializer para eliminar una pieza de la lista de deseos."""
-    pieza_id = serializers.IntegerField(
-        required=True,
-        help_text="ID de la pieza a eliminar de la lista de deseos"
-    )
+# class EliminarPiezaListaDeseosSerializer(serializers.Serializer):
+#     """Serializer para eliminar una pieza de la lista de deseos."""
+#     pieza_id = serializers.IntegerField(
+#         required=True,
+#         help_text="ID de la pieza a eliminar de la lista de deseos"
+#     )
 
 
-class PasarAlCarritoSerializer(serializers.Serializer):
-    """Serializer para pasar items de la lista de deseos al carrito."""
-    piezas_ids = serializers.ListField(
-        child=serializers.IntegerField(),
-        required=False,
-        allow_empty=True,
-        help_text="IDs de las piezas a pasar al carrito (si no se envía, pasa todas)"
-    )
-    eliminar_de_lista = serializers.BooleanField(
-        required=False,
-        default=False,
-        help_text="Si es true, elimina las piezas pasadas de la lista de deseos"
-    )
+# class PasarAlCarritoSerializer(serializers.Serializer):
+#     """Serializer para pasar items de la lista de deseos al carrito."""
+#     piezas_ids = serializers.ListField(
+#         child=serializers.IntegerField(),
+#         required=False,
+#         allow_empty=True,
+#         help_text="IDs de las piezas a pasar al carrito (si no se envía, pasa todas)"
+#     )
+#     eliminar_de_lista = serializers.BooleanField(
+#         required=False,
+#         default=False,
+#         help_text="Si es true, elimina las piezas pasadas de la lista de deseos"
+#     )
 
 
 # ============================================================

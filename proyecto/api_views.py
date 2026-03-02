@@ -1291,34 +1291,37 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
     serializer_class = ListaDeseosSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_serializer_class(self):
-        """Retorna el serializer apropiado según la acción."""
-        if self.action == 'agregar_pieza':
-            return AgregarPiezaListaDeseosSerializer
-        elif self.action == 'eliminar_pieza':
-            return EliminarPiezaListaDeseosSerializer
-        elif self.action == 'pasar_al_carrito':
-            return PasarAlCarritoSerializer
-        return ListaDeseosSerializer
+    # def get_serializer_class(self):
+    #     """Retorna el serializer apropiado según la acción."""
+    #     if self.action == 'agregar_pieza':
+    #         return AgregarPiezaListaDeseosSerializer
+    #     elif self.action == 'eliminar_pieza':
+    #         return EliminarPiezaListaDeseosSerializer
+    #     elif self.action == 'pasar_al_carrito':
+    #         return PasarAlCarritoSerializer
+    #     return ListaDeseosSerializer
 
-    def get_queryset(self):
-        """Solo muestra la lista de deseos del cliente autenticado."""
-        try:
-            cliente = self.request.user.cliente
-            return ListaDeseos.objects.filter(cliente=cliente)
-        except Cliente.DoesNotExist:
-            return ListaDeseos.objects.none()
+    # def get_queryset(self):
+    #     """Solo muestra la lista de deseos del cliente autenticado."""
+    #     try:
+    #         cliente = self.request.user.cliente
+    #         return ListaDeseos.objects.filter(cliente=cliente)
+    #     except Cliente.DoesNotExist:
+    #         return ListaDeseos.objects.none()
 
     # Método auxiliar para obtener o crear la lista de deseos del cliente
     def get_o_crear_lista(self, cliente):
-        """Obtiene o crea la lista de deseos del cliente."""
-        lista, created = ListaDeseos.objects.get_or_create(
-            cliente=cliente,
-            defaults={
-                'nombre': f'Lista de deseos de {cliente.usuario.first_name}',
-                'fecha_creacion': date.today()
-            }
-        )
+        """
+        Busca la lista de deseos del cliente. Si no existe, la crea y la devuelve.
+        Devuelve solo la instancia de la lista.
+        """
+        lista = ListaDeseos.objects.filter(cliente=cliente).first()
+        if not lista:
+            lista = ListaDeseos.objects.create(
+                cliente=cliente,
+                nombre=f'Lista de deseos de {cliente.usuario.first_name}',
+                fecha_creacion=date.today()
+            )
         return lista
 
     @action(detail=False, methods=['get'])
@@ -1553,8 +1556,8 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
                 items_eliminados.append(pieza.nombre)
                 item.delete()
 
-        # Actualizar el total del pedido (carrito) MIRAR BIEN ESTE CÓDIGO
-        pedido.total = sum(l.cantidad * l.precio_unitario for l in pedido.lineas_pedido.all())
+        # Calcula el total del pedido sumando el precio de cada línea de pedido . El resultado se asigna al campo total del pedido
+        pedido.total = sum(l.cantidad * l.precio_unitario for l in pedido.lineas_pedido.all()) #Expresión generadora que itera sobre todas las líneas de pedido del carrito, multiplicando la cantidad por el precio unitario de cada línea y sumando esos valores para obtener el total del pedido.
         pedido.save()
 
         return Response({
@@ -1566,53 +1569,53 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
             'total_en_carrito': pedido.lineas_pedido.count()
         })
 
-    @action(detail=False, methods=['post'])
-    def vaciar(self, request):
-        """
-        Vacía completamente la lista de deseos.
+    # @action(detail=False, methods=['post'])
+    # def vaciar(self, request):
+    #     """
+    #     Vacía completamente la lista de deseos.
         
-        POST /api/v1/lista_deseo/vaciar/
-        """
-        try:
-            cliente = request.user.cliente
-        except Cliente.DoesNotExist:
-            return Response({'error': 'Usuario no es cliente'}, status=400)
+    #     POST /api/v1/lista_deseo/vaciar/
+    #     """
+    #     try:
+    #         cliente = request.user.cliente
+    #     except Cliente.DoesNotExist:
+    #         return Response({'error': 'Usuario no es cliente'}, status=400)
 
-        try:
-            lista = ListaDeseos.objects.get(cliente=cliente)
-            cantidad = lista.items.count()
-            lista.items.all().delete()
-            return Response({
-                'message': f'Lista de deseos vaciada ({cantidad} items eliminados)'
-            })
-        except ListaDeseos.DoesNotExist:
-            return Response({'error': 'No tienes una lista de deseos'}, status=404)
+    #     try:
+    #         lista = ListaDeseos.objects.get(cliente=cliente)
+    #         cantidad = lista.items.count()
+    #         lista.items.all().delete()
+    #         return Response({
+    #             'message': f'Lista de deseos vaciada ({cantidad} items eliminados)'
+    #         })
+    #     except ListaDeseos.DoesNotExist:
+    #         return Response({'error': 'No tienes una lista de deseos'}, status=404)
 
-    @action(detail=False, methods=['get'])
-    def verificar_pieza(self, request):
-        """
-        Verifica si una pieza está en la lista de deseos.
+    # @action(detail=False, methods=['get'])
+    # def verificar_pieza(self, request):
+    #     """
+    #     Verifica si una pieza está en la lista de deseos.
         
-        GET /api/v1/lista_deseo/verificar_pieza/?pieza_id=1
-        """
-        try:
-            cliente = request.user.cliente
-        except Cliente.DoesNotExist:
-            return Response({'en_lista': False})
+    #     GET /api/v1/lista_deseo/verificar_pieza/?pieza_id=1
+    #     """
+    #     try:
+    #         cliente = request.user.cliente
+    #     except Cliente.DoesNotExist:
+    #         return Response({'en_lista': False})
 
-        pieza_id = request.query_params.get('pieza_id')
-        if not pieza_id:
-            return Response({'error': 'Debe indicar el ID de la pieza'}, status=400)
+    #     pieza_id = request.query_params.get('pieza_id')
+    #     if not pieza_id:
+    #         return Response({'error': 'Debe indicar el ID de la pieza'}, status=400)
 
-        try:
-            lista = ListaDeseos.objects.get(cliente=cliente)
-            en_lista = ListaDeseosPieza.objects.filter(
-                lista_deseos=lista,
-                pieza_id=pieza_id
-            ).exists()
-            return Response({'en_lista': en_lista, 'pieza_id': int(pieza_id)})
-        except ListaDeseos.DoesNotExist:
-            return Response({'en_lista': False, 'pieza_id': int(pieza_id)})
+    #     try:
+    #         lista = ListaDeseos.objects.get(cliente=cliente)
+    #         en_lista = ListaDeseosPieza.objects.filter(
+    #             lista_deseos=lista,
+    #             pieza_id=pieza_id
+    #         ).exists()
+    #         return Response({'en_lista': en_lista, 'pieza_id': int(pieza_id)})
+    #     except ListaDeseos.DoesNotExist:
+    #         return Response({'en_lista': False, 'pieza_id': int(pieza_id)})
 
 
 class ListaDeseosPiezaViewSet(viewsets.ModelViewSet):
