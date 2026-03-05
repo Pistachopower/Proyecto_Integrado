@@ -24,6 +24,7 @@ from datetime import date, timedelta
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
+from django.core.mail import send_mail
 import paypalrestsdk
 from dotenv import load_dotenv
 import os
@@ -328,28 +329,77 @@ class PedidoViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['patch'])
     def cambiar_estado_vendedor(self, request, pk=None):
-        pedido = self.get_object()
+        """
+        Permite al vendedor cambiar el estado de un pedido.
+        Si el estado cambia a ENVIADO, se notifica al cliente por email.
+        """
+        pedido = self.get_object() #Obtiene el objeto pedido basado en el ID proporcionado en la URL. Si no se encuentra, devuelve un error 404 automáticamente.
         serializer = CambiarEstadoPedidoVendedorSerializer(data=request.data)
 
         if not serializer.is_valid():
             return Response(serializer.errors, status=400)
 
-        estado_anterior = pedido.get_estado_display()
-        pedido.estado = serializer.validated_data['estado']
+        nuevo_estado = serializer.validated_data['estado']
+        estado_anterior = pedido.estado
+        estado_anterior_display = pedido.get_estado_display() #Obtenemos la representación legible del estado anterior para mostrar en la respuesta
+
+        # Si el estado no cambia, no hacemos nada
+        if nuevo_estado == estado_anterior:
+            return Response({
+                'mensaje': 'El estado ya es el indicado.',
+                'pedido_id': pedido.id,
+                'estado_actual': pedido.get_estado_display()
+            }, status=200)
+
+
+        pedido.estado = nuevo_estado
         pedido.save()
 
-        return Response({
+        email_enviado = False
+        email_error = None
+
+        if nuevo_estado == Pedido.ENVIADO:
+            try:
+                self.notificar_pedido_enviado(pedido)
+                email_enviado = True
+            except Exception as e:
+                email_error = str(e)
+
+        respuesta = {
             'mensaje': 'Estado actualizado',
             'pedido_id': pedido.id,
-            'estado_anterior': estado_anterior,
-            'estado_actual': pedido.get_estado_display()
-        })
+            'estado_anterior': estado_anterior_display,
+            'estado_actual': pedido.get_estado_display(),
+            'email_enviado': email_enviado
+        }
+        
+        if email_error:
+            respuesta['email_error'] = email_error
 
-    # def perform_create(self, serializer):
-    #     pedido = serializer.save()
-    #     cliente = pedido.cliente
-    #     # Intentar asignar el descuento de fidelidad si corresponde
-    #     asignar_descuento_fidelidad(cliente)
+        return Response(respuesta)
+
+    def notificar_pedido_enviado(self, pedido):
+        """
+        Envía un email al cliente notificando que su pedido ha sido enviado.
+        """
+        cliente_email = pedido.cliente.usuario.email
+        asunto = "¡Tu pedido ha sido enviado!"
+        mensaje = (
+            f"Hola {pedido.cliente.usuario.first_name},\n\n"
+            f"Te informamos que tu pedido número {pedido.id} ha sido enviado y está en camino.\n"
+            "Pronto lo recibirás en la dirección indicada.\n\n"
+            "Gracias por confiar en nosotros.\n\n"
+            "Saludos,\nEl equipo de MotorPartExpress"
+        )
+        # Utilizamos la función send_mail de Django para enviar el correo electrónico al cliente.
+        send_mail(
+            subject=asunto,
+            message=mensaje,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[cliente_email],
+            fail_silently=False,
+        )
+
 
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def filtrar_pedidosCliente(self, request):
@@ -407,6 +457,11 @@ class PedidoViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
+    # def perform_create(self, serializer):
+    #     pedido = serializer.save()
+    #     cliente = pedido.cliente
+    #     # Intentar asignar el descuento de fidelidad si corresponde
+    #     asignar_descuento_fidelidad(cliente)
 
     @action(detail=True, methods=['get'])
     def factura_cliente(self, request, pk=None):
