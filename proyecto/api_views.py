@@ -134,14 +134,21 @@ class VendedorViewSet(viewsets.ModelViewSet):
         Endpoint: POST /api/v1/vendedor/{id}/subir_foto_perfil/
         """
         vendedor = self.get_object()
-        
         foto = request.FILES.get('foto_perfil_vendedor')
+        
         if not foto:
             return Response({'error': 'No se envió ninguna imagen.'}, status=status.HTTP_400_BAD_REQUEST)
         
+        # Eliminar la imagen anterior si existe
+        if vendedor.foto_perfil_vendedor and vendedor.foto_perfil_vendedor.name:
+            vendedor.foto_perfil_vendedor.delete(save=False)
+        
         vendedor.foto_perfil_vendedor = foto
+        
         vendedor.save()
-        serializer = self.get_serializer(vendedor, context={'request': request}) #get_serializer() obtiene el serializador definido para este ViewSet (VendedorSerializer) y lo instancia con el objeto vendedor actualizado. El contexto se pasa para que el serializador pueda construir URLs completas si es necesario.
+
+        serializer = self.get_serializer(vendedor, context={'request': request})
+
         return Response({'foto_perfil_vendedor': serializer.data.get('foto_perfil_vendedor')}, status=status.HTTP_200_OK)
 
 
