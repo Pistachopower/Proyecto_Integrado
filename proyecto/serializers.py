@@ -45,12 +45,26 @@ class ClienteSerializer(serializers.ModelSerializer):
 
 class VendedorSerializer(serializers.HyperlinkedModelSerializer):
     usuario = UsuarioSerializer(read_only=True)
+    foto_perfil_vendedor = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Vendedor
-        fields = ['id', 'usuario', 'fecha_contratacion', 'comision_porcentaje']
+        fields = ['id', 'usuario', 'fecha_contratacion', 'comision_porcentaje', 'foto_perfil_vendedor']
 
+        def validate_foto_perfil_vendedor(self, value):
+            # Validar tamaño máximo (por ejemplo, 2MB)
+            max_size = 2 * 1024 * 1024  # 2MB
+            
+            if value and value.size > max_size:
+                raise serializers.ValidationError('La imagen no debe superar los 2MB.')
 
+            # Validar formato permitido
+            valid_types = ['image/jpeg', 'image/png']
+
+            if value and value.content_type not in valid_types: # El content_type se obtiene del archivo subido y se compara con los tipos permitidos
+                raise serializers.ValidationError('Solo se permiten imágenes JPEG o PNG.')
+
+            return value
 
 
 # ============================================================

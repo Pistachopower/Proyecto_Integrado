@@ -62,6 +62,7 @@ class Vendedor(models.Model):
     )
     fecha_contratacion = models.DateField()
     comision_porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
+    foto_perfil_vendedor = models.ImageField(upload_to='foto_perfil_vendedor/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.usuario.first_name} {self.usuario.last_name}"

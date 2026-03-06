@@ -127,6 +127,23 @@ class VendedorViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             ) 
 
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def subir_foto_perfil(self, request, pk=None):
+        """
+        Permite a un vendedor subir o actualizar su foto de perfil.
+        Endpoint: POST /api/v1/vendedor/{id}/subir_foto_perfil/
+        """
+        vendedor = self.get_object()
+        
+        foto = request.FILES.get('foto_perfil_vendedor')
+        if not foto:
+            return Response({'error': 'No se envió ninguna imagen.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        vendedor.foto_perfil_vendedor = foto
+        vendedor.save()
+        serializer = self.get_serializer(vendedor, context={'request': request}) #get_serializer() obtiene el serializador definido para este ViewSet (VendedorSerializer) y lo instancia con el objeto vendedor actualizado. El contexto se pasa para que el serializador pueda construir URLs completas si es necesario.
+        return Response({'foto_perfil_vendedor': serializer.data.get('foto_perfil_vendedor')}, status=status.HTTP_200_OK)
+
 
 class CategoriaPiezaViewSet(viewsets.ModelViewSet):
     queryset = CategoriaPieza.objects.all()
