@@ -343,14 +343,6 @@ class PedidoViewSet(viewsets.ModelViewSet):
         estado_anterior = pedido.estado
         estado_anterior_display = pedido.get_estado_display() #Obtenemos la representación legible del estado anterior para mostrar en la respuesta
 
-        # Si el estado no cambia, no hacemos nada
-        if nuevo_estado == estado_anterior:
-            return Response({
-                'mensaje': 'El estado ya es el indicado.',
-                'pedido_id': pedido.id,
-                'estado_actual': pedido.get_estado_display()
-            }, status=200)
-
 
         pedido.estado = nuevo_estado
         pedido.save()
@@ -372,7 +364,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
             'estado_actual': pedido.get_estado_display(),
             'email_enviado': email_enviado
         }
-        
+
         if email_error:
             respuesta['email_error'] = email_error
 
