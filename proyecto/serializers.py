@@ -399,50 +399,52 @@ class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
     def validate(self, data):
         tipo = data.get('tipo_metodo')
 
+        # En actualizaciones parciales, si no se envía tipo_metodo, usamos el del objeto existente
+        if tipo is None and self.instance:
+            tipo = self.instance.tipo_metodo
+
         # --- VALIDACIÓN CONDICIONAL ---
         
         # CASO 1: TARJETA
         if tipo == MetodoPago.TARJETA:
             tarjeta_data = data.get('detalles_tarjeta')
             
-            if not tarjeta_data:
-                raise serializers.ValidationError({"detalles_tarjeta": "Faltan los datos de la tarjeta."})
-            
-            # Validación manual de campos críticos (porque los hicimos opcionales arriba)
-            errores_tarjeta = {}
-
-            if not tarjeta_data.get('num_tarjeta_encriptado'):
-                errores_tarjeta['num_tarjeta_encriptado'] = "Este campo es requerido."
-            
-            if not tarjeta_data.get('propietario'):
-                errores_tarjeta['propietario'] = "Este campo es requerido."
-            
-            if errores_tarjeta:
-                raise serializers.ValidationError({"detalles_tarjeta": errores_tarjeta})
+            # Solo exigimos los detalles al crear, no al actualizar parcialmente
+            if not self.instance:
+                if not tarjeta_data:
+                    raise serializers.ValidationError({"detalles_tarjeta": "Faltan los datos de la tarjeta."})
+                
+                errores_tarjeta = {}
+                if not tarjeta_data.get('num_tarjeta_encriptado'):
+                    errores_tarjeta['num_tarjeta_encriptado'] = "Este campo es requerido."
+                if not tarjeta_data.get('propietario'):
+                    errores_tarjeta['propietario'] = "Este campo es requerido."
+                if errores_tarjeta:
+                    raise serializers.ValidationError({"detalles_tarjeta": errores_tarjeta})
 
         # CASO 2: CUENTA BANCARIA
         elif tipo == MetodoPago.CUENTA:
             cuenta_data = data.get('detalles_cuenta')
-            if not cuenta_data:
-                raise serializers.ValidationError({"detalles_cuenta": "Faltan los datos de la cuenta bancaria."})
-            
-            errores_cuenta = {}
-            if not cuenta_data.get('iban'):
-                errores_cuenta['iban'] = "El IBAN es obligatorio."
-            if not cuenta_data.get('banco'):
-                errores_cuenta['banco'] = "El nombre del banco es obligatorio."
-            
-            if errores_cuenta:
-                raise serializers.ValidationError({"detalles_cuenta": errores_cuenta})
+            if not self.instance:
+                if not cuenta_data:
+                    raise serializers.ValidationError({"detalles_cuenta": "Faltan los datos de la cuenta bancaria."})
+                
+                errores_cuenta = {}
+                if not cuenta_data.get('iban'):
+                    errores_cuenta['iban'] = "El IBAN es obligatorio."
+                if not cuenta_data.get('banco'):
+                    errores_cuenta['banco'] = "El nombre del banco es obligatorio."
+                if errores_cuenta:
+                    raise serializers.ValidationError({"detalles_cuenta": errores_cuenta})
 
         # CASO 3: BILLETERA DIGITAL
         elif tipo == MetodoPago.BILLETERA:
             billetera_data = data.get('detalles_billetera')
-            if not billetera_data:
-                raise serializers.ValidationError({"detalles_billetera": "Faltan los datos de la billetera."})
-            
-            if not billetera_data.get('email'):
-                 raise serializers.ValidationError({"detalles_billetera": {"email": "El email es obligatorio."}})
+            if not self.instance:
+                if not billetera_data:
+                    raise serializers.ValidationError({"detalles_billetera": "Faltan los datos de la billetera."})
+                if not billetera_data.get('email'):
+                    raise serializers.ValidationError({"detalles_billetera": {"email": "El email es obligatorio."}})
             
         else:
             raise serializers.ValidationError({"tipo_metodo": "Tipo de método de pago no válido."})
@@ -468,6 +470,40 @@ class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
             BilleteraDigital.objects.create(metodo_pago=metodo_pago, **datos_billetera)
 
         return metodo_pago
+
+    def update(self, instance, validated_data):
+        datos_tarjeta = validated_data.pop('detalles_tarjeta', None)
+        datos_cuenta = validated_data.pop('detalles_cuenta', None)
+        datos_billetera = validated_data.pop('detalles_billetera', None)
+
+        # Actualizar campos del MetodoPago
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Actualizar el objeto hijo según el tipo
+        if instance.tipo_metodo == MetodoPago.TARJETA and datos_tarjeta:
+            tarjeta = getattr(instance, 'tarjeta', None)
+            if tarjeta:
+                for attr, value in datos_tarjeta.items():
+                    setattr(tarjeta, attr, value)
+                tarjeta.save()
+
+        elif instance.tipo_metodo == MetodoPago.CUENTA and datos_cuenta:
+            cuenta = getattr(instance, 'cuenta_bancaria', None)
+            if cuenta:
+                for attr, value in datos_cuenta.items():
+                    setattr(cuenta, attr, value)
+                cuenta.save()
+
+        elif instance.tipo_metodo == MetodoPago.BILLETERA and datos_billetera:
+            billetera = getattr(instance, 'billetera_digital', None)
+            if billetera:
+                for attr, value in datos_billetera.items():
+                    setattr(billetera, attr, value)
+                billetera.save()
+
+        return instance
 
     def destroy(self):
         instance = self.instance

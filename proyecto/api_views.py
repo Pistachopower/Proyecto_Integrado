@@ -46,7 +46,7 @@ class ClienteViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, EsDuenioDirecto]
 
     #Para el dashboard vendedor - obtener clientes asociados a un vendedor específico
-    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def clientes_vendedor(self, request):
         """ 
         Obtiene todos los clientes asociados a un vendedor específico mediante pedidos.
@@ -91,7 +91,7 @@ class VendedorViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, EsDuenioDirecto]
 
     #Para el dashboard vendedor - obtener pedidos asociados a un vendedor específico
-    @action(detail=False, methods=['get'], permission_classes=[AllowAny])
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def pedidos_vendedor(self, request):
         """
         Obtiene todos los pedidos asociados a un vendedor específico.
@@ -155,9 +155,8 @@ class VendedorViewSet(viewsets.ModelViewSet):
 class CategoriaPiezaViewSet(viewsets.ModelViewSet):
     queryset = CategoriaPieza.objects.all()
     serializer_class = CategoriaPiezaSerializer
-    permission_classes = [AllowAny]  # Permite acceso público para ver categorías de piezas
+    permission_classes = [PermisoGestionInventario]  #Solo empleados y administradores pueden gestionar categorías de piezas.
 
-#TODO: CAMBIAR EL NOMBRE DEL PERMISO
 class PiezaViewSet(viewsets.ModelViewSet):
     """
     Obtener una pieza específica.
@@ -166,8 +165,7 @@ class PiezaViewSet(viewsets.ModelViewSet):
     """
     queryset = Pieza.objects.all()
     serializer_class = PiezaSerializer
-    # http_method_names = ['get'] ##Esto sirve para controlar los métodos permitidos (lectura, borrado, etc)
-    permission_classes = [AllowAny] #TODO: Permitir ver piezas pero no crear/modificar/borrar (admin,empleado) 
+    permission_classes = [PermisoGestionInventario]
 
     filter_backends= [DjangoFilterBackend]
     filterset_fields= ['categoria'] #Permite filtrar las piezas por categoría
@@ -350,6 +348,21 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
     filterset_fields=[
         'cliente_id'   ]
+
+    def get_queryset(self):
+        """
+        Filtra los pedidos según el rol del usuario:
+        - Admin/Empleado: ve todos los pedidos
+        - Cliente: solo ve sus propios pedidos
+        - Vendedor: solo ve pedidos asignados a él
+        """
+        user = self.request.user
+        if es_jefe(user):
+            return Pedido.objects.all()
+        try:
+            return Pedido.objects.filter(cliente__usuario=user)
+        except Exception:
+            return Pedido.objects.none()
     
     @action(detail=True, methods=['patch'])
     def cambiar_estado_vendedor(self, request, pk=None):
@@ -651,7 +664,7 @@ class LineaPedidoViewSet(viewsets.ModelViewSet):
 class MetodoPagoViewSet(viewsets.ModelViewSet):
     queryset = MetodoPago.objects.all()
     serializer_class = MetodoPagoSerializer
-    #permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
 
     filter_backends=[
         DjangoFilterBackend,
@@ -1081,8 +1094,15 @@ class ValoracionViewSet(viewsets.ModelViewSet):
     serializer_class = ValoracionSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['cliente_id', 'pieza_id']
-    
 
+    def get_permissions(self):
+        """Permisos dinámicos según la acción:
+        - list, retrieve, por_pieza: público (AllowAny)
+        - create, update, partial_update, destroy: autenticado + dueño de la valoración
+        """
+        if self.action in ['list', 'retrieve', 'por_pieza']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated(), PuedeEditarValoracion()]
 
     def perform_update(self, serializer):
         """
@@ -1709,7 +1729,7 @@ class ListaDeseosPiezaViewSet(viewsets.ModelViewSet):
 class DescuentoViewSet(viewsets.ModelViewSet):
     queryset = Descuento.objects.all()
     serializer_class = DescuentoSerializer
-    permission_classes = [IsAuthenticated, SoloAdmin]
+    permission_classes = [IsAuthenticated, SoloAdminOEmpleado]
 
 class ClienteDescuentoViewSet(viewsets.ModelViewSet):
     queryset = ClienteDescuento.objects.all()
@@ -1883,7 +1903,7 @@ class VerMiPerfilView(APIView):
 class ImagenPiezaViewSet(viewsets.ModelViewSet):
     queryset = ImagenPieza.objects.all()
     serializer_class = ImagenPiezaSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [PermisoGestionInventario]
 
 
 #class LoginSessionView(APIView):

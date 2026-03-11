@@ -9,9 +9,9 @@ def es_jefe(user):
     return es_empleado_admin_tienda
     
 
-class SoloAdmin(permissions.BasePermission):
+class SoloAdminOEmpleado(permissions.BasePermission):
     """
-    Nadie entra aquí a menos que sea Admin, Staff o Empleado.
+    Permite acceso solo a Administradores y Empleados.
     """
     
     def has_permission(self, request, view):
@@ -38,6 +38,10 @@ class EsDuenioUsuario(permissions.BasePermission):
         if view.action == 'list':
             return False
         
+        # 3. Un usuario normal no puede crear otros usuarios.
+        if view.action == 'create':
+            return False
+
         return True
 
     def has_object_permission(self, request, view, obj):
@@ -102,10 +106,14 @@ class SoloVerPiezasLineaPedido(permissions.BasePermission):
     """
     SOLO VER LÍNEAS DE PEDIDO y Piezas.
     Permite ver las líneas de pedido, pero no modificarlas.
+    Los jefes (admin/empleado) tienen acceso completo.
     """
 
     def has_permission(self, request, view):
-        # Permitir solo métodos seguros (GET, HEAD, OPTIONS)
+        # Los jefes pueden hacer cualquier operación
+        if es_jefe(request.user):
+            return True
+        # Usuarios normales: solo métodos seguros (GET, HEAD, OPTIONS)
         if request.method in permissions.SAFE_METHODS:
             return True
         return False
@@ -119,49 +127,61 @@ class SoloVerPiezasLineaPedido(permissions.BasePermission):
 
 class PermisoGestionInventario(permissions.BasePermission):
     """
-    - ADMINISTRADOR: 
+    Permiso para gestión de inventario (Piezas, Categorías, etc.).
+    - Cualquier usuario (incluido anónimo): solo lectura (GET, HEAD, OPTIONS)
+    - EMPLEADO: lectura + edición (PUT/PATCH), pero NO crear (POST) ni borrar (DELETE)
+    - ADMINISTRADOR: acceso total
     """
 
     def has_permission(self, request, view):
-        # 1. Obtenemos el rol del usuario de forma segura
+        # 1. Cualquier usuario puede VER (métodos seguros)
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # 2. Para métodos de escritura, el usuario debe estar autenticado
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        # 3. Obtenemos el rol del usuario de forma segura
         rol = getattr(request.user, 'rol', None)
 
-        # 2. Si es ADMINISTRADOR -> Acceso TOTAL
+        # 4. Si es ADMINISTRADOR -> Acceso TOTAL
         if rol == Usuario.ADMINISTRADOR:
             return True
 
-        # 3. Si es EMPLEADO -> Revisamos qué quiere hacer
-        if rol == Usuario.EMPLEADO:
-            
-            # Si intenta CREAR (POST) -> PROHIBIDO 
-            if request.method == 'POST':
-                return False
-            # Si intenta BORRAR (DELETE) -> PROHIBIDO 
-            # (Aunque DELETE suele ir a has_object_permission, lo paramos aquí también por si acaso)
-            if request.method == 'DELETE':
-                return False
-            
-            # Si es GET (Ver), PUT o PATCH (Editar) -> ADELANTE 
+        # 5. Si es VENDEDOR (tiene modelo Vendedor asociado) -> acceso total a inventario
+        if hasattr(request.user, 'vendedor'):
             return True
 
-        # 4. Cualquier otro (Cliente) -> FUERA
+        # 6. Si es EMPLEADO -> puede editar pero NO crear ni borrar
+        if rol == Usuario.EMPLEADO:
+            if request.method in ('POST', 'DELETE'):
+                return False
+            return True
+
+        # 7. Cualquier otro (Cliente) -> solo lectura (ya pasó arriba)
         return False
 
     def has_object_permission(self, request, view, obj):
-        # 1. Obtenemos el rol
+        # 1. Lectura siempre permitida
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # 2. Obtenemos el rol
         rol = getattr(request.user, 'rol', None)
 
-        # 2. Si es ADMINISTRADOR -> Acceso TOTAL
+        # 3. Si es ADMINISTRADOR -> Acceso TOTAL
         if rol == Usuario.ADMINISTRADOR:
             return True
 
-        # 3. Si es EMPLEADO
+        # 4. Si es VENDEDOR -> acceso total a inventario
+        if hasattr(request.user, 'vendedor'):
+            return True
+
+        # 5. Si es EMPLEADO -> puede editar pero NO borrar
         if rol == Usuario.EMPLEADO:
-            # Si intenta BORRAR (DELETE) -> PROHIBIDO 
             if request.method == 'DELETE':
                 return False
-            
-            # Si es Editar (PUT/PATCH) o Ver (GET) -> ADELANTE 
             return True
 
         return False
@@ -174,16 +194,30 @@ class PuedeEditarValoracion(permissions.BasePermission):
     1. El usuario es el propietario de la valoración
     2. El usuario compró el producto (tiene LineaPedido con esa pieza)
     3. El pedido está en estado ENVIADO (3) o posterior
+    Los administradores y empleados pueden gestionar cualquier valoración.
     """
     
     message = "No puedes editar esta valoración. Debes ser el propietario y tener el pedido enviado."
 
+    def has_permission(self, request, view):
+        # Los jefes (admin/empleado) pueden gestionar cualquier valoración
+        if es_jefe(request.user):
+            return True
+        # Usuarios normales deben estar autenticados
+        if not request.user or not request.user.is_authenticated:
+            return False
+        return True
+
     def has_object_permission(self, request, view, obj):
-        # 1. Verificar que es el dueño de la valoración
+        # 1. Los jefes pueden gestionar cualquier valoración (ej: borrar ofensivas)
+        if es_jefe(request.user):
+            return True
+
+        # 2. Verificar que es el dueño de la valoración
         if obj.cliente.usuario != request.user:
             return False
         
-        # 2. Verificar que ha comprado el producto Y el pedido está ENVIADO (3) o más
+        # 3. Verificar que ha comprado el producto Y el pedido está ENVIADO (3) o más
         compra_existe = LineaPedido.objects.filter(
             pieza=obj.pieza,  # La misma pieza que se valora
             pedido__cliente__usuario=request.user,  # Del usuario actual
