@@ -102,6 +102,54 @@ class EsDuenioDirecto(permissions.BasePermission):
         return obj.usuario == request.user
     
 
+class EsDuenioPorMetodoPago(permissions.BasePermission):
+    """
+    Para Tarjeta, CuentaBancaria y BilleteraDigital.
+    Estos modelos no tienen 'cliente' directamente, sino que van a través de MetodoPago.
+    Ruta: Tarjeta -> MetodoPago -> Cliente -> Usuario
+    """
+
+    def has_permission(self, request, view):
+        if es_jefe(request.user):
+            return True
+        if view.action == 'list':
+            return False
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if es_jefe(request.user):
+            return True
+        try:
+            return obj.metodo_pago.cliente.usuario == request.user
+        except AttributeError as error:
+            print(f"Error de permiso: {error}")
+            return False
+
+
+class EsDuenioPorPedido(permissions.BasePermission):
+    """
+    Para Pago.
+    El Pago no tiene 'cliente' directamente, sino que va a través del Pedido.
+    Ruta: Pago -> Pedido -> Cliente -> Usuario
+    """
+
+    def has_permission(self, request, view):
+        if es_jefe(request.user):
+            return True
+        if view.action == 'list':
+            return False
+        return True
+
+    def has_object_permission(self, request, view, obj):
+        if es_jefe(request.user):
+            return True
+        try:
+            return obj.pedido.cliente.usuario == request.user
+        except AttributeError as error:
+            print(f"Error de permiso: {error}")
+            return False
+
+
 class SoloVerPiezasLineaPedido(permissions.BasePermission):
     """
     SOLO VER LÍNEAS DE PEDIDO y Piezas.

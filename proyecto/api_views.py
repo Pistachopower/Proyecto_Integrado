@@ -715,22 +715,22 @@ class MetodoPagoClienteViewSet(viewsets.ModelViewSet):
 class TarjetaViewSet(viewsets.ModelViewSet):
     queryset = Tarjeta.objects.all()
     serializer_class = TarjetaSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    permission_classes = [IsAuthenticated, EsDuenioPorMetodoPago]
 
 class CuentaBancariaViewSet(viewsets.ModelViewSet):
     queryset = CuentaBancaria.objects.all()
     serializer_class = CuentaBancariaSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    permission_classes = [IsAuthenticated, EsDuenioPorMetodoPago]
 
 class BilleteraDigitalViewSet(viewsets.ModelViewSet):
     queryset = BilleteraDigital.objects.all()
     serializer_class = BilleteraDigitalSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    permission_classes = [IsAuthenticated, EsDuenioPorMetodoPago]
 
 class PagoViewSet(viewsets.ModelViewSet):
     queryset = Pago.objects.all()
     serializer_class = PagoSerializer
-    permission_classes = [IsAuthenticated, EsDuenioDeObjeto]
+    permission_classes = [IsAuthenticated, EsDuenioPorPedido]
 
 # class DevolucionViewSet(viewsets.ModelViewSet):
 #     queryset = Devolucion.objects.all()

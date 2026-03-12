@@ -16,7 +16,74 @@ Agregar productos con un csv
 
 
 HOY
-Necesito definir bien cuándo voy a descontar el stock, si es en finalizar (con pago Tarjeta, Cuenta Bancaria) paypal 
+Importante
+https://www.youtube.com/watch?v=kkBfitvmIk8
+https://www.youtube.com/watch?v=I-pzCJnGO08
+
+Los test heredan de la clase TestCase.
+Recuerda que los métodos para hacer los test funcionan empezando con: test_
+Para el test, se crea una base de datos vacía (test_tienda) fuera de la que tenemos nosotros 
+
+Haz una lista de todas las funciones que tiene tu programa.
+
+Para cada una, define cómo comprobarías si funciona bien.
+
+Crea una tabla con casos de prueba que incluyan:
+
+    Qué vas a probar
+    Cómo lo pruebas (pasos)
+    Qué resultado esperas
+
+(Opcional) Si tienes tests automáticos en Python (por ejemplo, con pytest), inclúyelos o di que los vas a utilizar.
 
 
-Repasar el codigo del frontend y backend de pasar productos de la lista de deseo del cliente al carrito
+
+
+Funcionalidades:
+Usuarios anónimos 
+Pueden acceder a las categorías de las piezas
+Interactuar con formulario 
+Interactuar con el chatbot
+Ver todos los productos
+Interactuar con filtros
+Ver el detalle del producto
+Ver productos relacionados
+Registrarse como cliente
+Recuperar contraseña
+
+Clientes
+Comprar piezas 
+Tener lista de favoritos 
+Pagar con paypal 
+Pagar con otros métodos de pago (cuenta bancaria)
+Editar su perfil 
+Hacer valoración de una pieza que ha comprador
+Realizar una devolución 
+CRUD para métodos de pago 
+Filtrar los pedidos 
+Añadir productos de la lista de deseo al carrito 
+Hacer una devolución
+Imprimir factura
+Recibir un correo cuando los productos estén enviado
+
+
+Empleados
+Cambiar foto de perfil
+Editar datos del perfil
+Cambiar el estado de un pedido
+Filtrar por id, cliente, monto, fecha
+Agregar pieza con imagen
+CRUD pieza
+Agregar varias piezas en documento con csv, xlsx, ods
+Aprobar y rechazar devolución
+Aprobar comentarios 
+
+
+
+Tutoriales 
+Django Testing tutorial
+Django REST Framework testing tutorial
+Python unittest tutorial
+
+
+
