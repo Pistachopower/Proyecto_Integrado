@@ -360,8 +360,9 @@ class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
 
 
     
-    def to_representation(self, instance):
+    def to_representation(self, instance): # Sobrescribimos este método para incluir los detalles específicos según el tipo de método de pago al generar la respuesta JSON.
         data = super().to_representation(instance)
+        
         if instance.tipo_metodo == MetodoPago.TARJETA:
             tarjeta = getattr(instance, 'tarjeta', None)
             if tarjeta:
