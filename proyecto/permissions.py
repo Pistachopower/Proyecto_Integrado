@@ -29,17 +29,16 @@ class EsDuenioUsuario(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        # 1. Si eres jefe, pasas siempre.
+        # 1. Solo el administrador puede crear usuarios.
+        if view.action == 'create':
+            return getattr(request.user, 'rol', None) == Usuario.ADMINISTRADOR
+
+        # 2. Si eres jefe (empleado o admin), puedes ver la lista.
         if es_jefe(request.user):
             return True
 
-        # 2. Si intentas ver la LISTA COMPLETA de usuarios (action='list'),
-        # y no eres jefe, no puedes ver a los demás.
+        # 3. Un cliente no puede ver la lista completa de usuarios.
         if view.action == 'list':
-            return False
-        
-        # 3. Un usuario normal no puede crear otros usuarios.
-        if view.action == 'create':
             return False
 
         return True
