@@ -86,4 +86,19 @@ Django REST Framework testing tutorial
 Python unittest tutorial
 
 
+Probar test:
+Cliente
+¿Puede un cliente ver la lista de usuarios?
+¿Puede un cliente crear un usuario nuevo?
+¿Puede un cliente editar su propia cuenta?
+¿Puede un cliente editar la cuenta de otro cliente?
+
+
+Empleado 
+¿Puede un Empleado ver la lista de usuarios?
+¿Puede un Empleado crear un usuario nuevo? 
+¿Puede un Empleado editar su propia cuenta?
+
+
+
 

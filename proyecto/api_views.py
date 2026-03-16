@@ -1170,6 +1170,7 @@ class ValoracionViewSet(viewsets.ModelViewSet):
 
         # Guardar la valoración, asignando el cliente, la fecha y la pieza de forma segura
         nueva_valoracion = serializer.save(cliente=cliente, pieza=pieza, fecha_valoracion=date.today())
+        
         # Paso 7: Devolver la valoración creada como respuesta
         return Response(self.get_serializer(nueva_valoracion).data, status=201)
     
@@ -1262,7 +1263,7 @@ class ValoracionViewSet(viewsets.ModelViewSet):
             imagen_principal = None
             imagen_obj = ImagenPieza.objects.filter(pieza=pieza).first()  # Buscar imagen en ImagenPieza
             
-            # Simplificado: Si imagen_obj existe y tiene url_imagen, usarla
+            # Si imagen_obj existe y tiene url_imagen, usarla
             if imagen_obj and getattr(imagen_obj, 'url_imagen', None):
                 # Si existe una imagen en ImagenPieza, uso esa
                 imagen_principal = request.build_absolute_uri(imagen_obj.url_imagen.url)
@@ -2322,6 +2323,7 @@ class CarritoViewSet(ViewSet):
         except LineaPedido.DoesNotExist:
             return Response({'error': 'Pieza no encontrada en el carrito'}, status=404)
 
+    #TO DO: REVISAR FUNCIONAMIENTO DE ESTE ENDPOINT Y SU USO DESDE EL FRONTEND
     @action(detail=False, methods=['post'])
     def vaciar(self, request):
         """
