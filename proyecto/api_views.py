@@ -349,7 +349,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
     filterset_fields=[
         'cliente_id'   ]
 
-    def get_queryset(self):
+    def get_queryset(self): #get_queryset(): controla qué registros puede ver ese usuario.
         """
         Filtra los pedidos según el rol del usuario:
         - Admin/Empleado: ve todos los pedidos
@@ -438,7 +438,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
         GET /api/v1/pedido/filtrar_pedidosCliente/?estado=pendiente
         GET /api/v1/pedido/filtrar_pedidosCliente/?fecha=2026-02-19
         """
-        pedidos = Pedido.objects.all()
+        # Reutilizamos la misma regla de seguridad definida en get_queryset.
+        pedidos = self.get_queryset()
 
         pedido_id = request.query_params.get('id')
         estados = request.query_params.getlist('estado')
@@ -464,7 +465,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
         Filtra pedidos por vendedor, id, nombre del cliente, monto y fecha.
         GET /api/v1/pedido/filtrar_pedidosVendedor/?vendedor_id=1&id=1&nombre_cliente=Juan&monto=100.00&fecha=2026-02-19
         """
-        pedidos = Pedido.objects.all()
+        # Reutilizamos la misma regla de seguridad definida en get_queryset.
+        pedidos = self.get_queryset()
         pedido_id = request.query_params.get('id')
         nombre_cliente = request.query_params.get('nombre_cliente')
         monto = request.query_params.get('monto')
