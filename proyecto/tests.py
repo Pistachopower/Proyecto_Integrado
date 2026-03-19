@@ -430,11 +430,11 @@ class PedidoPermisosIntegracionTests(TestCase):
     def test_anonimo_no_puede_listar_pedidos(self):
         """
         El método self.assertIn verifica que un elemento esté presente dentro de una colección (lista, string, diccionario, etc.) durante un test.
-        
+
         Si el elemento está dentro de la colección, el test pasa. Si no está, el test falla.
-        
+
         Por ejemplo:
-        
+
         self.assertIn("a", ["a", "b", "c"]) pasa.
         self.assertIn(401, [401, 403]) pasa si el valor es 401 o 403.
         self.assertIn("clave", diccionario) pasa si "clave" es una key del diccionario.
@@ -772,7 +772,7 @@ class UsuarioAutenticacionIntegracionTests(TestCase):
         Prueba que el sistema devuelve error si falta un campo requerido.
         """
         data_incompleta = self.cliente_data.copy()
-        del data_incompleta["password"]
+        del data_incompleta["password"] # El password es obligatorio, así que lo eliminamos para probar el error
         response = self.api_client.post(
             "/api/v1/registro_cliente/",
             {"user_data": data_incompleta},

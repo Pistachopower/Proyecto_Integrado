@@ -30,7 +30,7 @@ Plantilla:
 # verificar resultado
 ```
 
-## 3) Para permisos en DRF (tu caso)
+## 3) Para permisos en DRF
 
 - [ ] Crear request simulado con `APIRequestFactory`.
 - [ ] Asignar usuario al request (`request.user = ...`).
@@ -50,6 +50,35 @@ view = SimpleNamespace(action="list")
 tiene_permiso = self.permiso.has_permission(request, view)
 self.assertFalse(tiene_permiso)
 ```
+
+## 4) Para pruebas de integración (APIClient)
+
+- [ ] Usa `APIClient` para simular peticiones HTTP reales.
+- [ ] Prepara los datos de entrada (usuario, payload, etc.).
+- [ ] Envía la petición al endpoint correcto (`post`, `get`, `delete`, etc.).
+- [ ] Verifica el código de estado esperado (`assertEqual` o `assertIn`).
+- [ ] Comprueba que los datos devueltos sean los esperados (`assertEqual`, `assertIn`, etc.).
+- [ ] Si esperas error, verifica que el mensaje o campo esté en la respuesta.
+- [ ] Si el test requiere autenticación, usa `force_authenticate` o login previo.
+- [ ] Si el test es de acceso restringido, verifica que responde 401 o 403.
+
+Ejemplo:
+
+```python
+# Arrange
+client = APIClient()
+user_data = {...}
+
+# Act
+response = client.post('/api/v1/registro_cliente/', {'user_data': user_data}, format='json')
+
+# Assert
+self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+self.assertEqual(response.data['user_data']['username'], user_data['username'])
+```
+
+- [ ] Documenta el objetivo del test en un comentario.
+- [ ] Usa nombres claros para los métodos de test.
 
 ## 4) Aserciones comunes
 

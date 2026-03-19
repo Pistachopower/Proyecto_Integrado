@@ -1787,7 +1787,7 @@ class VerMiPerfilView(APIView):
                 perfil = Cliente.objects.get(usuario=usuario)
                 serializer = ClienteSerializer(perfil, context={'request': request})
                 
-                # Truco: Añadimos el campo 'tipo_usuario' a la respuesta JSON
+                #Añadimos el campo 'tipo_usuario' a la respuesta JSON
                 # para que Vue sepa qué pintar
                 data = serializer.data
                 data['tipo_usuario'] = 'cliente'
@@ -2053,7 +2053,7 @@ class CarritoViewSet(ViewSet):
             cliente=cliente,
             estado=Pedido.CARRITO,
             defaults={
-                'vendedor': Vendedor.objects.first(),
+                'vendedor': None,  # No asignar vendedor hasta finalizar compra
                 'fecha_pedido': date.today(),
                 'direccion_envio': cliente.usuario.direccion or '',
                 'total': Decimal('0.00')
@@ -2356,6 +2356,53 @@ class CarritoViewSet(ViewSet):
     #         'message': f'Carrito vaciado ({cantidad} items eliminados)'
     #     })
 
+
+    def asignar_vendedor_por_carga(self, pedido):
+        """
+        Asigna al pedido el vendedor con menos pedidos activos (Pendiente, Pagado, Carrito).
+        Si hay empate, elige uno aleatoriamente.
+        """
+        # Obtiene todos los vendedores disponibles
+        vendedores = list(Vendedor.objects.all())
+        
+        # Si no hay vendedores, lanza una excepción para evitar asignaciones inválidas
+        if not vendedores:
+            raise Exception("No hay vendedores disponibles para asignar el pedido.")
+
+        # Diccionario para contar los pedidos activos por vendedor
+        pedidos_por_vendedor = {} #Guarda el id del vendedor como clave y la cantidad de pedidos activos como valor
+        
+        estados_activos = [Pedido.PENDIENTE, Pedido.PAGADO, Pedido.CARRITO]
+        
+        # Recorre cada vendedor y cuenta sus pedidos activos
+        for vendedor in vendedores:
+            pedidos_activos = Pedido.objects.filter(
+                vendedor=vendedor,
+                estado__in=estados_activos
+            ).count()
+
+            print(f"Vendedor {vendedor.id} ({vendedor.usuario}): {pedidos_activos} pedidos activos")
+            
+            pedidos_por_vendedor[vendedor.id] = pedidos_activos
+        
+        # Encuentra la menor cantidad de pedidos activos entre todos los vendedores
+        min_pedidos = min(pedidos_por_vendedor.values())
+        
+        # Filtra los vendedores que tienen la menor carga de trabajo
+        menos_cargados = []
+        
+        for vendedor in vendedores:
+            if pedidos_por_vendedor[vendedor.id] == min_pedidos:
+                menos_cargados.append(vendedor)
+        
+        # Si hay empate, elige uno aleatoriamente
+        import random
+        vendedor_elegido = random.choice(menos_cargados)
+
+        # Asigna el vendedor elegido al pedido
+        pedido.vendedor = vendedor_elegido
+
+
     @action(detail=False, methods=['post'])
     def finalizar(self, request):
         """
@@ -2389,6 +2436,7 @@ class CarritoViewSet(ViewSet):
 
         # 3. Obtener dirección
         direccion = request.data.get('direccion_envio')
+        
         if not direccion:
             return Response({'error': 'Debe proporcionar una dirección de envío'}, status=400)
 
@@ -2401,6 +2449,8 @@ class CarritoViewSet(ViewSet):
             except MetodoPago.DoesNotExist:
                 return Response({'error': 'Método de pago no válido'}, status=400)
 
+        else:
+            return Response({'error': 'Debe seleccionar un método de pago'}, status=400)
 
 
         # 5. Verificar stock de todas las piezas
@@ -2419,8 +2469,10 @@ class CarritoViewSet(ViewSet):
         pedido.estado = Pedido.PENDIENTE
         pedido.fecha_pedido = date.today()
         pedido.direccion_envio = direccion
+        
+        # Asignar vendedor por carga de trabajo si no tiene uno
         if not pedido.vendedor:
-            pedido.vendedor = Vendedor.objects.first()
+            self.asignar_vendedor_por_carga(pedido)
         pedido.save()
 
         # 8. Crear registro de pago
