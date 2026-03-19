@@ -15,9 +15,8 @@ Agregar productos con un csv
 
 
 
-HOY
-Importante
-https://www.youtube.com/watch?v=kkBfitvmIk8
+HOY Importante
+-https://www.youtube.com/watch?v=kkBfitvmIk8
 https://www.youtube.com/watch?v=I-pzCJnGO08
 
 Los test heredan de la clase TestCase.

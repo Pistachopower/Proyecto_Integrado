@@ -6,7 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient , APIRequestFactory #sirve mejor para unitarias (probar métodos concretos y permisos aislados)
-from .models import Cliente, Pedido, Usuario, Vendedor
+from .models import Cliente, Pedido, Usuario, Vendedor, ListaDeseos, Pieza, ListaDeseosPieza
 from .permissions import EsDuenioUsuario, SoloAdminOEmpleado
 
 
@@ -428,6 +428,18 @@ class PedidoPermisosIntegracionTests(TestCase):
         self.assertEqual(ids, {self.pedido_cliente_1.id, self.pedido_cliente_2.id})
 
     def test_anonimo_no_puede_listar_pedidos(self):
+        """
+        El método self.assertIn verifica que un elemento esté presente dentro de una colección (lista, string, diccionario, etc.) durante un test.
+        
+        Si el elemento está dentro de la colección, el test pasa. Si no está, el test falla.
+        
+        Por ejemplo:
+        
+        self.assertIn("a", ["a", "b", "c"]) pasa.
+        self.assertIn(401, [401, 403]) pasa si el valor es 401 o 403.
+        self.assertIn("clave", diccionario) pasa si "clave" es una key del diccionario.
+        Se usa para comprobar que un valor esperado está incluido en un conjunto de posibles valores.
+        """
         # 1) Sin autenticación, llamar a listado.
         response = self.api_client.get("/api/v1/pedido/")
 
@@ -437,12 +449,13 @@ class PedidoPermisosIntegracionTests(TestCase):
             [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
         )
 
-    def test_filtrar_pedidos_cliente_respeta_regla_de_seguridad(self):
+
+    def test_filtrar_pedidos_cliente_respeta_regla_de_seguridad(self): #Mirar otros filtros en api_views.py
         # 1) Autenticar como cliente 1.
         self.api_client.force_authenticate(user=self.usuario_cliente_1)
 
         # 2) Llamar acción personalizada de filtrado para cliente.
-        response = self.api_client.get("/api/v1/pedido/filtrar_pedidosCliente/")
+        response = self.api_client.get("/api/v1/pedido/filtrar_pedidosCliente/") #Recuerda que esta en las accion 
 
         # 3) Debe devolver solo los pedidos del cliente autenticado.
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -461,7 +474,320 @@ class PedidoPermisosIntegracionTests(TestCase):
         ids = obtener_ids_desde_respuesta(response)
         self.assertEqual(ids, {self.pedido_cliente_1.id})
 
-#test pendientes por hacer EsDuenioDeObjeto, EsDuenioDirecto, 
-#EsDuenioPorMetodoPago, EsDuenioPorPedido, SoloVerPiezasLineaPedido
-#PermisoGestionInventario, PuedeEditarValoracion
+class ListaDeseosIntegracionTests(TestCase):
+    """Pruebas de integración para la lista de deseos: cada cliente solo ve su propia lista."""
+
+    def setUp(self):
+        self.api_client = APIClient()
+        # Crear dos usuarios y clientes
+        self.usuario_cliente_1 = crear_usuario_cliente(
+            username="cliente_test_1",
+            email="cliente_test_1@example.com",
+        )
+        self.usuario_cliente_2 = crear_usuario_cliente(
+            username="cliente_test_2",
+            email="cliente_test_2@example.com",
+        )
+        self.cliente_1 = Cliente.objects.create(usuario=self.usuario_cliente_1)
+        self.cliente_2 = Cliente.objects.create(usuario=self.usuario_cliente_2)
+        # Crear listas de deseos para cada cliente
+        self.lista_1 = ListaDeseos.objects.create(
+            cliente=self.cliente_1,
+            nombre="Lista de cliente 1",
+            fecha_creacion=date.today(),
+        )
+        self.lista_2 = ListaDeseos.objects.create(
+            cliente=self.cliente_2,
+            nombre="Lista de cliente 2",
+            fecha_creacion=date.today(),
+        )
+
+    def test_cliente_ve_solo_su_lista(self):
+        """El cliente autenticado solo ve su propia lista de deseos."""
+        self.api_client.force_authenticate(user=self.usuario_cliente_1)
+        response = self.api_client.get("/api/v1/lista_deseo/mi_lista/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["lista_id"], self.lista_1.id)
+        self.assertEqual(response.data["nombre"], self.lista_1.nombre)
+        # No debe ver la lista del otro cliente
+        self.assertNotEqual(response.data["lista_id"], self.lista_2.id)
+
+    def test_cliente_2_ve_solo_su_lista(self):
+        """El segundo cliente solo ve su propia lista de deseos."""
+        self.api_client.force_authenticate(user=self.usuario_cliente_2)
+        response = self.api_client.get("/api/v1/lista_deseo/mi_lista/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["lista_id"], self.lista_2.id)
+        self.assertEqual(response.data["nombre"], self.lista_2.nombre)
+        self.assertNotEqual(response.data["lista_id"], self.lista_1.id)
+
+    def test_anonimo_no_puede_ver_lista(self):
+        """Un usuario no autenticado no puede acceder a la lista de deseos."""
+        response = self.api_client.get("/api/v1/lista_deseo/mi_lista/")
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
+        )
+
+class ListaDeseosOperacionesTests(TestCase):
+    """Pruebas de integración para operaciones (CRUD) sobre la lista de deseos."""
+
+    def setUp(self):
+        self.api_client = APIClient()
+        self.usuario_cliente = crear_usuario_cliente(
+            username="cliente_test",
+            email="cliente_test@example.com",
+        )
+        self.cliente = Cliente.objects.create(usuario=self.usuario_cliente)
+        self.lista = ListaDeseos.objects.create(
+            cliente=self.cliente,
+            nombre="Lista de cliente",
+            fecha_creacion=date.today(),
+        )
+        self.pieza = Pieza.objects.create(
+            estado=Pieza.NUEVO,
+            nombre="Pieza Test",
+            referencia="REF123",
+            version="V1",
+            marca="MarcaTest",
+            anio=2022,
+            precio_base=Decimal("50.00"),
+            descripcion="Pieza de prueba",
+            stock=10,
+            categoria=None,
+        )
+
+    def test_agregar_pieza_a_lista(self):
+        """El cliente puede agregar una pieza a su lista de deseos."""
+        self.api_client.force_authenticate(user=self.usuario_cliente)
+        response = self.api_client.post(
+            "/api/v1/lista_deseo/agregar_pieza/",
+            {"pieza_id": self.pieza.id},
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue(ListaDeseosPieza.objects.filter(lista_deseos=self.lista, pieza=self.pieza).exists())
+
+    def test_no_agrega_pieza_repetida(self):
+        """No se puede agregar la misma pieza dos veces a la lista de deseos."""
+        self.api_client.force_authenticate(user=self.usuario_cliente)
+        # Agregar la pieza una vez
+        self.api_client.post(
+            "/api/v1/lista_deseo/agregar_pieza/",
+            {"pieza_id": self.pieza.id},
+            format="json"
+        )
+        # Intentar agregarla de nuevo
+        response = self.api_client.post(
+            "/api/v1/lista_deseo/agregar_pieza/",
+            {"pieza_id": self.pieza.id},
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("ya_existe", response.data)
+
+    def test_eliminar_pieza_de_lista(self):
+        """El cliente puede eliminar una pieza de su lista de deseos."""
+        self.api_client.force_authenticate(user=self.usuario_cliente)
+        # Agregar la pieza
+        self.api_client.post(
+            "/api/v1/lista_deseo/agregar_pieza/",
+            {"pieza_id": self.pieza.id},
+            format="json"
+        )
+        # Eliminar la pieza
+        response = self.api_client.delete(
+            "/api/v1/lista_deseo/eliminar_pieza/",
+            {"pieza_id": self.pieza.id},
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(ListaDeseosPieza.objects.filter(lista_deseos=self.lista, pieza=self.pieza).exists())
+
+    def test_anonimo_no_puede_agregar(self):
+        """Un usuario no autenticado no puede agregar piezas a la lista de deseos."""
+        response = self.api_client.post(
+            "/api/v1/lista_deseo/agregar_pieza/",
+            {"pieza_id": self.pieza.id},
+            format="json"
+        )
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
+        )
+
+    def test_anonimo_no_puede_eliminar(self):
+        """Un usuario no autenticado no puede eliminar piezas de la lista de deseos."""
+        response = self.api_client.delete(
+            "/api/v1/lista_deseo/eliminar_pieza/",
+            {"pieza_id": self.pieza.id},
+            format="json"
+        )
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
+        )
+
+class UsuarioAutenticacionIntegracionTests(TestCase):
+    """
+    Pruebas de integración para registro y login de usuarios (cliente, empleado, anónimo).
+    Incluye:
+    - Registro de cliente
+    - Login de cliente
+    - Login de empleado
+    - Casos de login fallido
+    - Acceso restringido para usuario anónimo
+    """
+
+    def setUp(self):
+        self.api_client = APIClient()
+        # Datos de prueba para cliente
+        self.cliente_data = {
+            "username": "cliente_test",
+            "email": "cliente_test@example.com",
+            "first_name": "Juan",
+            "last_name": "Perez",
+            "telefono": "600123123",
+            "fecha_nacimiento": "1990-01-01",
+            "direccion": "Calle Falsa 123",
+            "password": "Pass123456!"
+        }
+        # Datos de prueba para empleado (creado por admin)
+        self.empleado_username = "empleado_test"
+        self.empleado_password = "Pass123456!"
+        user_model = get_user_model()
+        # Crear empleado directamente en la base de datos
+        self.empleado = user_model.objects.create_user(
+            username=self.empleado_username,
+            email="empleado_test@example.com",
+            password=self.empleado_password,
+            rol=Usuario.EMPLEADO,
+            telefono="600123124",
+            direccion="Calle Verdadera 456",
+        )
+
+    def test_registro_cliente_exitoso(self):
+        """
+        Registro exitoso de un cliente.
+        Verifica que el endpoint de registro crea correctamente el usuario y devuelve los datos esperados.
+        """
+        # Enviar los datos bajo la clave 'user_data' como espera el serializer
+        response = self.api_client.post(
+            "/api/v1/registro_cliente/",
+            {"user_data": self.cliente_data},
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIn("user_data", response.data)
+        self.assertEqual(response.data["user_data"]["username"], self.cliente_data["username"])
+
+    def test_login_cliente_exitoso(self):
+        """
+        Login exitoso de un cliente recién registrado.
+        Primero registra el cliente, luego prueba el login y verifica los tokens y datos devueltos.
+        """
+        # Registrar cliente
+        self.api_client.post(
+            "/api/v1/registro_cliente/",
+            {"user_data": self.cliente_data},
+            format="json"
+        )
+        # Login
+        response = self.api_client.post(
+            "/api/v1/login/",
+            {
+                "username": self.cliente_data["username"],
+                "password": self.cliente_data["password"]
+            },
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+        self.assertIn("refresh", response.data)
+        self.assertTrue(response.data["is_authenticated"])
+        self.assertEqual(response.data["user"]["username"], self.cliente_data["username"])
+
+    def test_login_empleado_exitoso(self):
+        """
+        Login exitoso de un empleado creado por admin.
+        Verifica que el empleado puede autenticarse y recibe los tokens y datos correctos.
+        """
+        response = self.api_client.post(
+            "/api/v1/login/",
+            {
+                "username": self.empleado_username,
+                "password": self.empleado_password
+            },
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("access", response.data)
+        self.assertIn("refresh", response.data)
+        self.assertTrue(response.data["is_authenticated"])
+        self.assertEqual(response.data["user"]["username"], self.empleado_username)
+        self.assertEqual(response.data["user"]["rol"], Usuario.EMPLEADO)
+
+    def test_login_fallido_usuario_inexistente(self):
+        """
+        Login fallido con usuario inexistente.
+        Verifica que el sistema responde con error y status adecuado.
+        """
+        response = self.api_client.post(
+            "/api/v1/login/",
+            {
+                "username": "no_existe",
+                "password": "incorrecta"
+            },
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertIn("error", response.data)
+
+    def test_login_fallido_password_incorrecta(self):
+        """
+        Login fallido con password incorrecta.
+        Primero registra el cliente, luego intenta login con password incorrecta y verifica el error.
+        """
+        # Registrar cliente
+        self.api_client.post(
+            "/api/v1/registro_cliente/",
+            {"user_data": self.cliente_data},
+            format="json"
+        )
+        # Intentar login con password incorrecta
+        response = self.api_client.post(
+            "/api/v1/login/",
+            {
+                "username": self.cliente_data["username"],
+                "password": "incorrecta"
+            },
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertIn("error", response.data)
+
+    def test_registro_cliente_fallido_faltan_campos(self):
+        """
+        Registro fallido por campos obligatorios faltantes.
+        Prueba que el sistema devuelve error si falta un campo requerido.
+        """
+        data_incompleta = self.cliente_data.copy()
+        del data_incompleta["password"]
+        response = self.api_client.post(
+            "/api/v1/registro_cliente/",
+            {"user_data": data_incompleta},
+            format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("password", response.data["user_data"])
+
+    def test_login_anonimo_acceso_restringido(self):
+        """
+        Usuario anónimo no puede acceder a endpoints protegidos.
+        Verifica que el sistema restringe el acceso a usuarios no autenticados.
+        """
+        response = self.api_client.get("/api/v1/mi-perfil/")
+        self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
+
 

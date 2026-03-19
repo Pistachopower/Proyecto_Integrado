@@ -215,18 +215,23 @@ class PiezaViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
   
-    #TODO: REVISAR Y PROBAR FUNCIONAMIENTO
     @action(detail=False, methods=['get'])
     def otros_filtros(self, request):
         """
-        Filtra piezas por estado.
+        Filtra piezas según varios criterios:
 
-        GET /api/piezas/otros_filtros/?estado=activo&estado=pendiente
-        GET /api/piezas/otros_filtros/?estado=activo
+        - estado: Filtra por uno o varios estados de la pieza (por número).
+        - busqueda: Filtra por nombre de la pieza (texto parcial).
+        - stock: Si stock=true, solo muestra piezas con stock disponible (>0).
+        - marca: Filtra por marca exacta (no distingue mayúsculas/minúsculas).
 
-        Parámetros query:
-        - estado: Estado de la pieza (puede repetirse para múltiples valores)
-        - busqueda: Búsqueda por nombre
+        Ejemplos de uso:
+        GET /api/piezas/otros_filtros/?estado=1&estado=2
+        GET /api/piezas/otros_filtros/?busqueda=rueda
+        GET /api/piezas/otros_filtros/?stock=true
+        GET /api/piezas/otros_filtros/?marca=Toyota
+
+        Devuelve la lista de piezas que cumplen los filtros aplicados.
         """
         # Recibe MÚLTIPLES valores: ['activo', 'pendiente']
         estados = request.query_params.getlist('estado')
@@ -245,7 +250,8 @@ class PiezaViewSet(viewsets.ModelViewSet):
         if busqueda:
             piezas = piezas.filter(nombre__icontains=busqueda)
 
-        if stock.lower() == 'true'.lower():
+        #Filtrar por stock (si hay) - si stock=true, solo mostrar piezas con stock > 0
+        if stock and stock.lower() == 'true'.lower():
             piezas = piezas.filter(stock__gt=0)
 
         if marca:
@@ -440,6 +446,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
         """
         # Reutilizamos la misma regla de seguridad definida en get_queryset.
         pedidos = self.get_queryset()
+
+        #pedidos = Pedido.objects.all()
 
         pedido_id = request.query_params.get('id')
         estados = request.query_params.getlist('estado')
@@ -1395,13 +1403,13 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
     #         return PasarAlCarritoSerializer
     #     return ListaDeseosSerializer
 
-    # def get_queryset(self):
-    #     """Solo muestra la lista de deseos del cliente autenticado."""
-    #     try:
-    #         cliente = self.request.user.cliente
-    #         return ListaDeseos.objects.filter(cliente=cliente)
-    #     except Cliente.DoesNotExist:
-    #         return ListaDeseos.objects.none()
+    def get_queryset(self):
+        """Solo muestra la lista de deseos del cliente autenticado."""
+        try:
+            cliente = self.request.user.cliente
+            return ListaDeseos.objects.filter(cliente=cliente)
+        except Cliente.DoesNotExist:
+            return ListaDeseos.objects.none()
 
     # Método auxiliar para obtener o crear la lista de deseos del cliente
     def get_o_crear_lista(self, cliente):
@@ -2326,27 +2334,27 @@ class CarritoViewSet(ViewSet):
             return Response({'error': 'Pieza no encontrada en el carrito'}, status=404)
 
     #TO DO: REVISAR FUNCIONAMIENTO DE ESTE ENDPOINT Y SU USO DESDE EL FRONTEND
-    @action(detail=False, methods=['post'])
-    def vaciar(self, request):
-        """
-        Vacía completamente el carrito.
+    # @action(detail=False, methods=['post'])
+    # def vaciar(self, request):
+    #     """
+    #     Vacía completamente el carrito.
         
-        POST /api/v1/carrito/vaciar/
-        """
-        try:
-            cliente = request.user.cliente
-        except Cliente.DoesNotExist:
-            return Response({'error': 'Usuario no es cliente'}, status=400)
+    #     POST /api/v1/carrito/vaciar/
+    #     """
+    #     try:
+    #         cliente = request.user.cliente
+    #     except Cliente.DoesNotExist:
+    #         return Response({'error': 'Usuario no es cliente'}, status=400)
 
-        pedido = self.get_carrito(cliente)
-        cantidad = pedido.lineas_pedido.count()
-        pedido.lineas_pedido.all().delete()
-        pedido.total = Decimal('0.00')
-        pedido.save()
+    #     pedido = self.get_carrito(cliente)
+    #     cantidad = pedido.lineas_pedido.count()
+    #     pedido.lineas_pedido.all().delete()
+    #     pedido.total = Decimal('0.00')
+    #     pedido.save()
 
-        return Response({
-            'message': f'Carrito vaciado ({cantidad} items eliminados)'
-        })
+    #     return Response({
+    #         'message': f'Carrito vaciado ({cantidad} items eliminados)'
+    #     })
 
     @action(detail=False, methods=['post'])
     def finalizar(self, request):
