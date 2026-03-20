@@ -742,6 +742,7 @@ class ClienteDescuentoSerializer(serializers.HyperlinkedModelSerializer):
 # ============================================================
 # REGISTROS DE USUARIOS 
 # ============================================================
+#TODO: REVISAR LAS VALIDACIONES. Posible redundancia email 
 class RegistroClienteSerializer(serializers.Serializer):
     #Creamos primero el usuario
     user_data = UsuarioSerializer()

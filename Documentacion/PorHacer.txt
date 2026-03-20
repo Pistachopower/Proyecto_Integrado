@@ -4,20 +4,20 @@ Permisos
 
 Descuento: descuento de bienvenida 5% aplicado pero puedes hacer más cosas (indicar al cliente que tiene descuento bienvenida)
 
-Devolucion (cambiar el estado)
-
-Cuando termine la compra crear un pdf con la factura
-
-
-Vendedor 
-Permisos
-Agregar productos con un csv
 
 
 
-HOY
-Importante
-https://www.youtube.com/watch?v=kkBfitvmIk8
+
+
+
+
+HOY Importante
+Validar bien los campos cuando se agrega una tarjeta a los metodos de pago
+Volver a revisar el modelo linea pedido porque tiene estados que no se van a utilizar
+
+
+
+-https://www.youtube.com/watch?v=kkBfitvmIk8
 https://www.youtube.com/watch?v=I-pzCJnGO08
 
 Los test heredan de la clase TestCase.
@@ -84,6 +84,21 @@ Tutoriales
 Django Testing tutorial
 Django REST Framework testing tutorial
 Python unittest tutorial
+
+
+Probar test:
+Cliente
+¿Puede un cliente ver la lista de usuarios?
+¿Puede un cliente crear un usuario nuevo?
+¿Puede un cliente editar su propia cuenta?
+¿Puede un cliente editar la cuenta de otro cliente?
+
+
+Empleado 
+¿Puede un Empleado ver la lista de usuarios?
+¿Puede un Empleado crear un usuario nuevo? 
+¿Puede un Empleado editar su propia cuenta?
+
 
 
 

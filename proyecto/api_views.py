@@ -215,18 +215,23 @@ class PiezaViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
   
-    #TODO: REVISAR Y PROBAR FUNCIONAMIENTO
     @action(detail=False, methods=['get'])
     def otros_filtros(self, request):
         """
-        Filtra piezas por estado.
+        Filtra piezas según varios criterios:
 
-        GET /api/piezas/otros_filtros/?estado=activo&estado=pendiente
-        GET /api/piezas/otros_filtros/?estado=activo
+        - estado: Filtra por uno o varios estados de la pieza (por número).
+        - busqueda: Filtra por nombre de la pieza (texto parcial).
+        - stock: Si stock=true, solo muestra piezas con stock disponible (>0).
+        - marca: Filtra por marca exacta (no distingue mayúsculas/minúsculas).
 
-        Parámetros query:
-        - estado: Estado de la pieza (puede repetirse para múltiples valores)
-        - busqueda: Búsqueda por nombre
+        Ejemplos de uso:
+        GET /api/piezas/otros_filtros/?estado=1&estado=2
+        GET /api/piezas/otros_filtros/?busqueda=rueda
+        GET /api/piezas/otros_filtros/?stock=true
+        GET /api/piezas/otros_filtros/?marca=Toyota
+
+        Devuelve la lista de piezas que cumplen los filtros aplicados.
         """
         # Recibe MÚLTIPLES valores: ['activo', 'pendiente']
         estados = request.query_params.getlist('estado')
@@ -245,7 +250,8 @@ class PiezaViewSet(viewsets.ModelViewSet):
         if busqueda:
             piezas = piezas.filter(nombre__icontains=busqueda)
 
-        if stock.lower() == 'true'.lower():
+        #Filtrar por stock (si hay) - si stock=true, solo mostrar piezas con stock > 0
+        if stock and stock.lower() == 'true'.lower():
             piezas = piezas.filter(stock__gt=0)
 
         if marca:
@@ -349,7 +355,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
     filterset_fields=[
         'cliente_id'   ]
 
-    def get_queryset(self):
+    def get_queryset(self): #get_queryset(): controla qué registros puede ver ese usuario.
         """
         Filtra los pedidos según el rol del usuario:
         - Admin/Empleado: ve todos los pedidos
@@ -438,7 +444,10 @@ class PedidoViewSet(viewsets.ModelViewSet):
         GET /api/v1/pedido/filtrar_pedidosCliente/?estado=pendiente
         GET /api/v1/pedido/filtrar_pedidosCliente/?fecha=2026-02-19
         """
-        pedidos = Pedido.objects.all()
+        # Reutilizamos la misma regla de seguridad definida en get_queryset.
+        pedidos = self.get_queryset()
+
+        #pedidos = Pedido.objects.all()
 
         pedido_id = request.query_params.get('id')
         estados = request.query_params.getlist('estado')
@@ -464,7 +473,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
         Filtra pedidos por vendedor, id, nombre del cliente, monto y fecha.
         GET /api/v1/pedido/filtrar_pedidosVendedor/?vendedor_id=1&id=1&nombre_cliente=Juan&monto=100.00&fecha=2026-02-19
         """
-        pedidos = Pedido.objects.all()
+        # Reutilizamos la misma regla de seguridad definida en get_queryset.
+        pedidos = self.get_queryset()
         pedido_id = request.query_params.get('id')
         nombre_cliente = request.query_params.get('nombre_cliente')
         monto = request.query_params.get('monto')
@@ -1170,6 +1180,7 @@ class ValoracionViewSet(viewsets.ModelViewSet):
 
         # Guardar la valoración, asignando el cliente, la fecha y la pieza de forma segura
         nueva_valoracion = serializer.save(cliente=cliente, pieza=pieza, fecha_valoracion=date.today())
+        
         # Paso 7: Devolver la valoración creada como respuesta
         return Response(self.get_serializer(nueva_valoracion).data, status=201)
     
@@ -1262,7 +1273,7 @@ class ValoracionViewSet(viewsets.ModelViewSet):
             imagen_principal = None
             imagen_obj = ImagenPieza.objects.filter(pieza=pieza).first()  # Buscar imagen en ImagenPieza
             
-            # Simplificado: Si imagen_obj existe y tiene url_imagen, usarla
+            # Si imagen_obj existe y tiene url_imagen, usarla
             if imagen_obj and getattr(imagen_obj, 'url_imagen', None):
                 # Si existe una imagen en ImagenPieza, uso esa
                 imagen_principal = request.build_absolute_uri(imagen_obj.url_imagen.url)
@@ -1392,13 +1403,13 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
     #         return PasarAlCarritoSerializer
     #     return ListaDeseosSerializer
 
-    # def get_queryset(self):
-    #     """Solo muestra la lista de deseos del cliente autenticado."""
-    #     try:
-    #         cliente = self.request.user.cliente
-    #         return ListaDeseos.objects.filter(cliente=cliente)
-    #     except Cliente.DoesNotExist:
-    #         return ListaDeseos.objects.none()
+    def get_queryset(self):
+        """Solo muestra la lista de deseos del cliente autenticado."""
+        try:
+            cliente = self.request.user.cliente
+            return ListaDeseos.objects.filter(cliente=cliente)
+        except Cliente.DoesNotExist:
+            return ListaDeseos.objects.none()
 
     # Método auxiliar para obtener o crear la lista de deseos del cliente
     def get_o_crear_lista(self, cliente):
@@ -1776,7 +1787,7 @@ class VerMiPerfilView(APIView):
                 perfil = Cliente.objects.get(usuario=usuario)
                 serializer = ClienteSerializer(perfil, context={'request': request})
                 
-                # Truco: Añadimos el campo 'tipo_usuario' a la respuesta JSON
+                #Añadimos el campo 'tipo_usuario' a la respuesta JSON
                 # para que Vue sepa qué pintar
                 data = serializer.data
                 data['tipo_usuario'] = 'cliente'
@@ -2042,7 +2053,7 @@ class CarritoViewSet(ViewSet):
             cliente=cliente,
             estado=Pedido.CARRITO,
             defaults={
-                'vendedor': Vendedor.objects.first(),
+                'vendedor': None,  # No asignar vendedor hasta finalizar compra
                 'fecha_pedido': date.today(),
                 'direccion_envio': cliente.usuario.direccion or '',
                 'total': Decimal('0.00')
@@ -2322,27 +2333,75 @@ class CarritoViewSet(ViewSet):
         except LineaPedido.DoesNotExist:
             return Response({'error': 'Pieza no encontrada en el carrito'}, status=404)
 
-    @action(detail=False, methods=['post'])
-    def vaciar(self, request):
-        """
-        Vacía completamente el carrito.
+    #TO DO: REVISAR FUNCIONAMIENTO DE ESTE ENDPOINT Y SU USO DESDE EL FRONTEND
+    # @action(detail=False, methods=['post'])
+    # def vaciar(self, request):
+    #     """
+    #     Vacía completamente el carrito.
         
-        POST /api/v1/carrito/vaciar/
+    #     POST /api/v1/carrito/vaciar/
+    #     """
+    #     try:
+    #         cliente = request.user.cliente
+    #     except Cliente.DoesNotExist:
+    #         return Response({'error': 'Usuario no es cliente'}, status=400)
+
+    #     pedido = self.get_carrito(cliente)
+    #     cantidad = pedido.lineas_pedido.count()
+    #     pedido.lineas_pedido.all().delete()
+    #     pedido.total = Decimal('0.00')
+    #     pedido.save()
+
+    #     return Response({
+    #         'message': f'Carrito vaciado ({cantidad} items eliminados)'
+    #     })
+
+
+    def asignar_vendedor_por_carga(self, pedido):
         """
-        try:
-            cliente = request.user.cliente
-        except Cliente.DoesNotExist:
-            return Response({'error': 'Usuario no es cliente'}, status=400)
+        Asigna al pedido el vendedor con menos pedidos activos (Pendiente, Pagado, Carrito).
+        Si hay empate, elige uno aleatoriamente.
+        """
+        # Obtiene todos los vendedores disponibles
+        vendedores = list(Vendedor.objects.all())
+        
+        # Si no hay vendedores, lanza una excepción para evitar asignaciones inválidas
+        if not vendedores:
+            raise Exception("No hay vendedores disponibles para asignar el pedido.")
 
-        pedido = self.get_carrito(cliente)
-        cantidad = pedido.lineas_pedido.count()
-        pedido.lineas_pedido.all().delete()
-        pedido.total = Decimal('0.00')
-        pedido.save()
+        # Diccionario para contar los pedidos activos por vendedor
+        pedidos_por_vendedor = {} #Guarda el id del vendedor como clave y la cantidad de pedidos activos como valor
+        
+        estados_activos = [Pedido.PENDIENTE, Pedido.PAGADO, Pedido.CARRITO]
+        
+        # Recorre cada vendedor y cuenta sus pedidos activos
+        for vendedor in vendedores:
+            pedidos_activos = Pedido.objects.filter(
+                vendedor=vendedor,
+                estado__in=estados_activos
+            ).count()
 
-        return Response({
-            'message': f'Carrito vaciado ({cantidad} items eliminados)'
-        })
+            print(f"Vendedor {vendedor.id} ({vendedor.usuario}): {pedidos_activos} pedidos activos")
+            
+            pedidos_por_vendedor[vendedor.id] = pedidos_activos
+        
+        # Encuentra la menor cantidad de pedidos activos entre todos los vendedores
+        min_pedidos = min(pedidos_por_vendedor.values())
+        
+        # Filtra los vendedores que tienen la menor carga de trabajo
+        menos_cargados = []
+        
+        for vendedor in vendedores:
+            if pedidos_por_vendedor[vendedor.id] == min_pedidos:
+                menos_cargados.append(vendedor)
+        
+        # Si hay empate, elige uno aleatoriamente
+        import random
+        vendedor_elegido = random.choice(menos_cargados)
+
+        # Asigna el vendedor elegido al pedido
+        pedido.vendedor = vendedor_elegido
+
 
     @action(detail=False, methods=['post'])
     def finalizar(self, request):
@@ -2377,6 +2436,7 @@ class CarritoViewSet(ViewSet):
 
         # 3. Obtener dirección
         direccion = request.data.get('direccion_envio')
+        
         if not direccion:
             return Response({'error': 'Debe proporcionar una dirección de envío'}, status=400)
 
@@ -2389,6 +2449,8 @@ class CarritoViewSet(ViewSet):
             except MetodoPago.DoesNotExist:
                 return Response({'error': 'Método de pago no válido'}, status=400)
 
+        else:
+            return Response({'error': 'Debe seleccionar un método de pago'}, status=400)
 
 
         # 5. Verificar stock de todas las piezas
@@ -2407,8 +2469,10 @@ class CarritoViewSet(ViewSet):
         pedido.estado = Pedido.PENDIENTE
         pedido.fecha_pedido = date.today()
         pedido.direccion_envio = direccion
+        
+        # Asignar vendedor por carga de trabajo si no tiene uno
         if not pedido.vendedor:
-            pedido.vendedor = Vendedor.objects.first()
+            self.asignar_vendedor_por_carga(pedido)
         pedido.save()
 
         # 8. Crear registro de pago

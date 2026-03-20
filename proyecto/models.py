@@ -166,7 +166,8 @@ class Pedido(models.Model):
     vendedor = models.ForeignKey(
         Vendedor,
         on_delete=models.CASCADE,
-        related_name="pedidos_vendedor"
+        related_name="pedidos_vendedor",
+        null=True,  # Permite que el pedido no tenga vendedor asignado inicialmente
     )
     fecha_pedido = models.DateField()
     direccion_envio = models.CharField(max_length=255)

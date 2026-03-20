@@ -29,17 +29,16 @@ class EsDuenioUsuario(permissions.BasePermission):
     """
 
     def has_permission(self, request, view):
-        # 1. Si eres jefe, pasas siempre.
+        # 1. Solo el administrador puede crear usuarios.
+        if view.action == 'create':
+            return getattr(request.user, 'rol', None) == Usuario.ADMINISTRADOR
+
+        # 2. Si eres jefe (empleado o admin), puedes ver la lista.
         if es_jefe(request.user):
             return True
 
-        # 2. Si intentas ver la LISTA COMPLETA de usuarios (action='list'),
-        # y no eres jefe, no puedes ver a los demás.
+        # 3. Un cliente no puede ver la lista completa de usuarios.
         if view.action == 'list':
-            return False
-        
-        # 3. Un usuario normal no puede crear otros usuarios.
-        if view.action == 'create':
             return False
 
         return True
@@ -176,60 +175,52 @@ class SoloVerPiezasLineaPedido(permissions.BasePermission):
 class PermisoGestionInventario(permissions.BasePermission):
     """
     Permiso para gestión de inventario (Piezas, Categorías, etc.).
-    - Cualquier usuario (incluido anónimo): solo lectura (GET, HEAD, OPTIONS)
-    - EMPLEADO: lectura + edición (PUT/PATCH), pero NO crear (POST) ni borrar (DELETE)
+    - Cualquier usuario (incluido anónimo o cliente): solo lectura (GET, HEAD, OPTIONS)
+    - EMPLEADO: puede CREAR (POST), EDITAR (PUT/PATCH) y BORRAR (DELETE)
     - ADMINISTRADOR: acceso total
     """
 
     def has_permission(self, request, view):
-        # 1. Cualquier usuario puede VER (métodos seguros)
+        """
+        Controla el acceso general según el método HTTP y el rol del usuario.
+        - Métodos seguros (GET, HEAD, OPTIONS): acceso para todos.
+        - Métodos de escritura (POST, PUT, PATCH, DELETE):
+            - ADMINISTRADOR y EMPLEADO pueden acceder.
+            - VENDEDOR (si existe) también puede acceder.
+            - Cliente/anónimo: denegado.
+        """
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # 2. Para métodos de escritura, el usuario debe estar autenticado
         if not request.user or not request.user.is_authenticated:
             return False
 
-        # 3. Obtenemos el rol del usuario de forma segura
         rol = getattr(request.user, 'rol', None)
 
-        # 4. Si es ADMINISTRADOR -> Acceso TOTAL
         if rol == Usuario.ADMINISTRADOR:
             return True
-
-        # 5. Si es VENDEDOR (tiene modelo Vendedor asociado) -> acceso total a inventario
         if hasattr(request.user, 'vendedor'):
             return True
-
-        # 6. Si es EMPLEADO -> puede editar pero NO crear ni borrar
         if rol == Usuario.EMPLEADO:
-            if request.method in ('POST', 'DELETE'):
-                return False
             return True
 
-        # 7. Cualquier otro (Cliente) -> solo lectura (ya pasó arriba)
         return False
 
     def has_object_permission(self, request, view, obj):
-        # 1. Lectura siempre permitida
+        """
+        Controla el acceso a objetos individuales según el método HTTP y el rol del usuario.
+        - Métodos seguros: acceso para todos.
+        - Métodos de escritura: ADMINISTRADOR, EMPLEADO y VENDEDOR pueden acceder.
+        """
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # 2. Obtenemos el rol
         rol = getattr(request.user, 'rol', None)
-
-        # 3. Si es ADMINISTRADOR -> Acceso TOTAL
         if rol == Usuario.ADMINISTRADOR:
             return True
-
-        # 4. Si es VENDEDOR -> acceso total a inventario
         if hasattr(request.user, 'vendedor'):
             return True
-
-        # 5. Si es EMPLEADO -> puede editar pero NO borrar
         if rol == Usuario.EMPLEADO:
-            if request.method == 'DELETE':
-                return False
             return True
 
         return False
