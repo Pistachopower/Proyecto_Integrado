@@ -1,0 +1,163 @@
+[
+{
+    "model": "proyecto.usuario",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$JhQ1GhCnwmiGm9TXYHaEye$5V7Q9DplXhqTFYsCQSpfMVnUtBTHv2pXfPvdhdn30Lw=",
+        "last_login": "2026-03-18T12:19:47.512Z",
+        "is_superuser": true,
+        "username": "nelson",
+        "first_name": "",
+        "last_name": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2026-01-12T12:30:53.396Z",
+        "rol": 1,
+        "email": "nelson@tienda.com",
+        "telefono": "",
+        "direccion": "",
+        "fecha_nacimiento": null,
+        "fecha_registro": "2026-01-12",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$JQVOLp2PcLAhDL5Jbj5JmA$KOmW0ChIeKvpvwFLg1nGNhnIo8AN0My9rsjOkgTcE34=",
+        "last_login": "2026-03-19T10:44:00.689Z",
+        "is_superuser": false,
+        "username": "isidoro.miguel",
+        "first_name": "Isidoro",
+        "last_name": "Ramires",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-01-12T12:30:53.630Z",
+        "rol": 2,
+        "email": "isidoro.miguel@tienda.com",
+        "telefono": "+34 888 19 20 37",
+        "direccion": "Plaza Sergio Padilla 745\nMurcia, 28331",
+        "fecha_nacimiento": "1996-04-30",
+        "fecha_registro": "2026-03-09",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 3,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$2XT9Xc8ETXhm5b4biKuiCr$rhoH3JJrr1MqI8IehUTi7yH/Ai7TphTZv1pd64y3RkA=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "leocadio.acero",
+        "first_name": "Leocadio",
+        "last_name": "Acero",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-01-12T12:30:53.837Z",
+        "rol": 2,
+        "email": "leocadio.acero@tienda.com",
+        "telefono": "+34874 28 82 44",
+        "direccion": "Calle de Noé Solana 4 Piso 5 \nHuelva, 01212",
+        "fecha_nacimiento": "1969-03-28",
+        "fecha_registro": "2026-01-12",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 4,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$cssgmDLTSSwBhAW8jZnoYm$FLpjbkltVXRaP0sw9A0j1F+IqUD++j27YP1KmpTYdwc=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "adelaida.zabaleta",
+        "first_name": "Adelaida",
+        "last_name": "Zabaleta",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-01-12T12:30:54.040Z",
+        "rol": 2,
+        "email": "adelaida.zabaleta@tienda.com",
+        "telefono": "+34871018291",
+        "direccion": "Pasaje de Espiridión Oller 259\nCádiz, 48712",
+        "fecha_nacimiento": "1991-06-16",
+        "fecha_registro": "2026-01-12",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 5,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$GG3zc17WDH2DI5WJjXSFsI$G0OJ1KH/4cU7HI1wiBgIJ6W1vK4TXmcWVNZ310RizXM=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "ciro.gargallo",
+        "first_name": "Ciro",
+        "last_name": "Gargallo",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-01-12T12:30:54.248Z",
+        "rol": 2,
+        "email": "ciro.gargallo@tienda.com",
+        "telefono": "+34844958933",
+        "direccion": "Paseo Emiliana Aparicio 8\nÁlava, 03547",
+        "fecha_nacimiento": "1977-11-29",
+        "fecha_registro": "2026-01-12",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 6,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$zJy8xxmoMaSM6O6M1R7c4j$BC9LuXHHW+f7WnLWQR9eC8Oy/gt3en2ycBoAib5iBUY=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "florentina.perea",
+        "first_name": "Florentina",
+        "last_name": "Perea",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-01-12T12:30:54.453Z",
+        "rol": 2,
+        "email": "florentina.perea@tienda.com",
+        "telefono": "+34 824615755",
+        "direccion": "Pasaje de Ariadna Rozas 45 Puerta 7 \nBaleares, 12891",
+        "fecha_nacimiento": "1976-02-12",
+        "fecha_registro": "2026-01-12",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "proyecto.usuario",
+    "pk": 7,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$xevnkqhtpBNL7IJfLZWaLv$JBchc3aBwwy0xUt8sh1azIXJ9Ya6DcThxHvrorjDyGU=",
+        "last_login": "2026-03-19T09:43:18.350Z",
+        "is_superuser": false,
+        "username": "marina.chico",
+        "first_name": "Marina Sara",
+        "last_name": "Chico",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-01-12T12:30:54.663Z",
+        "rol": 3,
+        "email": "nelson.galicia.carrero.al@iespoligonosur.org",
+        "telefono": "",
+        "direccion": "",
+        "fecha_nacimiento": null,
+        "fecha_registro": "2026-01-12",
+        "groups": [],
+        "user_permissions": []
+    }
+}
+]

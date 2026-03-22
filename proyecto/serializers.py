@@ -319,7 +319,40 @@ class TarjetaInputSerializer(serializers.ModelSerializer):
             'tipo_tarjeta': {'required': False}, 
         }
 
+    def validate(self, datos):
+            # Validar propietario: longitud entre 3 y 50 caracteres si está presente
+            propietario = datos.get('propietario')
+            if propietario is not None:
+                if not (3 <= len(propietario.strip()) <= 50):
+                    raise serializers.ValidationError({
+                        'propietario': 'El nombre del propietario debe tener entre 3 y 50 caracteres.'
+                    })
+
+            # Validar fecha de caducidad: debe ser futura si está presente
+            from datetime import datetime, date
+            import calendar
+
+            fecha_caducidad = datos.get('fecha_caducidad')
+            if fecha_caducidad:
+                try:
+                    # Convertir MM/AA a último día del mes y obtener solo la fecha
+                    fecha_caducidad_dt = datetime.strptime(fecha_caducidad, '%m/%y')
+                    last_day = calendar.monthrange(fecha_caducidad_dt.year, fecha_caducidad_dt.month)[1]
+                    fecha_caducidad_date = fecha_caducidad_dt.replace(day=last_day).date()
+                except ValueError:
+                    raise serializers.ValidationError({
+                        'fecha_caducidad': 'Formato inválido. Use MM/AA.'
+                    })
+
+                if fecha_caducidad_date < date.today():
+                    raise serializers.ValidationError({
+                        'fecha_caducidad': 'La tarjeta está caducada.'
+                    })
+
+            return datos
+
 class CuentaBancariaInputSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = CuentaBancaria
         exclude = ['metodo_pago']
@@ -330,6 +363,54 @@ class CuentaBancariaInputSerializer(serializers.ModelSerializer):
             'moneda': {'required': False},
         }
 
+
+    def validate_iban(self, value):
+        """
+        Valida el IBAN: obligatorio, 15-34 caracteres, solo alfanumérico.
+        """
+
+        #No sea None o vacío (not value)
+        #Sea una cadena de texto (not isinstance(value, str))
+        #No sea solo espacios en blanco (not value.strip())
+        if not value or not isinstance(value, str) or not value.strip():
+            raise serializers.ValidationError("El IBAN es obligatorio.")
+        
+        iban = value.replace(' ', '') # Eliminar espacios para validar longitud y caracteres
+        
+        if len(iban) < 15 or len(iban) > 34:
+            raise serializers.ValidationError("El IBAN debe tener entre 15 y 34 caracteres.")
+        
+        if not iban.isalnum():
+            raise serializers.ValidationError("El IBAN solo puede contener letras y números.")
+        return value
+
+    def validate_banco(self, value):
+        """
+        Valida el banco: obligatorio, 3-100 caracteres.
+        """
+        if not value or not isinstance(value, str) or not value.strip():
+            raise serializers.ValidationError("El nombre del banco es obligatorio.")
+        
+        nombre = value.strip()
+        
+        if len(nombre) < 3 or len(nombre) > 100:
+            raise serializers.ValidationError("El nombre del banco debe tener entre 3 y 100 caracteres.")
+        return nombre
+
+    def validate_moneda(self, value):
+        """
+        Valida la moneda: obligatorio, 3 letras (ej: EUR, USD).
+        """
+        if not value or not isinstance(value, str) or not value.strip():
+            raise serializers.ValidationError("La moneda es obligatoria.")
+        
+        moneda = value.strip().upper()
+        
+        if len(moneda) != 3 or not moneda.isalpha():
+            raise serializers.ValidationError("La moneda debe ser un código de 3 letras (ej: EUR, USD).")
+        
+        return moneda
+
 class BilleteraDigitalInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = BilleteraDigital
@@ -339,6 +420,32 @@ class BilleteraDigitalInputSerializer(serializers.ModelSerializer):
             'email': {'required': False},
             'proveedor': {'required': False},
         }
+
+
+    def validate(self, datos):
+        correo = datos.get('email')
+        if correo:
+            # Validar formato de email
+            from django.core.validators import validate_email
+            from django.core.exceptions import ValidationError as DjangoValidationError
+            try:
+                validate_email(correo)
+            except DjangoValidationError:
+                raise serializers.ValidationError({"email": "El email no tiene un formato válido."})
+
+            # Validar que el email no esté repetido para el mismo cliente
+            request = self.context.get('request')
+            if request and hasattr(request.user, 'cliente'):
+                cliente_id = request.user.cliente.id
+                
+                billeteras_iguales = BilleteraDigital.objects.filter(email=correo, metodo_pago__cliente_id=cliente_id)
+                
+                # Si estamos editando una billetera, excluimos la actual para no contarla como duplicada
+                if self.instance:
+                    billeteras_iguales = billeteras_iguales.exclude(pk=self.instance.pk)
+                if billeteras_iguales.exists():
+                    raise serializers.ValidationError({"email": "No puedes registrar dos billeteras digitales con el mismo email."})
+        return datos
 
 # --- EL SERIALIZADOR MAESTRO ---
 class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):
@@ -898,6 +1005,42 @@ class ContactoVendedorSerializer(serializers.Serializer):
     numero_telefono = serializers.CharField(max_length=20, required=True, allow_blank=False)
     asunto = serializers.CharField(max_length=200)
     mensaje = serializers.CharField(max_length=2000)
+
+    def validate(self, data):
+        """
+        Validación general de los datos de contacto del vendedor.
+        """
+        errores = {}
+
+        # Validar nombre: no vacío y mínimo 2 caracteres
+        nombre = data.get('nombre', '').strip()
+        if not nombre or len(nombre) < 2:
+            errores['nombre'] = 'El nombre debe tener al menos 2 caracteres.'
+
+        # Validar número de teléfono: solo dígitos, longitud 7-20
+        telefono = data.get('numero_telefono', '').strip()
+        digitos = ''.join(filter(str.isdigit, telefono))
+        if len(digitos) < 7 or len(digitos) > 20:
+            errores['numero_telefono'] = 'El número de teléfono debe tener entre 7 y 20 dígitos.'
+
+        # Validar asunto: no vacío y mínimo 3 caracteres
+        asunto = data.get('asunto', '').strip()
+        if not asunto or len(asunto) < 3:
+            errores['asunto'] = 'El asunto debe tener al menos 3 caracteres.'
+
+        # Validar mensaje: no vacío y mínimo 10 caracteres
+        mensaje = data.get('mensaje', '').strip()
+        if not mensaje or len(mensaje) < 10:
+            errores['mensaje'] = 'El mensaje debe tener al menos 10 caracteres.'
+
+        if errores:
+            raise serializers.ValidationError(errores)
+        return data
+
+    
+
+
+
 
 
 

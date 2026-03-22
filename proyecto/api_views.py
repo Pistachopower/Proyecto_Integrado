@@ -2363,7 +2363,8 @@ class CarritoViewSet(ViewSet):
         Si hay empate, elige uno aleatoriamente.
         """
         # Obtiene todos los vendedores disponibles
-        vendedores = list(Vendedor.objects.all())
+        vendedores = list(Vendedor.objects.select_related('usuario').all())
+
         
         # Si no hay vendedores, lanza una excepción para evitar asignaciones inválidas
         if not vendedores:
@@ -3169,7 +3170,7 @@ class ContactoVendedorAPIView(APIView):
         nombre = datos['nombre']
         email = datos['email']
         numero_telefono = datos['numero_telefono']
-        asunto = f"Nuevo mensaje de contacto de {nombre}"
+        asunto = f"Nuevo mensaje del cliente: {nombre}"
         mensaje = f"Nombre: {nombre}\nEmail: {email}\nNúmero de teléfono: {numero_telefono}\n\nMensaje:\n{datos['mensaje']}"
 
         try:
@@ -3335,6 +3336,7 @@ class ChatbotView(APIView):
         prompt = (
             "Eres un chatbot experto en atención al cliente de MotorPartExpress. "
             "Responde de forma profesional, útil y sin repetir saludos como 'Hola' o 'Bienvenido' en cada respuesta. "
+            "Sólo saluda la primera vez que el usuario inicia la conversación. "
             "Utiliza la siguiente información de la FAQ para ayudar al usuario.\n\n"
             f"FAQ:\n{faq_content}\n\n"
             "Historial de la conversación:\n" +
