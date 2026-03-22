@@ -319,6 +319,38 @@ class TarjetaInputSerializer(serializers.ModelSerializer):
             'tipo_tarjeta': {'required': False}, 
         }
 
+    def validate(self, datos):
+            # Validar propietario: longitud entre 3 y 50 caracteres si está presente
+            propietario = datos.get('propietario')
+            if propietario is not None:
+                if not (3 <= len(propietario.strip()) <= 50):
+                    raise serializers.ValidationError({
+                        'propietario': 'El nombre del propietario debe tener entre 3 y 50 caracteres.'
+                    })
+
+            # Validar fecha de caducidad: debe ser futura si está presente
+            from datetime import datetime, date
+            import calendar
+
+            fecha_caducidad = datos.get('fecha_caducidad')
+            if fecha_caducidad:
+                try:
+                    # Convertir MM/AA a último día del mes y obtener solo la fecha
+                    fecha_caducidad_dt = datetime.strptime(fecha_caducidad, '%m/%y')
+                    last_day = calendar.monthrange(fecha_caducidad_dt.year, fecha_caducidad_dt.month)[1]
+                    fecha_caducidad_date = fecha_caducidad_dt.replace(day=last_day).date()
+                except ValueError:
+                    raise serializers.ValidationError({
+                        'fecha_caducidad': 'Formato inválido. Use MM/AA.'
+                    })
+
+                if fecha_caducidad_date < date.today():
+                    raise serializers.ValidationError({
+                        'fecha_caducidad': 'La tarjeta está caducada.'
+                    })
+
+            return datos
+
 class CuentaBancariaInputSerializer(serializers.ModelSerializer):
     class Meta:
         model = CuentaBancaria
@@ -339,6 +371,32 @@ class BilleteraDigitalInputSerializer(serializers.ModelSerializer):
             'email': {'required': False},
             'proveedor': {'required': False},
         }
+
+
+    def validate(self, datos):
+        correo = datos.get('email')
+        if correo:
+            # Validar formato de email
+            from django.core.validators import validate_email
+            from django.core.exceptions import ValidationError as DjangoValidationError
+            try:
+                validate_email(correo)
+            except DjangoValidationError:
+                raise serializers.ValidationError({"email": "El email no tiene un formato válido."})
+
+            # Validar que el email no esté repetido para el mismo cliente
+            request = self.context.get('request')
+            if request and hasattr(request.user, 'cliente'):
+                cliente_id = request.user.cliente.id
+                
+                billeteras_iguales = BilleteraDigital.objects.filter(email=correo, metodo_pago__cliente_id=cliente_id)
+                
+                # Si estamos editando una billetera, excluimos la actual para no contarla como duplicada
+                if self.instance:
+                    billeteras_iguales = billeteras_iguales.exclude(pk=self.instance.pk)
+                if billeteras_iguales.exists():
+                    raise serializers.ValidationError({"email": "No puedes registrar dos billeteras digitales con el mismo email."})
+        return datos
 
 # --- EL SERIALIZADOR MAESTRO ---
 class CrearMetodoPagoUnificadoSerializer(serializers.ModelSerializer):

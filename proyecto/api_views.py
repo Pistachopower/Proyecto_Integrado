@@ -2363,7 +2363,8 @@ class CarritoViewSet(ViewSet):
         Si hay empate, elige uno aleatoriamente.
         """
         # Obtiene todos los vendedores disponibles
-        vendedores = list(Vendedor.objects.all())
+        vendedores = list(Vendedor.objects.select_related('usuario').all())
+
         
         # Si no hay vendedores, lanza una excepción para evitar asignaciones inválidas
         if not vendedores:
