@@ -37,12 +37,8 @@ cat key-proyectoIntegrado.pub
    Perfil → Settings → SSH and GPG Keys → New SSH key.
 3. Pega el contenido y asigna un nombre descriptivo.
 
-### 2.4. Probar conexión con GitHub
-```bash
-ssh git@github.com
-```
 
-### 2.5. Configurar el archivo SSH `config`
+### 2.4. Configurar el archivo SSH `config`
 ```bash
 vim ~/.ssh/config
 ```
@@ -52,11 +48,14 @@ Host *
     AddKeysToAgent yes
     IdentityFile ~/.ssh/key-proyectoIntegrado
 ```
-Vuelve a probar:
+Verifica la conexión:
 ```bash
 ssh git@github.com
 ```
 Agrega la contraseña y tu cuenta estará vinculada a la instancia.
+
+Debe aparecer un mensaje: "You've successfully authenticated, but GitHub does not provide shell access.
+"
 
 ## **3. Clonación y preparación del repositorio**
 
@@ -80,7 +79,7 @@ git clone git@github.com:<usuario>/<repositorio>.git
 
 ### 4.1. Build y ejecución inicial
 ```bash
-sudo docker compose up -d --build
+sudo docker-compose up -d --build
 ```
 
 ### 4.2. Verificar contenedores activos
@@ -96,7 +95,7 @@ En el archivo `.env`, asegúrate de tener:
 ### 4.4. Reiniciar contenedores tras cambios
 ```bash
 sudo docker compose down  # Apaga los contenedores
-sudo docker compose up -d --build  # Reconstruye y levanta contenedores después de cambios
+sudo docker-compose up -d --build  # Reconstruye y levanta contenedores después de cambios
 ```
 
 ### 4.5. Verificar contenedores
@@ -109,7 +108,7 @@ Deberían aparecer los 3 contenedores (web, db y nginx).
 ```bash
 sudo docker logs tienda_web  # Ver el estado del contenedor web
 sudo docker logs tienda_db
-sudo docker logs nginxs
+sudo docker logs tienda_nginx
 ```
 
 ## **5. Comandos útiles de Docker**
@@ -117,13 +116,15 @@ sudo docker logs nginxs
 | Comando                                   | Acción                                                     |
 |--------------------------------------------|------------------------------------------------------------|
 | `sudo docker compose down`                 | Apaga todos los contenedores                               |
-| `sudo docker compose up -d --build`        | Construye y levanta contenedores en segundo plano (rebuild)|
+| `sudo docker-compose up -d --build`        | Construye y levanta contenedores en segundo plano (rebuild)|
 | `sudo docker ps`                           | Muestra contenedores activos                               |
 | `sudo docker logs tienda_web`              | Muestra el estado/logs del contenedor web                  |
 
 ## **6. Configuración de Nginx como Proxy**
 
 ### 6.1. Editar archivo `nginx.conf`
+Si vas al navegador debe aparecer la página de bienvenida de Nginx, pero no está redirigiendo al backend de Django. Por lo tanto, debes ajustar el archivo nginx.conf del proyecto para que Nginx actúe como proxy y envíe las peticiones a tu contenedor web.
+
 Ubicado en el proyecto, copia:
 ```
 server {
@@ -216,3 +217,116 @@ sudo docker-compose exec web python manage.py collectstatic
 
 ---
 
+# Arrancar Docker Compose automáticamente en AWS
+
+## 1️⃣ Conéctate a tu instancia
+
+Usa SSH:
+
+```bash
+ssh -i "tu-llave.pem" ubuntu@TU_IP_DE_INSTANCIA
+```
+
+tu-llave.pem → tu archivo de clave descargado.
+TU_IP_DE_INSTANCIA → IP pública de tu instancia.
+
+2️⃣ Verifica Docker y Docker Compose 
+```bash
+docker --version
+docker-compose --version
+```
+
+Si no están instalados:
+
+```bash
+sudo apt update
+sudo apt install docker.io docker-compose -y
+sudo systemctl enable docker
+sudo systemctl start docker
+```
+
+3️⃣ Permitir usar Docker sin sudo
+```bash
+sudo usermod -aG docker $USER
+```
+
+Cierra sesión y vuelve a entrar.
+Verifica con:
+```bash
+groups
+```
+
+Debe aparecer docker.
+
+4️⃣ Ubica tu proyecto
+
+Supongamos que tu proyecto está en:
+
+```
+/home/ubuntu/Proyecto_Integrado/
+```
+Debe contener docker-compose.yml.
+Verifica:
+```bash
+ls /home/ubuntu/Proyecto_Integrado/docker-compose.yml
+```
+5️⃣ Crear un servicio systemd
+```bash
+sudo nano /etc/systemd/system/docker-compose-app.service
+```
+
+Pega esto, reemplazando ubuntu y la ruta si es necesario:
+
+```
+[Unit]
+Description=Mi app con Docker Compose
+Requires=docker.service
+After=docker.service
+
+[Service]
+WorkingDirectory=/home/ubuntu/Proyecto_Integrado
+ExecStart=/usr/bin/docker-compose up -d
+ExecStop=/usr/bin/docker-compose down
+Restart=always
+User=ubuntu
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Guarda y cierra (Ctrl+O, Enter, Ctrl+X).
+
+6️⃣ Habilitar el servicio
+```bash
+sudo systemctl enable docker-compose-app
+```
+Esto asegura que se ejecute al iniciar la instancia.
+7️⃣ Probar el servicio
+```bash
+sudo systemctl start docker-compose-app
+sudo systemctl status docker-compose-app
+```
+Debe aparecer active (exited).
+Verifica los contenedores:
+```bash
+docker ps
+```
+Deben aparecer todos tus contenedores (tienda_nginx, tienda_web, tienda_db).
+8️⃣ Ver logs de los contenedores
+```bash
+sudo docker-compose -f /home/ubuntu/Proyecto_Integrado/docker-compose.yml logs -f
+```
+-f → seguir los logs en tiempo real.
+9️⃣ Probar reinicio
+```bash
+sudo reboot
+```
+Luego, vuelve a conectarte y verifica:
+```bash
+docker ps
+sudo systemctl status docker-compose-app
+```
+Si los contenedores están activos, la configuración funciona ✅
+
+Resultado final:
+Cada vez que tu instancia de AWS se inicie, tus contenedores se levantarán automáticamente sin necesidad de comandos adicionales.

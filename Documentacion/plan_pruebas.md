@@ -122,8 +122,46 @@ Comando base de pruebas automaticas:
 python manage.py test proyecto
 ```
 
-Cobertura inicial automatizada en `proyecto/tests.py` para:
-- Registro de cliente
-- Permisos de inventario
-- Recuperacion de contrasena
-- Flujo base de devoluciones
+## 9.1. Tipos de test y frameworks utilizados
+
+- **Tipos de test implementados:**
+  - Test unitarios (con `TestCase` y `APIRequestFactory`): validan lógica y permisos de clases o funciones aisladas.
+  - Test de integración (con `TestCase` y `APIClient`): validan flujos completos y endpoints reales de la API.
+
+- **Frameworks/librerías utilizadas:**
+  - Django TestCase (`django.test.TestCase`)
+  - Django REST Framework: `APIClient`, `APIRequestFactory`, `status`
+  - Modelos y utilidades de Django para crear datos de prueba
+
+Estos frameworks permiten simular peticiones HTTP, autenticación, y verificar respuestas y reglas de negocio en endpoints REST.
+
+
+## 10. Resumen de cobertura de pruebas automatizadas
+
+### Tabla 1: Funcionalidades con tests implementados
+
+| Area / Endpoint | Tipo de test | Descripcion | Casos cubiertos |
+|---|---|---|---|
+| Registro cliente | Integracion | POST `/api/v1/registro_cliente/` | Exitoso, error por campos, login correcto/incorrecto |
+| Login cliente/empleado | Integracion | POST `/api/v1/login/` | Login correcto, error usuario/pass |
+| Permisos usuario | Unitario | Permisos sobre usuarios (listar, crear) | Cliente, empleado, admin, anonimo |
+| Permisos descuento | Unitario | Permisos sobre descuentos | Cliente, empleado, admin, anonimo |
+| Permisos pedidos | Integracion | GET/POST `/api/v1/pedido/` y filtros | Cliente ve solo sus pedidos, empleados/admin todos |
+| Lista de deseos | Integracion | CRUD y acceso a lista | Solo propia, agregar/eliminar, no duplicados, anonimo restringido |
+| Filtros pedidos | Integracion | Filtros por cliente/vendedor | Seguridad y visibilidad |
+| Registro/login errores | Integracion | Casos de error en registro/login | Usuario inexistente, password incorrecta, campos faltantes |
+
+### Tabla 2: Funcionalidades pendientes de automatizar/testear
+
+| Area / Endpoint | Prioridad | Descripcion | Casos faltantes |
+|---|---|---|---|
+| Formulario contacto vendedor | Media | POST `/api/v1/contacto-vendedor/` | Envio exitoso, validaciones, errores |
+| Chatbot/FAQ | Media | POST `/api/v1/chatbot/` | Pregunta/Respuesta, errores |
+| Carga masiva piezas | Media | POST `/api/v1/pieza/bulk_upload/` | CSV/XLSX/ODS, validaciones |
+| Recuperacion de contraseña | Alta | POST `/api/v1/password-reset/` | Flujo completo, confirmacion |
+| Pagos y metodos de pago | Alta | CRUD y validaciones de metodos | Tarjeta, cuenta, billetera, pago pedido |
+| Carrito de compras | Alta | Flujo de compra y finalizar | Agregar, quitar, finalizar compra |
+| Valoraciones y devoluciones | Alta | POST `/api/v1/valoracion/`, `/api/v1/mis-devoluciones/` | Crear, aprobar, rechazar, restricciones |
+| Facturacion y notificaciones | Alta | GET `/api/v1/pedido/<id>/factura_cliente/` | PDF generado, email enviado |
+| Marketing/descuentos | Media | CRUD descuentos | Crear, editar, eliminar, no solo permisos |
+| Operaciones empleado | Baja/Media | Subir foto, editar perfil, inventario | Imagen, datos, inventario avanzado |

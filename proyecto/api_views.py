@@ -542,19 +542,20 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
         # --- Cabecera: Logo y datos empresa ---
 
-        #Obtenemos la ruta absoluta del logo de la empresa. /home/nelson/Documentos/Proyecto_Integrado/media/logo.png
+        #Obtenemos la ruta absoluta del logo de la empresa
+        # Construimos la ruta absoluta al logo de la empresa
         logo_path = os.path.join(settings.BASE_DIR, 'media/logo.png')
-        
-        #ImageReader abre el archivo de imagen directamente desde el disco y lo convierte en un objeto que ReportLab puede usar para dibujar la imagen en el PDF
-        logo = ImageReader(logo_path)
-        
-        #logo: es el objeto de imagen cargado previamente (con ImageReader).
-        #margen_izq: posición X (horizontal) donde empieza la imagen (margen izquierdo).
-        #y-10*mm: posición Y (vertical) desde arriba, bajando 10 mm desde la coordenada y.
-        #width=40*mm: ancho de la imagen (40 milímetros).
-        #height=20*mm: alto de la imagen (20 milímetros).
-        #mask='auto': hace transparente el fondo blanco de la imagen si es posible.
-        p.drawImage(logo, margen_izq, y-10*mm, width=40*mm, height=20*mm, mask='auto')
+        # Comprobamos si el archivo existe antes de intentar cargarlo
+        if os.path.exists(logo_path):
+            try:
+                # Si existe, intentamos cargarlo y dibujarlo en el PDF
+                logo = ImageReader(logo_path)
+                p.drawImage(logo, margen_izq, y-10*mm, width=40*mm, height=20*mm, mask='auto')
+            except Exception as e:
+                # Si ocurre cualquier error al cargar o dibujar el logo (por ejemplo, archivo corrupto),
+                # simplemente no se dibuja el logo y se continúa generando la factura normalmente.
+                pass
+        # Si el archivo no existe, la factura se genera igual, solo que sin el logo.
         
 
         # Datos empresa
@@ -1157,8 +1158,12 @@ class ValoracionViewSet(viewsets.ModelViewSet):
         except Pieza.DoesNotExist:
             return Response({'error': 'La pieza no existe.'}, status=404)
 
-        # Paso 4: Verificar que el cliente ha comprado esa pieza
-        la_ha_comprado = LineaPedido.objects.filter(pedido__cliente=cliente, pieza=pieza).exists()
+        # Paso 4: Verificar que el cliente ha comprado esa pieza y el pedido está entregado
+        la_ha_comprado = LineaPedido.objects.filter(
+            pedido__cliente=cliente,
+            pieza=pieza,
+            pedido__estado=Pedido.ENTREGADO
+        ).exists()
         
         if not la_ha_comprado:
             return Response({'error': 'Solo puedes valorar piezas que has comprado.'}, status=403)
