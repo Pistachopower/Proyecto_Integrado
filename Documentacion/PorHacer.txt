@@ -12,7 +12,11 @@ Descuento: descuento de bienvenida 5% aplicado pero puedes hacer más cosas (ind
 
 
 HOY Importante
+Pendiente volver a analizar devolucion
+En pedido indica que tengo una pieza que está en el carrito, pero en el carrito no aparece reflejada (frontend)
+
 Volver a revisar el modelo linea pedido porque tiene estados que no se van a utilizar
+
 
 
 

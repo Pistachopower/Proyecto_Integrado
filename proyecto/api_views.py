@@ -776,94 +776,169 @@ class DevolucionClienteViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         """
-        Crear una solicitud de devolución.
+        Crea devoluciones de una o varias líneas de pedido.
         
-        Solo se puede devolver si el pedido está ENTREGADO.
-        POST /api/v1/mis-devoluciones/
+        Espera: Un objeto o lista con 'linea_pedido', 'motivo', 'cantidad_devuelta'.
+        Devuelve: {'resultados': [ ... ]} con éxito o errores por cada devolución.
+        Código HTTP: 201
         """
-        # 1. Verificar que es cliente
         try:
+            # Obtener el cliente autenticado
             cliente = request.user.cliente
+        
         except Cliente.DoesNotExist:
+            # Si el usuario no es cliente, devolver error
             return Response({'error': 'Usuario no es cliente'}, status=400)
 
-        # 2. Obtener datos del request
-        linea_pedido_id = request.data.get('linea_pedido')
-        motivo = request.data.get('motivo')
-        cantidad_devuelta = request.data.get('cantidad_devuelta')
-
-        # 3. Validar campos requeridos
-        if not linea_pedido_id:
-            return Response({'error': 'Debe indicar la línea de pedido'}, status=400)
+        devoluciones_data = request.data
         
-        if not motivo or len(motivo.strip()) < 5:
-            return Response({'error': 'El motivo debe tener al menos 5 caracteres'}, status=400)
+        # Si se recibe un solo objeto, convertirlo a lista para procesamiento uniforme
+        if isinstance(devoluciones_data, dict):
+            devoluciones_data = [devoluciones_data]
+
+        resultados = []  # Lista para almacenar el resultado de cada devolución
         
-        if not cantidad_devuelta or int(cantidad_devuelta) < 1:
-            return Response({'error': 'La cantidad a devolver debe ser al menos 1'}, status=400)
+        for devolucion in devoluciones_data:
+            print(f"Procesando devolución: {devolucion}")
+            linea_pedido_id = devolucion.get('linea_pedido')
+            motivo = devolucion.get('motivo')
+            cantidad_devuelta = devolucion.get('cantidad_devuelta')
 
-        cantidad_devuelta = int(cantidad_devuelta)
+            error = None
+            resultado = {'linea_pedido': linea_pedido_id}
 
-        # 4. Obtener la línea de pedido
+            # Validaciones básicas de los datos recibidos
+            if not linea_pedido_id:
+                error = 'Debe indicar la línea de pedido'
+            
+            elif not motivo or len(str(motivo).strip()) < 5:
+                error = 'El motivo debe tener al menos 5 caracteres'
+            
+            else:
+                try:
+                    cantidad_devuelta = int(cantidad_devuelta)
+                    
+                    if cantidad_devuelta < 1:
+                        raise ValueError
+                except (TypeError, ValueError):
+                    error = 'La cantidad a devolver debe ser al menos 1'
+
+            linea_pedido = None
+            
+            if not error:
+                # Buscar la línea de pedido
+                try:
+                    linea_pedido = LineaPedido.objects.get(id=linea_pedido_id)
+                
+                except LineaPedido.DoesNotExist:
+                    error = 'Línea de pedido no encontrada'
+
+            # Validaciones de negocio
+            if not error and linea_pedido:
+                # Verificar que la línea de pedido pertenece al cliente
+                if linea_pedido.pedido.cliente != cliente:
+                    error = 'Este pedido no te pertenece'
+                
+                # Verificar que el pedido esté entregado
+                elif linea_pedido.pedido.estado != Pedido.ENTREGADO:
+                    error = 'Solo puedes devolver productos de pedidos entregados'
+                    resultado['estado_actual'] = linea_pedido.pedido.get_estado_display()
+                
+                # Verificar que la línea no haya sido ya devuelta
+                elif linea_pedido.estado == LineaPedido.DEVUELTO:
+                    error = 'Esta línea ya fue devuelta'
+                
+                else:
+                    # Calcular cuántas unidades ya han sido devueltas (pendientes o aprobadas)
+                    ya_devuelto = Devolucion.objects.filter(
+                        linea_pedido=linea_pedido,
+                        estado__in=[Devolucion.PENDIENTE, Devolucion.APROBADA]
+                    ).aggregate(total=models.Sum('cantidad_devuelta'))['total'] or 0
+                    disponible_devolver = linea_pedido.cantidad - ya_devuelto
+                    
+                    # Verificar que no se devuelvan más unidades de las disponibles
+                    if cantidad_devuelta > disponible_devolver:
+                        error = f'Solo puedes devolver {disponible_devolver} unidades'
+                        resultado['cantidad_en_linea'] = linea_pedido.cantidad
+                        resultado['ya_devuelto'] = ya_devuelto
+
+            if error:
+                # Si hubo algún error, agregarlo al resultado
+                resultado['error'] = error
+                resultados.append(resultado)
+            
+            else:
+                # Calcular el monto de reembolso
+                monto_reembolso = linea_pedido.precio_unitario * cantidad_devuelta
+
+                # Crear la devolución en la base de datos
+                devolucion_obj = Devolucion.objects.create(
+                    linea_pedido=linea_pedido,
+                    cliente=cliente,
+                    fecha_solicitud=date.today(),
+                    motivo=motivo,
+                    estado=Devolucion.PENDIENTE,
+                    cantidad_devuelta=cantidad_devuelta,
+                    monto_reembolso=monto_reembolso
+                )
+
+                # Agregar información de éxito al resultado
+                resultado.update({
+                    'devolucion_id': devolucion_obj.id,
+                    'estado': 'Pendiente de aprobación',
+                    'cantidad_devuelta': cantidad_devuelta,
+                    'monto_reembolso': str(monto_reembolso)
+                })
+                resultados.append(resultado)
+
+        # Devolver la lista de resultados (uno por cada devolución solicitada)
+        return Response({'resultados': resultados}, status=201)
+    
+
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated], url_path='mostrar_lineas_cliente_devolucion')
+    def mostrar_lineas_cliente_devolucion(self, request):
+        """
+        Devuelve las líneas de pedido de pedidos entregados (estado=4) del cliente autenticado
+        Endpoint: GET /api/v1/mis-devoluciones/mostrar_lineas_cliente_devolucion/
+        """
         try:
-            linea_pedido = LineaPedido.objects.get(id=linea_pedido_id)
-        except LineaPedido.DoesNotExist:
-            return Response({'error': 'Línea de pedido no encontrada'}, status=404)
-
-        # 5. Verificar que el pedido pertenece al cliente
-        if linea_pedido.pedido.cliente != cliente:
-            return Response({'error': 'Este pedido no te pertenece'}, status=403)
-
-        # 6. Verificar que el pedido está ENTREGADO
-        if linea_pedido.pedido.estado != Pedido.ENTREGADO:
-            return Response({
-                'error': 'Solo puedes devolver productos de pedidos entregados',
-                'estado_actual': linea_pedido.pedido.get_estado_display()
-            }, status=400)
-
-        # 7. Verificar que la línea no esté ya devuelta
-        if linea_pedido.estado == LineaPedido.DEVUELTO:
-            return Response({'error': 'Esta línea ya fue devuelta'}, status=400)
-
-        # 8. Verificar cantidad válida
-        # Calcular cuánto ya se devolvió de esta línea
-        #Sirve para saber cuántas unidades de esa línea de pedido ya han sido devueltas (o están en proceso de devolución), 
-        # y así evitar que el cliente devuelva más unidades de las que compró.
-        ya_devuelto = Devolucion.objects.filter(
-            linea_pedido=linea_pedido,
-            estado__in=[Devolucion.PENDIENTE, Devolucion.APROBADA]
-        ).aggregate(total=models.Sum('cantidad_devuelta'))['total'] or 0
-
-        disponible_devolver = linea_pedido.cantidad - ya_devuelto
-
-        if cantidad_devuelta > disponible_devolver:
-            return Response({
-                'error': f'Solo puedes devolver {disponible_devolver} unidades',
-                'cantidad_en_linea': linea_pedido.cantidad,
-                'ya_devuelto': ya_devuelto
-            }, status=400)
-
-        # 9. Calcular monto de reembolso
-        monto_reembolso = linea_pedido.precio_unitario * cantidad_devuelta
-
-        # 10. Crear la devolución
-        devolucion = Devolucion.objects.create(
-            linea_pedido=linea_pedido,
-            cliente=cliente,
-            fecha_solicitud=date.today(),
-            motivo=motivo,
-            estado=Devolucion.PENDIENTE,
-            cantidad_devuelta=cantidad_devuelta,
-            monto_reembolso=monto_reembolso
+            cliente = request.user.cliente
+        
+        except Cliente.DoesNotExist:
+            return Response({'error': 'Usuario no es cliente'}, status=400)
+        
+        # Obtener pedidos entregados del cliente
+        pedidos_entregados = Pedido.objects.filter(cliente=cliente, estado=Pedido.ENTREGADO)
+        
+        # Obtener líneas de pedido de esos pedidos que no estén totalmente devueltas
+        lineas = LineaPedido.objects.filter(
+            pedido__in=pedidos_entregados
+        ).exclude(
+            estado=LineaPedido.DEVUELTO
         )
+        
+        #Solo se muestran las líneas de pedido donde el cliente todavía puede devolver alguna unidad.
+        #Por ejemplo, si compró 5 y ya devolvió 3, aquí aparecerá con 2 disponibles para devolver.
+        #Si ya devolvió todas, esa línea no se muestra.
+        resultado = []
+        
+        for linea in lineas:
+            # Calcular cuántas unidades ya han sido devueltas (pendientes o aprobadas)
+            ya_devuelto = Devolucion.objects.filter(
+                linea_pedido=linea,
+                estado__in=[Devolucion.PENDIENTE, Devolucion.APROBADA]
+            ).aggregate(total=Sum('cantidad_devuelta'))['total'] or 0
+            
+            disponible = linea.cantidad - ya_devuelto
+            
+            if disponible > 0:
+                # Serializar la línea de pedido y agregar info útil
+                data = LineaPedidoSerializer(linea, context={'request': request}).data
+                data['cantidad_disponible_para_devolver'] = disponible
+                resultado.append(data)
 
-        return Response({
-            'message': 'Solicitud de devolución creada correctamente',
-            'devolucion_id': devolucion.id,
-            'estado': 'Pendiente de aprobación',
-            'cantidad_devuelta': cantidad_devuelta,
-            'monto_reembolso': str(monto_reembolso)
-        }, status=201)
+        return Response({'lineas_para_devolucion': resultado})
+
 
 
 class DevolucionVendedorViewSet(viewsets.ModelViewSet):
