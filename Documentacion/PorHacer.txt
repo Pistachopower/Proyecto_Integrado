@@ -1,9 +1,7 @@
 
 
-Permisos
-
 Descuento: descuento de bienvenida 5% aplicado pero puedes hacer más cosas (indicar al cliente que tiene descuento bienvenida)
-
+Controlar que sólo se pueda subir foto en el perfil de empleado y no otros documentos
 
 
 

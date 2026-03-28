@@ -136,7 +136,7 @@ class VendedorViewSet(viewsets.ModelViewSet):
         vendedor = self.get_object()
         foto = request.FILES.get('foto_perfil_vendedor')
         
-        if not foto:
+        if not foto.content_type or not foto.content_type.startswith('image/'):
             return Response({'error': 'No se envió ninguna imagen.'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Eliminar la imagen anterior si existe
@@ -3152,8 +3152,8 @@ class PasswordResetRequestView(APIView):
             
             #URL de reseteo a la app de vue, donde el frontend tendrá una ruta que reciba 
             # el uid y el token para mostrar el formulario de nueva contraseña
-            reset_url = f"http://localhost:8080/restablecer-contrasena?uid={uid}&token={token}"
-
+            #reset_url = f"http://localhost:8080/restablecer-contrasena?uid={uid}&token={token}"
+            reset_url = f"http:3.225.154.212/restablecer-contrasena?uid={uid}&token={token}"
 
             #Este método viene de django.core.mail 
             send_mail(

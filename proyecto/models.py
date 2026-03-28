@@ -199,7 +199,7 @@ class LineaPedido(models.Model):
     )
     cantidad = models.IntegerField()
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
-    descuento_aplicado = models.DecimalField(max_digits=10, decimal_places=2)
+    descuento_aplicado = models.DecimalField(max_digits=10, decimal_places=2) #TO DO: QUITAR PORQUE NO SE ESTA APLICANDO 
     subtotal = models.DecimalField(max_digits=10, decimal_places=2) #Sin iva ni descuentos ni gastos de envio
     estado  = models.PositiveSmallIntegerField(choices=ESTADO, null=True, blank=True)
 
