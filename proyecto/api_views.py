@@ -2220,11 +2220,19 @@ class CarritoViewSet(ViewSet):
                 'stock_disponible': pieza.stock,
             })
 
+        pedidos_previos = cliente.pedidos_cliente.exclude(id=pedido.id).exclude(estado=pedido.CARRITO)
+        es_primer_pedido = not pedidos_previos.exists()
+        total_original = pedido.lineas_pedido.aggregate(total=Sum('subtotal'))['total'] or Decimal('0.00')
+        descuento_bienvenida = get_object_or_404(Descuento, nombre__icontains="Bienvenida", estado=Descuento.ACTIVO).valor if es_primer_pedido else Decimal('0.00')
+
         return Response({
             'pedido_id': pedido.id,
             'items': items,
             'total_items': len(items),
-            'precio_total': str(pedido.total)
+            'precio_total': str(pedido.total),
+            'es_primer_pedido': es_primer_pedido,
+            'total_original_sin_descuento': str(total_original),
+            'descuento_bienvenida': descuento_bienvenida
         })
 
     def retrieve(self, request, pk=None):
@@ -3152,8 +3160,8 @@ class PasswordResetRequestView(APIView):
             
             #URL de reseteo a la app de vue, donde el frontend tendrá una ruta que reciba 
             # el uid y el token para mostrar el formulario de nueva contraseña
-            #reset_url = f"http://localhost:8080/restablecer-contrasena?uid={uid}&token={token}"
-            reset_url = f"http:3.225.154.212/restablecer-contrasena?uid={uid}&token={token}"
+            reset_url = f"http://localhost:8080/restablecer-contrasena?uid={uid}&token={token}"
+            #reset_url = f"http:3.225.154.212/restablecer-contrasena?uid={uid}&token={token}"
 
             #Este método viene de django.core.mail 
             send_mail(
