@@ -330,3 +330,7 @@ Si los contenedores están activos, la configuración funciona ✅
 
 Resultado final:
 Cada vez que tu instancia de AWS se inicie, tus contenedores se levantarán automáticamente sin necesidad de comandos adicionales.
+
+
+Documentación
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent
