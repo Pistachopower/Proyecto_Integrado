@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-rneen%%$g57ob1h#ll+t%4r+yahrlyuaw@8fxuvc!@5^e7hf$q
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', '34.238.73.57','23.23.32.46', 'ec2-44-221-235-149.compute-1.amazonaws.com']
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', '34.238.73.57','23.23.32.46', 'ec2-44-221-235-149.compute-1.amazonaws.com', '44.221.235.149']
 
 
 
