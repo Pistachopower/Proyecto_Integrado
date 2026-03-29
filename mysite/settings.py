@@ -71,8 +71,8 @@ MIDDLEWARE = [
 
 # CAMBIO 1: Configuración de CORS y CSRF (Los permisos para Vue)
 CORS_ALLOWED_ORIGINS = [
-    #'http://23.23.32.46',  # Frontend
-    #'http://34.238.73.57', # Backend (por si accedes desde navegador a la API)
+    'http://3.225.154.212',  # Frontend
+    'http://44.221.235.149', # Backend (por si accedes desde navegador a la API)
     'http://localhost:8080',
     'http://127.0.0.1:8081',
 ]
