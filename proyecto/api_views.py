@@ -2139,6 +2139,7 @@ class CarritoViewSet(ViewSet):
                 'total': Decimal('0.00')
             }
         )
+        print(f"Carrito {'creado' if created else 'obtenido'} para cliente {cliente.usuario.username} (Pedido ID: {pedido.id})")
         return pedido
 
     def calcular_total(self, pedido):
@@ -2609,6 +2610,53 @@ class AuthStatusView(APIView):
         return Response({'is_authenticated': False}, status=200)
 
 
+# ==================== TRACKING DE EVENTOS CLIENTE ====================
+class EventoClienteTrackView(APIView):
+    """
+    Registra eventos de comportamiento del cliente para analitica.
+
+    POST /api/v1/eventos/track/
+    {
+        "nombre_evento": "producto_visto",
+        "sesion_id": "abc-123",
+        "propiedades": {
+            "pieza_id": 10,
+            "referencia": "REF-10",
+            "categoria_id": 2,
+            "precio": "49.90"
+        }
+    }
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        #Valida los datos recibidos usando el serializer. Si no son válidos, devuelve un error 400 con detalles.
+        serializer = EventoClienteSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        #Intenta obtener el cliente asociado al usuario autenticado. Si no hay usuario o no es cliente, cliente será None.
+        cliente = None
+        if request.user and request.user.is_authenticated:
+            try:
+                cliente = request.user.cliente
+            except Cliente.DoesNotExist:
+                cliente = None
+
+        # Crear desde validated_data evita el AssertionError si el debugger inspecciona serializer.data.
+        datos_evento = serializer.validated_data
+        evento = EventoCliente.objects.create(cliente=cliente, **datos_evento)
+
+        #Devuelve una respuesta con los datos del evento registrado y un status 201 Created.
+        return Response(
+            {
+                'id': evento.id,
+                'nombre_evento': evento.nombre_evento,
+                'fecha_evento': evento.fecha_evento,
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
 # ================= DASHBOARD VENDEDOR =====================
 class DashboardVendedorView(APIView):
     permission_classes = [IsAuthenticated]
@@ -2765,6 +2813,33 @@ class DashboardVendedorView(APIView):
             }
             ultimas_transacciones.append(resumen)
 
+        # Producto con mayor número de visualizaciones en toda la plataforma.
+        producto_mas_visto_global = (
+            EventoCliente.objects.filter(nombre_evento=EventoCliente.PRODUCTO_VISTO)
+            .values('propiedades__pieza_id', 'propiedades__referencia')
+            .annotate(total_eventos=Count('id'))
+            .order_by('-total_eventos')
+            .first()
+        )
+
+        #Término de búsqueda más repetido por los clientes en toda la plataforma.
+        busqueda_mas_frecuente_global = (
+            EventoCliente.objects.filter(nombre_evento=EventoCliente.BUSQUEDA_REALIZADA)
+            .values('propiedades__query')
+            .annotate(total_eventos=Count('id'))
+            .order_by('-total_eventos')
+            .first()
+        )
+
+        #Pieza cuyo evento agregado_carrito se disparó más veces en toda la plataforma.
+        pieza_mas_agregada_carrito_global = (
+            EventoCliente.objects.filter(nombre_evento=EventoCliente.AGREGADO_CARRITO)
+            .values('propiedades__pieza_id')
+            .annotate(total_eventos=Count('id'))
+            .order_by('-total_eventos')
+            .first()
+        )
+
         return Response({
             'ventas_hoy': float(ventas_hoy),
             'porcentaje_vs_ayer': porcentaje_vs_ayer,
@@ -2776,7 +2851,10 @@ class DashboardVendedorView(APIView):
             'porcentaje_vs_semana_pasada': porcentaje_vs_semana_pasada,
             'cliente_frecuente': cliente_frecuente_nombre,
             'cliente_frecuente_pedidos': cliente_frecuente_pedidos,
-            'ultimas_transacciones': ultimas_transacciones
+            'ultimas_transacciones': ultimas_transacciones,
+            'producto_mas_visto_global': producto_mas_visto_global,
+            'busqueda_mas_frecuente_global': busqueda_mas_frecuente_global,
+            'pieza_mas_agregada_carrito_global': pieza_mas_agregada_carrito_global,
         })
 
 

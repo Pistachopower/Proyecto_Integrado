@@ -997,6 +997,50 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 
 # ============================================================
+# ANALITICA DE EVENTOS DE CLIENTE
+# ============================================================
+class EventoClienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventoCliente
+        fields = [
+            'id',
+            'nombre_evento',
+            'sesion_id',
+            'propiedades',
+            'fecha_evento',
+        ]
+        read_only_fields = ['id', 'fecha_evento']
+
+    def validate(self, attrs):
+        nombre_evento = attrs.get('nombre_evento')
+        propiedades = attrs.get('propiedades') or {}
+
+        if not isinstance(propiedades, dict):
+            raise serializers.ValidationError({'propiedades': 'Debe ser un objeto JSON.'})
+
+        campos_requeridos_por_evento = {
+            EventoCliente.PRODUCTO_VISTO: ['pieza_id', 'referencia', 'categoria_id', 'precio'],
+            EventoCliente.BUSQUEDA_REALIZADA: ['query', 'total_resultados'],
+            EventoCliente.AGREGADO_CARRITO: ['pieza_id', 'cantidad', 'precio_unitario'],
+            EventoCliente.COMPRA_COMPLETADA: ['pedido_id', 'total'],
+        }
+
+        requeridos = campos_requeridos_por_evento.get(nombre_evento, [])
+        faltantes = []
+        
+        for campo in requeridos:
+            if campo not in propiedades:
+                faltantes.append(campo)
+
+        if faltantes:
+            raise serializers.ValidationError(
+                {'propiedades': f'Faltan campos requeridos para {nombre_evento}: {", ".join(faltantes)}'}
+            )
+
+        return attrs
+
+
+# ============================================================
 # CONTACTO VENDEDOR
 # ============================================================
 class ContactoVendedorSerializer(serializers.Serializer):

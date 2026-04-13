@@ -1,5 +1,3 @@
-
-
 Descuento: descuento de bienvenida 5% aplicado pero puedes hacer más cosas (indicar al cliente que tiene descuento bienvenida)
 Controlar que sólo se pueda subir foto en el perfil de empleado y no otros documentos
 
@@ -15,6 +13,21 @@ En pedido indica que tengo una pieza que está en el carrito, pero en el carrito
 
 Volver a revisar el modelo linea pedido porque tiene estados que no se van a utilizar
 
+
+
+Pendiente
+frontend se mantenga el corazon
+cuenta bancaria mostrar select de euros, etc
+Controlar que si el producto no está disponible lo ignore en el fronted
+debo actualizar o cerrar el modal de devolucion 
+mejorar en el cambiar cambiar contraseña los errores claramente
+Cuando hagas el bulk masivo indicar que las piezas ya están creadas
+En la foto de perfil controlar capturar los errores del backend
+En las piezas permitir que se subir más imágenes
+
+
+backend: cuando el cliente cancela el pago en paypal, se elimine el pedido 
+controlar que cuando en carrito que cuando no hay descuento mostrar algo que no hay desucentos disponible
 
 
 

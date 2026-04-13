@@ -66,6 +66,9 @@ urlpatterns = [
     # Dashboard vendedor
     path('dashboard-vendedor/', DashboardVendedorView.as_view(), name='dashboard-vendedor'),
 
+    # Tracking de eventos de cliente
+    path('eventos/track/', EventoClienteTrackView.as_view(), name='eventos-track'),
+
     # PayPal
     path('paypal/crear-orden/', CrearOrdenPayPalView.as_view(), name='paypal-crear-orden'),
     path('paypal/capturar-pago/', CapturarPagoPayPalView.as_view(), name='paypal-capturar-pago'),

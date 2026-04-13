@@ -486,7 +486,48 @@ class ListaDeseosPieza(models.Model):
 
 
 # ============================================================
-# NIVEL 5: MARKETING
+# NIVEL 5: ANALITICA DE CLIENTE
+# ============================================================
+class EventoCliente(models.Model):
+    # Nombres de evento estandarizados para frontend + backend.
+    PRODUCTO_VISTO = "producto_visto"
+    BUSQUEDA_REALIZADA = "busqueda_realizada"
+    AGREGADO_CARRITO = "agregado_carrito"
+    COMPRA_COMPLETADA = "compra_completada"
+
+    TIPOS_EVENTO = [
+        (PRODUCTO_VISTO, "Producto visto"),
+        (BUSQUEDA_REALIZADA, "Busqueda realizada"),
+        (AGREGADO_CARRITO, "Agregado al carrito"),
+        (COMPRA_COMPLETADA, "Compra completada"),
+    ]
+
+    nombre_evento = models.CharField(max_length=50, choices=TIPOS_EVENTO)
+    cliente = models.ForeignKey(
+        "Cliente",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="eventos_cliente",
+    )
+    sesion_id = models.CharField(max_length=100, blank=True, null=True)
+    fecha_evento = models.DateTimeField(auto_now_add=True)
+    propiedades = models.JSONField(default=dict)
+
+    class Meta:
+        db_table = "evento_cliente"
+        indexes = [
+            models.Index(fields=["nombre_evento"]),
+            models.Index(fields=["fecha_evento"]),
+            models.Index(fields=["cliente"]),
+        ]
+
+    def __str__(self):
+        return f"{self.nombre_evento} - {self.fecha_evento}"
+
+
+# ============================================================
+# NIVEL 6: MARKETING
 # ============================================================
 
 class Descuento(models.Model):

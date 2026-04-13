@@ -6,7 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient , APIRequestFactory #sirve mejor para unitarias (probar métodos concretos y permisos aislados)
-from .models import Cliente, Pedido, Usuario, Vendedor, ListaDeseos, Pieza, ListaDeseosPieza
+from .models import Cliente, Pedido, Usuario, Vendedor, ListaDeseos, Pieza, ListaDeseosPieza, EventoCliente
 from .permissions import EsDuenioUsuario, SoloAdminOEmpleado
 
 
@@ -788,6 +788,106 @@ class UsuarioAutenticacionIntegracionTests(TestCase):
         """
         response = self.api_client.get("/api/v1/mi-perfil/")
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
+
+
+class EventoClienteIntegracionTests(TestCase):
+    """Pruebas de integración para tracking de eventos estandarizados."""
+
+    def setUp(self):
+        self.api_client = APIClient()
+
+        self.usuario_cliente = crear_usuario_cliente(
+            username="cliente_eventos",
+            email="cliente_eventos@example.com",
+        )
+        self.cliente = Cliente.objects.create(usuario=self.usuario_cliente)
+
+        self.usuario_vendedor = crear_usuario_empleado(
+            username="vendedor_dashboard",
+            email="vendedor_dashboard@example.com",
+        )
+        self.vendedor = Vendedor.objects.create(
+            usuario=self.usuario_vendedor,
+            fecha_contratacion=date.today(),
+            comision_porcentaje=Decimal("8.00"),
+        )
+
+    def test_track_producto_visto_crea_evento(self):
+        payload = {
+            'nombre_evento': EventoCliente.PRODUCTO_VISTO,
+            'sesion_id': 'sesion-test-001',
+            'propiedades': {
+                'pieza_id': 10,
+                'referencia': 'REF-10',
+                'categoria_id': 2,
+                'precio': '49.90',
+            },
+        }
+
+        response = self.api_client.post('/api/v1/eventos/track/', payload, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(EventoCliente.objects.count(), 1)
+        self.assertEqual(EventoCliente.objects.first().nombre_evento, EventoCliente.PRODUCTO_VISTO)
+
+    def test_track_rechaza_payload_incompleto(self):
+        payload = {
+            'nombre_evento': EventoCliente.PRODUCTO_VISTO,
+            'sesion_id': 'sesion-test-002',
+            'propiedades': {
+                'pieza_id': 10,
+                'categoria_id': 2,
+                'precio': '49.90',
+            },
+        }
+
+        response = self.api_client.post('/api/v1/eventos/track/', payload, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn('propiedades', response.data)
+
+    def test_dashboard_vendedor_muestra_metricas_eventos(self):
+        EventoCliente.objects.create(
+            nombre_evento=EventoCliente.PRODUCTO_VISTO,
+            sesion_id='s1',
+            cliente=self.cliente,
+            propiedades={
+                'pieza_id': 99,
+                'referencia': 'REF-99',
+                'categoria_id': 4,
+                'precio': '80.00',
+            },
+        )
+        EventoCliente.objects.create(
+            nombre_evento=EventoCliente.PRODUCTO_VISTO,
+            sesion_id='s2',
+            cliente=self.cliente,
+            propiedades={
+                'pieza_id': 99,
+                'referencia': 'REF-99',
+                'categoria_id': 4,
+                'precio': '80.00',
+            },
+        )
+        EventoCliente.objects.create(
+            nombre_evento=EventoCliente.BUSQUEDA_REALIZADA,
+            sesion_id='s3',
+            propiedades={'query': 'filtro aceite', 'total_resultados': 12},
+        )
+        EventoCliente.objects.create(
+            nombre_evento=EventoCliente.AGREGADO_CARRITO,
+            sesion_id='s4',
+            propiedades={'pieza_id': 99, 'cantidad': 1, 'precio_unitario': '80.00'},
+        )
+
+        self.api_client.force_authenticate(user=self.usuario_vendedor)
+        response = self.api_client.get('/api/v1/dashboard-vendedor/')
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('producto_mas_visto_global', response.data)
+        self.assertIn('busqueda_mas_frecuente_global', response.data)
+        self.assertIn('pieza_mas_agregada_carrito_global', response.data)
+        self.assertEqual(response.data['producto_mas_visto_global']['propiedades__pieza_id'], 99)
 
 
 
