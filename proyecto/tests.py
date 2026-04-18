@@ -6,7 +6,8 @@ from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient , APIRequestFactory #sirve mejor para unitarias (probar métodos concretos y permisos aislados)
-from .models import Cliente, Pedido, Usuario, Vendedor, ListaDeseos, Pieza, ListaDeseosPieza, EventoCliente
+from .models import Cliente, Pedido, Usuario, Vendedor, ListaDeseos, Pieza, ListaDeseosPieza, EventoCliente, CategoriaPieza
+from .serializers import PiezaSerializer
 from .permissions import EsDuenioUsuario, SoloAdminOEmpleado
 
 
@@ -888,6 +889,31 @@ class EventoClienteIntegracionTests(TestCase):
         self.assertIn('busqueda_mas_frecuente_global', response.data)
         self.assertIn('pieza_mas_agregada_carrito_global', response.data)
         self.assertEqual(response.data['producto_mas_visto_global']['propiedades__pieza_id'], 99)
+
+
+class PiezaSerializerTests(TestCase): #Pruebas unitarias para el serializer de Pieza, enfocándonos en que incluya el campo categoria_id correctamente.
+    def setUp(self):
+        self.categoria = CategoriaPieza.objects.create(
+            nombre='Motor',
+            descripcion='Categoria de prueba',
+        )
+        self.pieza = Pieza.objects.create(
+            estado=Pieza.NUEVO,
+            nombre='Pieza Serializer Test',
+            referencia='REF-SER-001',
+            version='V1',
+            marca='MarcaTest',
+            anio=2024,
+            precio_base=Decimal('120.00'),
+            descripcion='Pieza para probar el serializer',
+            stock=5,
+            categoria=self.categoria,
+        )
+
+    def test_incluye_categoria_id(self):
+        serializer = PiezaSerializer(self.pieza)
+
+        self.assertEqual(serializer.data['categoria_id'], self.categoria.id)
 
 
 

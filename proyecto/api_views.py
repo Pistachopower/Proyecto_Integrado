@@ -2616,6 +2616,8 @@ class EventoClienteTrackView(APIView):
     Registra eventos de comportamiento del cliente para analitica.
 
     POST /api/v1/eventos/track/
+
+    Request JSON:
     {
         "nombre_evento": "producto_visto",
         "sesion_id": "abc-123",
@@ -2626,6 +2628,35 @@ class EventoClienteTrackView(APIView):
             "precio": "49.90"
         }
     }
+
+
+    {
+        "nombre_evento": "busqueda_realizada",
+        "sesion_id": "abc-124",
+        "propiedades": {
+          "query": "filtro aceite",
+          "total_resultados": 12
+        }
+    }
+
+    
+    {
+      "nombre_evento": "agregado_carrito",
+      "sesion_id": "abc-125",
+      "propiedades": {
+        "pieza_id": 10,
+        "cantidad": 1,
+        "precio_unitario": "49.90"
+      }
+    }
+
+
+    Response JSON (201):
+    {
+        "id": 123,
+        "nombre_evento": "producto_visto",
+        "fecha_evento": "2026-04-15T10:30:00Z"
+    }
     """
     permission_classes = [AllowAny]
 
@@ -2634,8 +2665,10 @@ class EventoClienteTrackView(APIView):
         serializer = EventoClienteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        #Intenta obtener el cliente asociado al usuario autenticado. Si no hay usuario o no es cliente, cliente será None.
+        #Intenta obtener el cliente asociado al usuario autenticado. Si no hay usuario o no es cliente, 
+        # cliente será None.
         cliente = None
+        
         if request.user and request.user.is_authenticated:
             try:
                 cliente = request.user.cliente

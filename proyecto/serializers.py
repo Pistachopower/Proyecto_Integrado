@@ -85,9 +85,11 @@ class CategoriaPiezaSerializer(serializers.HyperlinkedModelSerializer):
 # ============================================================
 
 class PiezaSerializer(serializers.HyperlinkedModelSerializer):
+    categoria_id = serializers.IntegerField(read_only=True)
+
     class Meta:
         model = Pieza
-        fields = ['id', 'nombre', 'marca', 'anio', 'precio_base', 'descripcion', 'estado', 'referencia', 'version','imagen']
+        fields = ['id', 'nombre', 'marca', 'anio', 'precio_base', 'descripcion', 'estado', 'referencia', 'version', 'imagen', 'categoria_id']
 
 
 class ImagenPiezaSerializer(serializers.HyperlinkedModelSerializer):
@@ -1022,14 +1024,14 @@ class EventoClienteSerializer(serializers.ModelSerializer):
             EventoCliente.PRODUCTO_VISTO: ['pieza_id', 'referencia', 'categoria_id', 'precio'],
             EventoCliente.BUSQUEDA_REALIZADA: ['query', 'total_resultados'],
             EventoCliente.AGREGADO_CARRITO: ['pieza_id', 'cantidad', 'precio_unitario'],
-            EventoCliente.COMPRA_COMPLETADA: ['pedido_id', 'total'],
+            EventoCliente.COMPRA_COMPLETADA: ['pedido_id', 'total'], #//No está implementada la lógica
         }
 
         requeridos = campos_requeridos_por_evento.get(nombre_evento, [])
         faltantes = []
         
         for campo in requeridos:
-            if campo not in propiedades:
+            if campo not in propiedades or propiedades.get(campo) in (None, ''):
                 faltantes.append(campo)
 
         if faltantes:
