@@ -21,6 +21,7 @@ admin.site.register(Descuento)
 admin.site.register(ClienteDescuento)
 admin.site.register(ImagenPieza)
 admin.site.register(CategoriaPieza)
+admin.site.register(EventoCliente)
 
 
 

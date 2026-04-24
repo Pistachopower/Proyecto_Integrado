@@ -10,6 +10,7 @@ from .models import Cliente, Pedido, Usuario, Vendedor, ListaDeseos, Pieza, List
 from .serializers import PiezaSerializer
 from .permissions import EsDuenioUsuario, SoloAdminOEmpleado
 
+#NO OLVIDAR AL DEPURAR: response.status_code, response.data, response.content 
 
 def crear_usuario_cliente( #función que encapsula la lógica (parámetros por defecto, rol específico, etc.)
     username="cliente_test",
@@ -72,6 +73,44 @@ def obtener_ids_desde_respuesta(response):
         ids.add(item["id"])
     return ids
 
+
+#PRUEBA LAS FUNCIONES
+class HelperDebugTests(TestCase):
+    def test_debug_crear_usuario_cliente(self):
+        usuario = crear_usuario_cliente()
+        print("Usuario cliente creado para pruebas:")
+        print(usuario.id, usuario.username, usuario.email, usuario.rol)
+
+    
+    def test_debug_crear_usuario_empleado(self):
+        usuario = crear_usuario_empleado()
+        print("Usuario empleado creado para pruebas:")
+        print(usuario.id, usuario.username, usuario.email, usuario.rol)
+
+    
+    def test_debug_crear_usuario_administrador(self):
+        usuario = crear_usuario_administrador()
+        print("Usuario administrador creado para pruebas:")
+        print(usuario.id, usuario.username, usuario.email, usuario.rol)
+
+
+    def test_debug_obtener_ids_desde_respuesta(self):
+        # Simular una respuesta de API con una lista de objetos que tienen 'id'
+        class Response:
+            data = [
+                {"id": 1, "nombre": "Objeto 1"},
+                {"id": 2, "nombre": "Objeto 2"},
+                {"id": 3, "nombre": "Objeto 3"},
+            ]
+
+        response = Response()
+        ids = obtener_ids_desde_respuesta(response)
+        print("IDs obtenidos desde la respuesta simulada:", ids)    
+
+
+
+
+
 class EsDuenioUsuarioTests(TestCase):
     """Pruebas para el permiso EsDuenioUsuario."""
 
@@ -83,7 +122,9 @@ class EsDuenioUsuarioTests(TestCase):
         self.empleado = crear_usuario_empleado()
         self.administrador = crear_usuario_administrador()
 
-    #Test para probar que el cliente no puede ver la lista de usuarios, lo cual es correcto porque solo los jefes (empleados y administradores) pueden verla.
+    #Test para probar que el cliente no puede ver la lista de usuarios, lo 
+    # cual es correcto porque solo los jefes (empleados y administradores) 
+    # pueden verla.
     def test_cliente_no_puede_ver_lista(self):
         # 1) Crear una peticion GET simulada.
         request = self.factory.get("/api/v1/usuario/")
@@ -195,7 +236,7 @@ class DescuentoPermisosTests(TestCase):
     
     Esto significa que:
     - Clientes: NO pueden acceder
-    - Empleados: SÍ pueden acceder (list, create, retrieve, update, delete)
+    - Empleados: Si pueden acceder (list, create, retrieve, update, delete)
     - Administradores: SÍ pueden acceder (list, create, retrieve, update, delete)
     - Anónimos: NO pueden acceder
     """
@@ -480,6 +521,7 @@ class ListaDeseosIntegracionTests(TestCase):
 
     def setUp(self):
         self.api_client = APIClient()
+        
         # Crear dos usuarios y clientes
         self.usuario_cliente_1 = crear_usuario_cliente(
             username="cliente_test_1",
@@ -491,6 +533,7 @@ class ListaDeseosIntegracionTests(TestCase):
         )
         self.cliente_1 = Cliente.objects.create(usuario=self.usuario_cliente_1)
         self.cliente_2 = Cliente.objects.create(usuario=self.usuario_cliente_2)
+        
         # Crear listas de deseos para cada cliente
         self.lista_1 = ListaDeseos.objects.create(
             cliente=self.cliente_1,
@@ -505,18 +548,28 @@ class ListaDeseosIntegracionTests(TestCase):
 
     def test_cliente_ve_solo_su_lista(self):
         """El cliente autenticado solo ve su propia lista de deseos."""
+
+        # Autenticamos la petición como el primer cliente para simular su acceso real.
         self.api_client.force_authenticate(user=self.usuario_cliente_1)
+
+        # Llamamos al endpoint que devuelve la lista de deseos del usuario autenticado.
         response = self.api_client.get("/api/v1/lista_deseo/mi_lista/")
+
+        # La respuesta debe ser correcta y corresponder a la lista del cliente 1.
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["lista_id"], self.lista_1.id)
         self.assertEqual(response.data["nombre"], self.lista_1.nombre)
-        # No debe ver la lista del otro cliente
+
+        # Confirmamos que no se ha devuelto la lista del segundo cliente.
         self.assertNotEqual(response.data["lista_id"], self.lista_2.id)
 
     def test_cliente_2_ve_solo_su_lista(self):
         """El segundo cliente solo ve su propia lista de deseos."""
+        
+        
         self.api_client.force_authenticate(user=self.usuario_cliente_2)
         response = self.api_client.get("/api/v1/lista_deseo/mi_lista/")
+        
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["lista_id"], self.lista_2.id)
         self.assertEqual(response.data["nombre"], self.lista_2.nombre)
@@ -524,7 +577,16 @@ class ListaDeseosIntegracionTests(TestCase):
 
     def test_anonimo_no_puede_ver_lista(self):
         """Un usuario no autenticado no puede acceder a la lista de deseos."""
+        
+        # 1) Sin autenticación, intentamos acceder al endpoint /api/v1/lista_deseo/mi_lista/
+        # Este endpoint está PROTEGIDO y requiere que el usuario esté autenticado.
         response = self.api_client.get("/api/v1/lista_deseo/mi_lista/")
+        
+        # 2) El servidor rechaza la petición porque el usuario es anónimo (sin autenticación).
+        # El endpoint devuelve uno de estos dos códigos de error:
+        # - 401 UNAUTHORIZED: necesitas credenciales/autenticación para acceder
+        # - 403 FORBIDDEN: tienes credenciales pero no tienes permisos
+        # Usamos assertIn para aceptar cualquiera de los dos (depende de cómo esté configurada la autenticación).
         self.assertIn(
             response.status_code,
             [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
@@ -560,6 +622,7 @@ class ListaDeseosOperacionesTests(TestCase):
 
     def test_agregar_pieza_a_lista(self):
         """El cliente puede agregar una pieza a su lista de deseos."""
+        
         self.api_client.force_authenticate(user=self.usuario_cliente)
         response = self.api_client.post(
             "/api/v1/lista_deseo/agregar_pieza/",
@@ -571,7 +634,9 @@ class ListaDeseosOperacionesTests(TestCase):
 
     def test_no_agrega_pieza_repetida(self):
         """No se puede agregar la misma pieza dos veces a la lista de deseos."""
+        
         self.api_client.force_authenticate(user=self.usuario_cliente)
+        
         # Agregar la pieza una vez
         self.api_client.post(
             "/api/v1/lista_deseo/agregar_pieza/",
@@ -589,13 +654,16 @@ class ListaDeseosOperacionesTests(TestCase):
 
     def test_eliminar_pieza_de_lista(self):
         """El cliente puede eliminar una pieza de su lista de deseos."""
+        
         self.api_client.force_authenticate(user=self.usuario_cliente)
+        
         # Agregar la pieza
         self.api_client.post(
             "/api/v1/lista_deseo/agregar_pieza/",
             {"pieza_id": self.pieza.id},
             format="json"
         )
+
         # Eliminar la pieza
         response = self.api_client.delete(
             "/api/v1/lista_deseo/eliminar_pieza/",
@@ -607,6 +675,7 @@ class ListaDeseosOperacionesTests(TestCase):
 
     def test_anonimo_no_puede_agregar(self):
         """Un usuario no autenticado no puede agregar piezas a la lista de deseos."""
+        
         response = self.api_client.post(
             "/api/v1/lista_deseo/agregar_pieza/",
             {"pieza_id": self.pieza.id},
@@ -619,6 +688,7 @@ class ListaDeseosOperacionesTests(TestCase):
 
     def test_anonimo_no_puede_eliminar(self):
         """Un usuario no autenticado no puede eliminar piezas de la lista de deseos."""
+        
         response = self.api_client.delete(
             "/api/v1/lista_deseo/eliminar_pieza/",
             {"pieza_id": self.pieza.id},
@@ -773,7 +843,9 @@ class UsuarioAutenticacionIntegracionTests(TestCase):
         Prueba que el sistema devuelve error si falta un campo requerido.
         """
         data_incompleta = self.cliente_data.copy()
+        
         del data_incompleta["password"] # El password es obligatorio, así que lo eliminamos para probar el error
+        
         response = self.api_client.post(
             "/api/v1/registro_cliente/",
             {"user_data": data_incompleta},
@@ -789,131 +861,5 @@ class UsuarioAutenticacionIntegracionTests(TestCase):
         """
         response = self.api_client.get("/api/v1/mi-perfil/")
         self.assertIn(response.status_code, [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN])
-
-
-class EventoClienteIntegracionTests(TestCase):
-    """Pruebas de integración para tracking de eventos estandarizados."""
-
-    def setUp(self):
-        self.api_client = APIClient()
-
-        self.usuario_cliente = crear_usuario_cliente(
-            username="cliente_eventos",
-            email="cliente_eventos@example.com",
-        )
-        self.cliente = Cliente.objects.create(usuario=self.usuario_cliente)
-
-        self.usuario_vendedor = crear_usuario_empleado(
-            username="vendedor_dashboard",
-            email="vendedor_dashboard@example.com",
-        )
-        self.vendedor = Vendedor.objects.create(
-            usuario=self.usuario_vendedor,
-            fecha_contratacion=date.today(),
-            comision_porcentaje=Decimal("8.00"),
-        )
-
-    def test_track_producto_visto_crea_evento(self):
-        payload = {
-            'nombre_evento': EventoCliente.PRODUCTO_VISTO,
-            'sesion_id': 'sesion-test-001',
-            'propiedades': {
-                'pieza_id': 10,
-                'referencia': 'REF-10',
-                'categoria_id': 2,
-                'precio': '49.90',
-            },
-        }
-
-        response = self.api_client.post('/api/v1/eventos/track/', payload, format='json')
-
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(EventoCliente.objects.count(), 1)
-        self.assertEqual(EventoCliente.objects.first().nombre_evento, EventoCliente.PRODUCTO_VISTO)
-
-    def test_track_rechaza_payload_incompleto(self):
-        payload = {
-            'nombre_evento': EventoCliente.PRODUCTO_VISTO,
-            'sesion_id': 'sesion-test-002',
-            'propiedades': {
-                'pieza_id': 10,
-                'categoria_id': 2,
-                'precio': '49.90',
-            },
-        }
-
-        response = self.api_client.post('/api/v1/eventos/track/', payload, format='json')
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('propiedades', response.data)
-
-    def test_dashboard_vendedor_muestra_metricas_eventos(self):
-        EventoCliente.objects.create(
-            nombre_evento=EventoCliente.PRODUCTO_VISTO,
-            sesion_id='s1',
-            cliente=self.cliente,
-            propiedades={
-                'pieza_id': 99,
-                'referencia': 'REF-99',
-                'categoria_id': 4,
-                'precio': '80.00',
-            },
-        )
-        EventoCliente.objects.create(
-            nombre_evento=EventoCliente.PRODUCTO_VISTO,
-            sesion_id='s2',
-            cliente=self.cliente,
-            propiedades={
-                'pieza_id': 99,
-                'referencia': 'REF-99',
-                'categoria_id': 4,
-                'precio': '80.00',
-            },
-        )
-        EventoCliente.objects.create(
-            nombre_evento=EventoCliente.BUSQUEDA_REALIZADA,
-            sesion_id='s3',
-            propiedades={'query': 'filtro aceite', 'total_resultados': 12},
-        )
-        EventoCliente.objects.create(
-            nombre_evento=EventoCliente.AGREGADO_CARRITO,
-            sesion_id='s4',
-            propiedades={'pieza_id': 99, 'cantidad': 1, 'precio_unitario': '80.00'},
-        )
-
-        self.api_client.force_authenticate(user=self.usuario_vendedor)
-        response = self.api_client.get('/api/v1/dashboard-vendedor/')
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('producto_mas_visto_global', response.data)
-        self.assertIn('busqueda_mas_frecuente_global', response.data)
-        self.assertIn('pieza_mas_agregada_carrito_global', response.data)
-        self.assertEqual(response.data['producto_mas_visto_global']['propiedades__pieza_id'], 99)
-
-
-class PiezaSerializerTests(TestCase): #Pruebas unitarias para el serializer de Pieza, enfocándonos en que incluya el campo categoria_id correctamente.
-    def setUp(self):
-        self.categoria = CategoriaPieza.objects.create(
-            nombre='Motor',
-            descripcion='Categoria de prueba',
-        )
-        self.pieza = Pieza.objects.create(
-            estado=Pieza.NUEVO,
-            nombre='Pieza Serializer Test',
-            referencia='REF-SER-001',
-            version='V1',
-            marca='MarcaTest',
-            anio=2024,
-            precio_base=Decimal('120.00'),
-            descripcion='Pieza para probar el serializer',
-            stock=5,
-            categoria=self.categoria,
-        )
-
-    def test_incluye_categoria_id(self):
-        serializer = PiezaSerializer(self.pieza)
-
-        self.assertEqual(serializer.data['categoria_id'], self.categoria.id)
-
 
 

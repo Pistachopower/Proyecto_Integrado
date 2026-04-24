@@ -25,7 +25,12 @@ class SoloAdminOEmpleado(permissions.BasePermission):
 
 class EsDuenioUsuario(permissions.BasePermission):
     """
-    Sirve para cuando alguien quiere ver/editar su propia cuenta de Login (Usuario).
+        Permiso para operaciones sobre Usuario:
+    - create: solo ADMINISTRADOR.
+    - list: solo EMPLEADO o ADMINISTRADOR.
+    - detalle/edición de objeto:
+      - EMPLEADO/ADMINISTRADOR: acceso total.
+      - resto: solo sobre su propio usuario.
     """
 
     def has_permission(self, request, view):

@@ -24,7 +24,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include('proyecto.api_urls')),
-    path('', include('proyecto.api_urls')),
+    #path('', include('proyecto.api_urls')), #para deploy
 
 
 ]
