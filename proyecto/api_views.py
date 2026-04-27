@@ -4,6 +4,7 @@ from .serializers import *
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
+from django.db import transaction #Para asegurar que la creación de pedidos y líneas de pedido sea atómica
 from django.db.models import Sum, Count, Avg
 from rest_framework import permissions
 from rest_framework import status
@@ -135,7 +136,9 @@ class VendedorViewSet(viewsets.ModelViewSet):
         """
         vendedor = self.get_object()
         foto = request.FILES.get('foto_perfil_vendedor')
-        
+
+        #Si no viene tipo de archivo, o no es de tipo imagen, devolver error
+        #Recuerda que content_type lo envia el frontend al subir el archivo, y debe empezar por "image/" para ser considerado una imagen válida.
         if not foto.content_type or not foto.content_type.startswith('image/'):
             return Response({'error': 'No se envió ninguna imagen.'}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -1009,30 +1012,34 @@ class DevolucionVendedorViewSet(viewsets.ModelViewSet):
                 'estado_actual': devolucion.get_estado_display()
             }, status=400)
 
-        # Aprobar la devolución
-        devolucion.estado = Devolucion.APROBADA
-        devolucion.fecha_aprobacion = date.today()
-        devolucion.save()
+        # Transacción: o se guarda TODO (devolución + stock + línea), o no se guarda NADA.
+        with transaction.atomic():
+            # Aprobar la devolución
+            devolucion.estado = Devolucion.APROBADA
+            devolucion.fecha_aprobacion = date.today()
+            devolucion.save()
 
-        # Restaurar stock
-        pieza = devolucion.linea_pedido.pieza
-        pieza.stock += devolucion.cantidad_devuelta
-        pieza.save()
+            # Descomenta esta línea para forzar un error y comprobar el rollback de la transacción.
+            #raise Exception("Fallo de prueba para rollback")
 
-        # Marcar línea como devuelta si se devolvió todo
-        linea = devolucion.linea_pedido
-        linea.estado = LineaPedido.DEVUELTO
-        linea.save()
+            # Restaurar stock
+            pieza = devolucion.linea_pedido.pieza
+            pieza.stock += devolucion.cantidad_devuelta
+            pieza.save()
 
-
-        total_devuelto = Devolucion.objects.filter(
-            linea_pedido=linea,
-            estado=Devolucion.APROBADA
-        ).aggregate(total=models.Sum('cantidad_devuelta'))['total'] or 0
-
-        if total_devuelto >= linea.cantidad:
+            # Marcar línea como devuelta si se devolvió todo
+            linea = devolucion.linea_pedido
             linea.estado = LineaPedido.DEVUELTO
             linea.save()
+
+            total_devuelto = Devolucion.objects.filter(
+                linea_pedido=linea,
+                estado=Devolucion.APROBADA
+            ).aggregate(total=models.Sum('cantidad_devuelta'))['total'] or 0
+
+            if total_devuelto >= linea.cantidad:
+                linea.estado = LineaPedido.DEVUELTO
+                linea.save()
 
         return Response({
             'message': 'Devolución aprobada correctamente',
@@ -2419,6 +2426,7 @@ class CarritoViewSet(ViewSet):
                 'message': f'"{nombre_pieza}" eliminada del carrito',
                 'total_carrito': str(pedido.total)
             })
+        
         except LineaPedido.DoesNotExist:
             return Response({'error': 'Pieza no encontrada en el carrito'}, status=404)
 
@@ -2542,38 +2550,48 @@ class CarritoViewSet(ViewSet):
         else:
             return Response({'error': 'Debe seleccionar un método de pago'}, status=400)
 
+        # Transacción de compra: evita dejar datos "a medias" si algo falla.
+        with transaction.atomic():
+            # 5. Verificar stock de todas las piezas
+            
+            # Bloqueamos las líneas mientras dura la transacción para evitar que dos compras lean el mismo stock a la vez.
+            #Cuando dos clientes intentan comprar la última unidad de una pieza, el select_for_update hace que uno de los dos espere a que el otro termine la transacción. 
+            # Así evitamos que ambos lean el mismo stock disponible y puedan comprar más unidades de las que hay.
+            lineas = pedido.lineas_pedido.select_related('pieza').select_for_update().all()
+            
+            for linea in lineas:
+                if linea.pieza.stock < linea.cantidad:
+                    return Response({
+                        'error': f'Stock insuficiente para "{linea.pieza.nombre}". Disponible: {linea.pieza.stock}'
+                    }, status=400)
 
-        # 5. Verificar stock de todas las piezas
-        for linea in pedido.lineas_pedido.all():
-            if linea.pieza.stock < linea.cantidad:
-                return Response({
-                    'error': f'Stock insuficiente para "{linea.pieza.nombre}". Disponible: {linea.pieza.stock}'
-                }, status=400)
+            # 6. Descontar stock
+            for linea in lineas:
+                linea.pieza.stock -= linea.cantidad
+                linea.pieza.save()
 
-        # 6. Descontar stock
-        for linea in pedido.lineas_pedido.all():
-            linea.pieza.stock -= linea.cantidad
-            linea.pieza.save()
+            # 7. Actualizar pedido
+            pedido.estado = Pedido.PENDIENTE
+            pedido.fecha_pedido = date.today()
+            pedido.direccion_envio = direccion
 
-        # 7. Actualizar pedido
-        pedido.estado = Pedido.PENDIENTE
-        pedido.fecha_pedido = date.today()
-        pedido.direccion_envio = direccion
-        
-        # Asignar vendedor por carga de trabajo si no tiene uno
-        if not pedido.vendedor:
-            self.asignar_vendedor_por_carga(pedido)
-        pedido.save()
+            # Asignar vendedor por carga de trabajo si no tiene uno
+            if not pedido.vendedor:
+                self.asignar_vendedor_por_carga(pedido)
+            pedido.save()
 
-        # 8. Crear registro de pago
-        Pago.objects.create(
-            pedido=pedido,
-            metodo_pago=metodo_pago,
-            fecha_pago=date.today(),
-            monto=pedido.total,
-            estado=Pago.PENDIENTE,
-            numero_transaccion=str(uuid.uuid4())[:20]
-        )
+            # 8. Crear registro de pago
+            # Descomenta esta línea para forzar un error y comprobar el rollback de la transacción.
+            #raise Exception("Fallo de prueba para rollback")
+            
+            Pago.objects.create(
+                pedido=pedido,
+                metodo_pago=metodo_pago,
+                fecha_pago=date.today(),
+                monto=pedido.total,
+                estado=Pago.PENDIENTE,
+                numero_transaccion=str(uuid.uuid4())[:20]
+            )
 
         return Response({
             'message': 'Compra realizada con éxito',
