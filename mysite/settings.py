@@ -208,11 +208,11 @@ PAYPAL_CLIENT_SECRET = os.getenv('PAYPAL_CLIENT_SECRET')
 PAYPAL_MODE = os.getenv('PAYPAL_MODE', 'sandbox')  # 'sandbox' 
 
 # URLs de retorno después del pago (Para VUE)
-#PAYPAL_RETURN_URL = os.getenv('PAYPAL_RETURN_URL', 'http://localhost:8080/pago/exito')
-#PAYPAL_CANCEL_URL = os.getenv('PAYPAL_CANCEL_URL', 'http://localhost:8080/pago/cancelado')
+PAYPAL_RETURN_URL = os.getenv('PAYPAL_RETURN_URL', 'http://localhost:8080/pago/exito')
+PAYPAL_CANCEL_URL = os.getenv('PAYPAL_CANCEL_URL', 'http://localhost:8080/pago/cancelado')
 
-PAYPAL_RETURN_URL = os.getenv('PAYPAL_RETURN_URL', 'http://3.225.154.212/pago/exito')
-PAYPAL_CANCEL_URL = os.getenv('PAYPAL_CANCEL_URL', 'http://3.225.154.212/pago/cancelado')
+#PAYPAL_RETURN_URL = os.getenv('PAYPAL_RETURN_URL', 'http://3.225.154.212/pago/exito')
+#PAYPAL_CANCEL_URL = os.getenv('PAYPAL_CANCEL_URL', 'http://3.225.154.212/pago/cancelado')
 
 
 
