@@ -513,7 +513,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
         GET /api/v1/pedido/{id}/factura_cliente/
         """
         #Obtenemos el id del pedido. Obtiene el objeto pedido
-        pedido = self.get_object()
+        pedido = self.get_object() #Recuerda que este método llama a get_queryset, toma pk desde la URL (self.kwargs["pk"]), aplica filtro por pk (por defecto lookup_field = pk), devuelve ese objeto o 404
 
         if pedido.estado not in [Pedido.PAGADO, Pedido.ENVIADO, Pedido.ENTREGADO]:
             return Response({'error': 'La factura solo está disponible para pedidos pagados.'}, status=403)
