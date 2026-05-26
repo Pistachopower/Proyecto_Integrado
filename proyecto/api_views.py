@@ -1540,6 +1540,8 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
                 #build_absolute_uri(...) la convierte en URL completa, por ejemplo:
                 #http://localhost:8000/media/imagenes_piezas/foto.jpg
                 imagen_principal = request.build_absolute_uri(imagen_obj.url_imagen.url)
+            
+            #Si no encuentro imagen en ImagenPieza, usa la imagen directa de la pieza
             elif pieza.imagen:
                 imagen_principal = request.build_absolute_uri(pieza.imagen.url)
             
