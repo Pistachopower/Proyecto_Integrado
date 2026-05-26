@@ -1536,6 +1536,9 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
             # Buscar imagen principal
             imagen_obj = ImagenPieza.objects.filter(pieza=pieza).first()
             if imagen_obj and imagen_obj.url_imagen:
+                #imagen_obj.url_imagen.url da la ruta relativa, por ejemplo /media/imagenes_piezas/foto.jpg.
+                #build_absolute_uri(...) la convierte en URL completa, por ejemplo:
+                #http://localhost:8000/media/imagenes_piezas/foto.jpg
                 imagen_principal = request.build_absolute_uri(imagen_obj.url_imagen.url)
             elif pieza.imagen:
                 imagen_principal = request.build_absolute_uri(pieza.imagen.url)
