@@ -221,7 +221,7 @@ class PiezaViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def otros_filtros(self, request):
         """
-        Filtra piezas según varios criterios:
+        Filtra piezas según varios criterios (Componente buscador):
 
         - estado: Filtra por uno o varios estados de la pieza (por número).
         - busqueda: Filtra por nombre de la pieza (texto parcial).
