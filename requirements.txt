@@ -1,34 +1,44 @@
-Django~=5.1.1
-djangorestframework~=3.14.0
-django-cors-headers~=4.3.1
-django-filter~=24.3 #crear filtros en la web
-pillow~=12.0.0 #imagen
-djangorestframework-simplejwt~=5.4.0 #autenticacion con tokens  
-psycopg2-binary~=2.9.9 #conexion con postgresql 
-Faker~=18.9.0 #poblar base de datos con datos falsos
-python-dotenv~=1.2.1 #manejo de variables de entorno
-
-#PayPal SDK para pagos. Comando de instalación con todo: pip install -r requirements.txt
-paypalrestsdk~=1.13.3
-
-#autenticacion con OAuth2
-django-oauth-toolkit~=3.0.1 
-
-#Para levantar el servidor en produccion
+asgiref==3.11.0
+certifi==2025.11.12
+cffi==2.0.0
+chardet==5.2.0
+charset-normalizer==3.4.4
+cryptography==46.0.3
+defusedxml==0.7.1
+dj-database-url==3.1.2
+Django==5.1.15
+django-cors-headers==4.3.1
+django-filter==24.3
+django-oauth-toolkit==3.0.1
+djangorestframework==3.14.0
+djangorestframework_simplejwt==5.4.0
+et_xmlfile==2.0.0
+Faker==18.9.1
 gunicorn==21.2.0
-
-#Libreria para generar PDF
-reportlab~=4.2.0
-
-
-# Soporte para carga masiva de piezas (csv, xlsx, ods)
-pandas~=2.2.1
-
-pyexcel-ods~=0.2.2
-
-openpyxl~=3.1.2
-
-odfpy~=1.4.1
-
-
-
+idna==3.11
+jwcrypto==1.5.6
+lml==0.2.0
+numpy==2.4.2
+oauthlib==3.3.1
+odfpy==1.4.1
+openpyxl==3.1.5
+packaging==26.0
+pandas==2.2.3
+paypalrestsdk==1.13.3
+pillow==12.0.0
+psycopg2-binary==2.9.11
+pycparser==2.23
+pyexcel-io==0.6.7
+pyexcel-ods==0.2.2
+PyJWT==2.10.1
+pyOpenSSL==25.3.0
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.1
+pytz==2025.2
+reportlab==4.2.5
+requests==2.32.5
+six==1.17.0
+sqlparse==0.5.5
+typing_extensions==4.15.0
+tzdata==2025.3
+urllib3==2.6.2

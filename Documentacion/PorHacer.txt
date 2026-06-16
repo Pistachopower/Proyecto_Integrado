@@ -7,27 +7,16 @@ Controlar que sólo se pueda subir foto en el perfil de empleado y no otros docu
 
 
 
-HOY Importante
-Pendiente volver a analizar devolucion
-En pedido indica que tengo una pieza que está en el carrito, pero en el carrito no aparece reflejada (frontend)
-
-Volver a revisar el modelo linea pedido porque tiene estados que no se van a utilizar
 
 
 
 Pendiente
-frontend se mantenga el corazon
-cuenta bancaria mostrar select de euros, etc
-Controlar que si el producto no está disponible lo ignore en el fronted
-debo actualizar o cerrar el modal de devolucion 
-mejorar en el cambiar cambiar contraseña los errores claramente
-Cuando hagas el bulk masivo indicar que las piezas ya están creadas
-En la foto de perfil controlar capturar los errores del backend
-En las piezas permitir que se subir más imágenes
+Hay un fallo cuando el cliente selecciona por ejemplo, paypal en el frontend y 
+da a pagar sin seleccionar la opcion de paypal y se haga el pago sin problema. No hay
+validacion.
 
+Al entrar en la url en el perfil del vendedor, el cliente puede ver  todos los Clientes
 
-backend: cuando el cliente cancela el pago en paypal, se elimine el pedido 
-controlar que cuando en carrito que cuando no hay descuento mostrar algo que no hay desucentos disponible
 
 
 

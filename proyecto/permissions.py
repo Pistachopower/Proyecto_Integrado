@@ -27,7 +27,7 @@ class EsDuenioUsuario(permissions.BasePermission):
     """
         Permiso para operaciones sobre Usuario:
     - create: solo ADMINISTRADOR.
-    - list: solo EMPLEADO o ADMINISTRADOR.
+    - list: solo EMPLEADO o ADMINISTRADOR.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     - detalle/edición de objeto:
       - EMPLEADO/ADMINISTRADOR: acceso total.
       - resto: solo sobre su propio usuario.

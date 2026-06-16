@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-rneen%%$g57ob1h#ll+t%4r+yahrlyuaw@8fxuvc!@5^e7hf$q'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', '34.238.73.57','23.23.32.46', 'ec2-44-221-235-149.compute-1.amazonaws.com', '44.221.235.149']
@@ -123,15 +123,27 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 #}
 
 #Nueva configuración para PostgreSQL
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('POSTGRES_NAME'),
+#         'USER': os.getenv('POSTGRES_USER'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+#         'HOST': os.getenv('POSTGRES_HOST'),
+#         'PORT': os.getenv('POSTGRES_PORT'), 
+#     }
+# }
+
+
+#Para deploy en Railway
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_NAME'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'), 
-    }
+    'default': dj_database_url.config(
+        default=os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 
@@ -219,15 +231,27 @@ PAYPAL_CANCEL_URL = os.getenv('PAYPAL_CANCEL_URL', 'http://localhost:8080/pago/c
 # ============================================================
 # CONFIGURACIÓN DE EMAIL (Para recuperación de contraseña)
 # ============================================================
+
+# Email de envío por defecto
 DEFAULT_FROM_EMAIL = 'no-reply@motorpartexpress.com'
 
+# Motor de envío (SMTP de Gmail para producción)
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' #Para produccion
+
+# Servidor SMTP de Gmail
+
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' #Prueba email desde consola para prueba 
+
+# Servidor SMTP de Gmail
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
+
+# Credenciales (leídas del .env)
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS = True
+
+# Configuración TLS (encriptación de la conexión)
+EMAIL_USE_TLS = True #se usa para cifrar la conexión entre tu aplicación y el servidor de correo.
 EMAIL_USE_SSL = False
 
 

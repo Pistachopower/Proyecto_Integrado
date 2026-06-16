@@ -292,6 +292,11 @@ class PiezaViewSet(viewsets.ModelViewSet):
         errores_creacion = []
         
         piezas_creadas = []
+
+        print("ANTES DEL BUCLE")
+        print("Filas y columnas:", df.shape)
+        print("Columnas:", list(df.columns))
+        print(df.head())
         
         for idx, row in df.iterrows():
             try:
@@ -317,9 +322,17 @@ class PiezaViewSet(viewsets.ModelViewSet):
                     categoria=categoria_obj
                 )
                 piezas_creadas.append(pieza.id)
+
+                print(f"Iteración {idx}")
+                print(row)
                 
             except Exception as e:
                 errores_creacion.append(f'Fila {idx+2}: {str(e)}')
+
+        print("DESPUÉS DEL BUCLE")
+        print("Piezas creadas:", piezas_creadas)
+        print("Errores:", errores_creacion)
+        print("Filas y columnas:", df.shape)
 
         if errores_creacion:
             return Response({'detalle': 'Error al crear algunas piezas.', 'errores': errores_creacion}, status=status.HTTP_400_BAD_REQUEST)
@@ -527,6 +540,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
         #Aquí se crea un objeto canvas de ReportLab, que permite dibujar y generar el contenido del PDF. 
         # Se le indica que el PDF se escribirá directamente en la respuesta HTTP (response) y que el 
         # tamaño de la página será A4
+    
+
         p = canvas.Canvas(response, pagesize=A4)
         
         #Definimos el tamaño de la página en formato A4
@@ -1751,6 +1766,7 @@ class ListaDeseosViewSet(viewsets.ModelViewSet):
                 item.delete()
 
         # Calcula el total del pedido sumando el precio de cada línea de pedido . El resultado se asigna al campo total del pedido
+        #Calculamos todos los productos de la lineapedido y agregamos en pedido el total de todos los productos
         pedido.total = sum(l.cantidad * l.precio_unitario for l in pedido.lineas_pedido.all()) #Expresión generadora que itera sobre todas las líneas de pedido del carrito, multiplicando la cantidad por el precio unitario de cada línea y sumando esos valores para obtener el total del pedido.
         pedido.save()
 
