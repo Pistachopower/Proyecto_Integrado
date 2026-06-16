@@ -66,6 +66,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware'
 
 ]
 
@@ -255,6 +256,11 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 # Configuración TLS (encriptación de la conexión)
 EMAIL_USE_TLS = True #se usa para cifrar la conexión entre tu aplicación y el servidor de correo.
 EMAIL_USE_SSL = False
+
+
+#Para que Django sirva los archivos estáticos de manera eficiente en producción, especialmente cuando se utiliza un servidor web como Nginx o Apache.
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 
 
