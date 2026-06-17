@@ -31,7 +31,7 @@ DEBUG = False
 
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', '34.238.73.57','23.23.32.46', 'ec2-44-221-235-149.compute-1.amazonaws.com', '44.221.235.149', 
-                 'proyectointegrado-production-ec47.up.railway.app']
+                 'proyectointegrado-production-9570.up.railway.app']
 
 
 
@@ -77,7 +77,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://44.221.235.149', # Backend (por si accedes desde navegador a la API)
     'http://localhost:8080',
     'http://127.0.0.1:8081',
-    'https://proyectointegrado-production-ec47.up.railway.app'
+    'https://proyectointegrado-production-9570.up.railway.app/'
 ]
 
 # ¡ESTO ES VITAL! Permite que las cookies viajen entre el puertos
@@ -90,7 +90,7 @@ CSRF_TRUSTED_ORIGINS = [
     #'http://34.238.73.57',
     'http://localhost:8080',
     'http://127.0.0.1:8081',
-    'https://proyectointegrado-production-ec47.up.railway.app'
+    'https://proyectointegrado-production-9570.up.railway.app/'
 ]
 
 
