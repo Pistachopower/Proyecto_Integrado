@@ -31,7 +31,7 @@ DEBUG = False
 
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost', '34.238.73.57','23.23.32.46', 'ec2-44-221-235-149.compute-1.amazonaws.com', '44.221.235.149', 
-                 'proyectointegrado-production-ec47.up.railway.app']
+                 'https://proyectointegrado-production-ec47.up.railway.app']
 
 
 
